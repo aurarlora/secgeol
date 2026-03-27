@@ -1,0 +1,12 @@
+[general]
+name=SecGeol
+description=Herramienta para secciones y perfiles geológicos
+version=0.1
+qgisMinimumVersion=3.0
+qgisMaximumVersion=4.0
+author=Aura Ramos Lora
+email=ralaua@correo.com
+requires_qt=5;6
+
+[advanced]
+class_name=SecGeol
