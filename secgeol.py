@@ -1,12 +1,20 @@
 import os
+import tempfile
+from datetime import datetime
+from .secgeol_dialog import SecGeolDialog
 
-from qgis.PyQt.QtCore import QCoreApplication
+from qgis.PyQt.QtCore import QCoreApplication, QVariant
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
+from qgis.core import ( QgsProject, 
+                        QgsWkbTypes,
+                        QgsVectorFileWriter,
+                        QgsVectorLayer,
+                        QgsFields,
+                        QgsField,
+                        QgsCoordinateReferenceSystem
+                       )
 
-from qgis.core import QgsProject, QgsWkbTypes
-
-from .secgeol_dialog import SecGeolDialog
 
 
 class SecGeol:
@@ -122,12 +130,14 @@ class SecGeol:
             )
             return
 
+        """
         if not salida:
             self.iface.messageBar().pushWarning(
                 self.tr("SecGeol"),
-                self.tr("Select an output file.")
+                self.tr("Select an output file. jeje")
             )
             return
+        """
 
         # -------------------------
         # INFORMACIÓN DE PRUEBA
@@ -145,10 +155,29 @@ class SecGeol:
         ]
 
         print("\n=== SecGeol PARAMETERS ===")
+
+        
         for r in resumen:
             print(r)
 
-        self.iface.messageBar().pushInfo(
-            self.tr("SecGeol"),
-            self.tr("Parameters read correctly. See Python console.")
-        )
+        
+        try:
+            self.dlg.inicializar_workspace()
+            layer = self.dlg.preparar_seccion_trabajo()
+            self.dlg.generar_puntos_perfil()   # LLama a profile
+
+            self.iface.messageBar().pushInfo(
+                self.tr("SecGeol"),
+                self.tr("Section workspace created successfully.")
+            )
+
+            self.dlg.accept()
+
+        except Exception as e:
+            self.iface.messageBar().pushWarning(
+                self.tr("SecGeol"),
+                str(e)
+            )
+            print(f"Error en SecGeol: {e}")
+
+        

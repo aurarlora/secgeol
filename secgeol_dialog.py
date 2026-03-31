@@ -4,7 +4,12 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDialog, QSplitter
 from qgis.PyQt.QtCore import QEvent
 from qgis.PyQt.QtCore import QEvent, QUrl
-from qgis.core import QgsMapLayerProxyModel
+from qgis.core import QgsMapLayerProxyModel, QgsProject
+
+from .core.workspace import WorkspaceManager
+from .core.section import SectionManager
+from .core.profile import ProfileManager
+
 
 try:
     EVENT_ENTER = 10
@@ -25,10 +30,24 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         super().__init__(parent)
         self.setupUi(self)
 
+        self.section_manager = SectionManager()
+        self.workspace_manager = WorkspaceManager()
+        self.gpkg_path = None
+
+
+        # --------  Ejecuta herramienta ---
+        self.buttonBox.accepted.connect(self.ejecutar_proceso)
+        self.buttonBox.rejected.connect(self.reject)
+
         # -----------------------------
         # SPLITTER DE AYUDA / CONTROLES
         # -----------------------------
         self.splitter_main = self.findChild(QSplitter, "splitter")
+
+        # --------  Extraer datos de elevación ---
+        self.profile_manager = ProfileManager()
+
+
 
         if self.splitter_main:
             self.splitter_main.setSizes([300, 100])
@@ -272,3 +291,157 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             self.actualizar_ayuda_tab()
             
         return super().eventFilter(obj, event)
+    
+    # ---------------------------------
+    # Conecta la función de la sección
+    # ---------------------------------
+
+    def preparar_seccion_trabajo(self):
+        print("A: entrar a preparar_seccion_trabajo")
+
+        if not self.gpkg_path:
+            raise Exception("Primero debes inicializar el workspace.")
+
+        self.section_manager.set_gpkg_path(self.gpkg_path)
+        print("B: gpkg asignado")
+
+        invertida = self.checkInvSec.isChecked()
+        source_layer = self.MapLayerSec.currentLayer()
+        print(f"C: capa origen = {source_layer.name() if source_layer else 'None'}")
+
+        if source_layer:
+            dem_layer = self.MapLayerDEM.currentLayer()
+            if dem_layer is None:
+                raise Exception("No se ha seleccionado un DEM.")
+
+            target_crs = dem_layer.crs()
+
+            temp_layer = self.section_manager.prepare_section_layer_from_user(
+                source_layer,
+                target_crs=target_crs,
+                invertida=invertida
+)
+            print("D: capa temporal creada")
+
+            self.section_manager.save_layer_to_gpkg(temp_layer, "sec_line_work")
+            print("E: capa guardada en gpkg")
+
+            layer = self.section_manager.load_gpkg_layer("sec_line_work")
+            print("F: capa cargada desde gpkg")
+
+           
+            QgsProject.instance().addMapLayer(layer)
+            print("G: capa agregada al mapa")
+
+            return layer
+
+        raise Exception("Aún no está implementada la opción de dibujar la sección.")
+    
+
+
+      
+    
+    # ---------------------------------
+    # Inicializa workspace
+    # ---------------------------------
+
+    def inicializar_workspace(self):
+        dem_layer = self.MapLayerDEM.currentLayer()
+        if dem_layer is None:
+            raise Exception("No se ha seleccionado un DEM.")
+
+        crs_authid = dem_layer.crs().authid()
+        self.gpkg_path = self.workspace_manager.create_base_geopackage(crs_authid)
+        self.section_manager.set_gpkg_path(self.gpkg_path)
+
+        print(f"GPKG creado: {self.gpkg_path}")
+
+
+    # ---------------------------------
+    # Prueba
+    # ---------------------------------
+
+    def probar_preparacion_seccion(self):
+        self.inicializar_workspace()
+        layer = self.preparar_seccion_trabajo()
+        print("Sección de trabajo preparada:", layer)
+
+
+    # ---------------------------------
+    # Entra a secprofile
+    # --------------------------------- 
+
+
+    def generar_puntos_perfil(self):
+        print("H: entrar a generar_puntos_perfil")
+
+        if not self.gpkg_path:
+            raise Exception("Primero debes inicializar el workspace.")
+
+        dem_layer = self.MapLayerDEM.currentLayer()
+        if dem_layer is None:
+            raise Exception("No se ha seleccionado un DEM.")
+
+        ve = self.obtener_ve()
+        print(f"VE: {ve}")
+
+        self.profile_manager.set_gpkg_path(self.gpkg_path)
+
+        section_layer = self.section_manager.load_gpkg_layer("sec_line_work")
+        print("I: sec_line_work cargada")
+
+        points_layer = self.profile_manager.build_profile_points_layer(
+            section_layer,
+            dem_layer,
+            ve=ve
+        )
+        print("J: capa temporal de puntos creada")
+
+        self.profile_manager.save_points_to_gpkg(points_layer, "sec_points_profile")
+        print("K: puntos guardados en gpkg")
+
+        points_gpkg = self.profile_manager.load_gpkg_layer("sec_points_profile")
+        QgsProject.instance().addMapLayer(points_gpkg)
+        print("L: puntos agregados al mapa")
+
+        return points_gpkg
+
+
+
+    # ---------------------------------
+    # ACEPTAR
+    # ---------------------------------
+    
+    def ejecutar_proceso(self):
+        try:
+            print("=== SecGeol PARAMETERS ===")
+            print(f"DEM: {self.MapLayerDEM.currentLayer().name() if self.MapLayerDEM.currentLayer() else 'None'}")
+            print(f"Section: {self.MapLayerSec.currentLayer().name() if self.MapLayerSec.currentLayer() else 'None'}")
+            print(f"Invert section: {self.checkInvSec.isChecked()}")
+            print(f"Geology: {self.MapLayerGeo.currentLayer().name() if self.MapLayerGeo.currentLayer() else 'None'}")
+            print(f"Structures: {self.MapLayerEst.currentLayer().name() if self.MapLayerEst.currentLayer() else 'None'}")
+            print(f"Box (m): {self.caja.value()}")
+            print(f"Create axes: {self.ejesXY.isChecked()}")
+            print(f"Output: {self.estSHP.filePath()}")
+
+            self.inicializar_workspace()
+            self.preparar_seccion_trabajo()
+
+            print("Proceso ejecutado correctamente")
+
+            ##self.accept()   # 👈 esto cierra la ventana
+
+        except Exception as e:
+            print(f"Error: {e}")
+
+    # ---------------------------------
+    # Exageración vrtical
+    # ---------------------------------
+
+    def obtener_ve(self):
+        ve = self.doubleSpinBox_ve.value()
+        if ve <= 0:
+            ve = 1.0
+        return ve
+    
+

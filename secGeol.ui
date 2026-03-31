@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>698</width>
-    <height>440</height>
+    <height>447</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>9</x>
      <y>9</y>
      <width>431</width>
-     <height>422</height>
+     <height>431</height>
     </rect>
    </property>
    <widget class="QTabWidget" name="tabWidget">
@@ -28,7 +28,7 @@
       <x>10</x>
       <y>10</y>
       <width>411</width>
-      <height>401</height>
+      <height>411</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -55,8 +55,8 @@
      <widget class="QLabel" name="label_4">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>280</y>
+        <x>20</x>
+        <y>300</y>
         <width>121</width>
         <height>20</height>
        </rect>
@@ -69,7 +69,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>340</y>
+        <y>350</y>
         <width>161</width>
         <height>32</height>
        </rect>
@@ -152,7 +152,7 @@
         <x>10</x>
         <y>130</y>
         <width>381</width>
-        <height>141</height>
+        <height>161</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -164,7 +164,7 @@
       <widget class="QDoubleSpinBox" name="doubleSpinBox">
        <property name="geometry">
         <rect>
-         <x>130</x>
+         <x>150</x>
          <y>90</y>
          <width>62</width>
          <height>22</height>
@@ -187,7 +187,7 @@
       <widget class="QCheckBox" name="checkEjes">
        <property name="geometry">
         <rect>
-         <x>260</x>
+         <x>270</x>
          <y>90</y>
          <width>101</width>
          <height>20</height>
@@ -243,12 +243,35 @@
         </rect>
        </property>
       </widget>
+      <widget class="QLabel" name="label_5">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>130</y>
+         <width>121</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Exageración vertical</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_ve">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>130</y>
+         <width>62</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
      <widget class="QgsFileWidget" name="fileWidgetPerfil">
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>310</y>
+        <y>320</y>
         <width>361</width>
         <height>27</height>
        </rect>
