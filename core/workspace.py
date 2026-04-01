@@ -65,15 +65,6 @@ class WorkspaceManager:
 
     def create_base_geopackage(self, crs_authid):
         gpkg_path = self.create_workspace_path()
-
-        self.create_layer(
-            gpkg_path, "sec_line_work", QgsWkbTypes.LineString, crs_authid, fields_section_internal()
-        )
-
-        self.create_layer(
-            gpkg_path, "sec_points_profile", QgsWkbTypes.Point, crs_authid, fields_profile_points()
-        )
-
         self.create_layer(
             gpkg_path, "sec_draw_lines", QgsWkbTypes.LineString, crs_authid, fields_draw_lines()
         )

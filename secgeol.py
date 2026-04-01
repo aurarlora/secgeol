@@ -164,7 +164,7 @@ class SecGeol:
         try:
             self.dlg.inicializar_workspace()
             layer = self.dlg.preparar_seccion_trabajo()
-            self.dlg.generar_puntos_perfil()   # LLama a profile
+            self.dlg.generar_perfil()   # LLama a profile
 
             self.iface.messageBar().pushInfo(
                 self.tr("SecGeol"),

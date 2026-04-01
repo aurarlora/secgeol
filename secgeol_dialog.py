@@ -156,6 +156,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.doubleSpinBox.setMinimum(0.0)
         self.doubleSpinBox.setSingleStep(10.0)
         self.doubleSpinBox.setSuffix(" m")
+        self.doubleSpinBox.setValue(100.0)
 
         # -----------------------------
         # EVENT FILTERS PARA AYUDA
@@ -299,43 +300,30 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     def preparar_seccion_trabajo(self):
         print("A: entrar a preparar_seccion_trabajo")
 
-        if not self.gpkg_path:
-            raise Exception("Primero debes inicializar el workspace.")
-
-        self.section_manager.set_gpkg_path(self.gpkg_path)
-        print("B: gpkg asignado")
-
         invertida = self.checkInvSec.isChecked()
         source_layer = self.MapLayerSec.currentLayer()
         print(f"C: capa origen = {source_layer.name() if source_layer else 'None'}")
 
-        if source_layer:
-            dem_layer = self.MapLayerDEM.currentLayer()
-            if dem_layer is None:
-                raise Exception("No se ha seleccionado un DEM.")
+        if source_layer is None:
+            raise Exception("No se ha seleccionado una capa de sección.")
 
-            target_crs = dem_layer.crs()
+        dem_layer = self.MapLayerDEM.currentLayer()
+        if dem_layer is None:
+            raise Exception("No se ha seleccionado un DEM.")
 
-            temp_layer = self.section_manager.prepare_section_layer_from_user(
-                source_layer,
-                target_crs=target_crs,
-                invertida=invertida
-)
-            print("D: capa temporal creada")
+        target_crs = dem_layer.crs()
 
-            self.section_manager.save_layer_to_gpkg(temp_layer, "sec_line_work")
-            print("E: capa guardada en gpkg")
+        temp_layer = self.section_manager.prepare_section_layer_from_user(
+            source_layer,
+            target_crs=target_crs,
+            invertida=invertida
+        )
+        print("D: capa temporal creada")
 
-            layer = self.section_manager.load_gpkg_layer("sec_line_work")
-            print("F: capa cargada desde gpkg")
+        if temp_layer is None or not temp_layer.isValid():
+            raise Exception("No fue posible preparar la sección de trabajo.")
 
-           
-            QgsProject.instance().addMapLayer(layer)
-            print("G: capa agregada al mapa")
-
-            return layer
-
-        raise Exception("Aún no está implementada la opción de dibujar la sección.")
+        return temp_layer
     
 
 
@@ -372,39 +360,33 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     # --------------------------------- 
 
 
-    def generar_puntos_perfil(self):
-        print("H: entrar a generar_puntos_perfil")
-
-        if not self.gpkg_path:
-            raise Exception("Primero debes inicializar el workspace.")
+    def generar_perfil(self):
+        print("H: entrar a generar_perfil")
 
         dem_layer = self.MapLayerDEM.currentLayer()
         if dem_layer is None:
             raise Exception("No se ha seleccionado un DEM.")
 
-        ve = self.obtener_ve()
-        print(f"VE: {ve}")
+        # Preparar sección temporal en el CRS del DEM
+        section_layer = self.preparar_seccion_trabajo()
+        print("I: sección temporal preparada")
 
-        self.profile_manager.set_gpkg_path(self.gpkg_path)
+        if section_layer is None or not section_layer.isValid():
+            raise Exception("No fue posible preparar la sección de trabajo.")
 
-        section_layer = self.section_manager.load_gpkg_layer("sec_line_work")
-        print("I: sec_line_work cargada")
+        # Metros adicionales de caja
+        caja_m = self.obtener_caja_m()
+        print(f"J: caja_m = {caja_m}")
 
-        points_layer = self.profile_manager.build_profile_points_layer(
-            section_layer,
-            dem_layer,
-            ve=ve
+        perfil_layer = self.profile_manager.build_profile_box_layer(
+            section_layer=section_layer,
+            dem_layer=dem_layer,
+            extra_depth=caja_m,
+            layer_name="Perfil_topografico"
         )
-        print("J: capa temporal de puntos creada")
+        print("K: capa de perfil creada")
 
-        self.profile_manager.save_points_to_gpkg(points_layer, "sec_points_profile")
-        print("K: puntos guardados en gpkg")
-
-        points_gpkg = self.profile_manager.load_gpkg_layer("sec_points_profile")
-        QgsProject.instance().addMapLayer(points_gpkg)
-        print("L: puntos agregados al mapa")
-
-        return points_gpkg
+        return perfil_layer
 
 
 
@@ -434,14 +416,14 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         except Exception as e:
             print(f"Error: {e}")
 
-    # ---------------------------------
-    # Exageración vrtical
-    # ---------------------------------
 
-    def obtener_ve(self):
-        ve = self.doubleSpinBox_ve.value()
-        if ve <= 0:
-            ve = 1.0
-        return ve
-    
+    # ---------------------------------
+    # Valor de caja en metros
+    # ---------------------------------   
+
+    def obtener_caja_m(self):
+        caja_m = self.doubleSpinBox.value()
+        if caja_m <= 0:
+            caja_m = 100.0
+        return caja_m
 

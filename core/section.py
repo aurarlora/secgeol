@@ -198,7 +198,7 @@ class SectionManager:
         source_crs = source_layer.crs()
         crs_authid = target_crs.authid()
 
-        temp_layer = self._create_memory_layer("sec_line_work", crs_authid, merged_fields)
+        temp_layer = self._create_memory_layer("seccion_temp", crs_authid, merged_fields)
         provider = temp_layer.dataProvider()
 
         features_to_add = []
@@ -227,71 +227,28 @@ class SectionManager:
         source_feature: QgsFeature,
         crs_authid: str,
         invertida=False
-    ) -> QgsVectorLayer:
+        ) -> QgsVectorLayer:
 
         if source_feature is None:
             raise Exception("No se proporcionó una sección dibujada.")
 
         merged_fields = fields_section_internal()
 
-        temp_layer = self._create_memory_layer("sec_line_work", crs_authid, merged_fields)
+        temp_layer = self._create_memory_layer("seccion_temp", crs_authid, merged_fields)
         provider = temp_layer.dataProvider()
 
         new_feat = self._copy_feature_with_fields(
-        source_feature,
-        merged_fields,
-        invertida=invertida,
-        origen="digitalizada",
-        source_crs=None,
-        target_crs=None
-)
+            source_feature,
+            merged_fields,
+            invertida=invertida,
+            origen="digitalizada",
+            source_crs=None,
+            target_crs=None
+        )
 
         provider.addFeatures([new_feat])
         temp_layer.updateExtents()
 
         return temp_layer
 
-    # ---------------------------------
-    #   Guarda la capa en el GeoPackage.
-    # --------------------------------- 
-
-    def save_layer_to_gpkg(self, layer: QgsVectorLayer, layer_name="sec_line_work"):
-
-        if not self.gpkg_path:
-            raise Exception("No se ha definido la ruta del GeoPackage.")
-
-        options = QgsVectorFileWriter.SaveVectorOptions()
-        options.driverName = "GPKG"
-        options.layerName = layer_name
-        options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
-
-        writer_result = QgsVectorFileWriter.writeAsVectorFormatV3(
-            layer,
-            self.gpkg_path,
-            QgsProject.instance().transformContext(),
-            options
-        )
-
-        result = writer_result[0]
-
-        error_message = writer_result[1] if len(writer_result) > 1 else ""
-
-        if result != QgsVectorFileWriter.NoError:
-            raise Exception(f"Error al guardar '{layer_name}' en el GPKG: {error_message}")
-    
-    # ---------------------------------
-    #   Carga una capa desde el GPKG.
-    # --------------------------------- 
-
-    def load_gpkg_layer(self, layer_name="sec_line_work") -> QgsVectorLayer:
-
-        if not self.gpkg_path:
-            raise Exception("No se ha definido la ruta del GeoPackage.")
-
-        uri = f"{self.gpkg_path}|layername={layer_name}"
-        layer = QgsVectorLayer(uri, layer_name, "ogr")
-
-        if not layer.isValid():
-            raise Exception(f"No se pudo cargar la capa '{layer_name}' desde el GPKG.")
-
-        return layer
+   

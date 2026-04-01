@@ -4,11 +4,12 @@ from qgis.core import (
     QgsPointXY,
     QgsProject,
     QgsRasterLayer,
+    QgsField,
     QgsVectorFileWriter,
     QgsVectorLayer
 )
 
-
+from qgis.PyQt.QtCore import QVariant
 
 class ProfileManager:
     def __init__(self, gpkg_path=None):
@@ -71,9 +72,9 @@ class ProfileManager:
         return line_geom.densifyByDistance(distance)
      
     # ---------------------------------
-    #   Genera puntos del perfil a partir de los vértices de una línea densificada. X = distancia acumulada  Y = elevación * ve
+    #   Genera puntos del perfil a partir de los vértices de una línea densificada. X = distancia acumulada  
     # --------------------------------- 
-    def _generate_profile_points_from_vertices(self, line_geom: QgsGeometry, dem_layer: QgsRasterLayer, ve: float):
+    def _generate_profile_points_from_vertices(self, line_geom: QgsGeometry, dem_layer: QgsRasterLayer):
         if line_geom is None or line_geom.isEmpty():
             raise Exception("La geometría de la sección está vacía.")
 
@@ -96,16 +97,16 @@ class ProfileManager:
             if elev is None:
                 elev = 0.0
 
-            perfil_geom = QgsGeometry.fromPointXY(QgsPointXY(dist_acum, elev * ve))
+            perfil_geom = QgsGeometry.fromPointXY(QgsPointXY(dist_acum, elev))
 
             feat = QgsFeature()
             feat.setGeometry(perfil_geom)
             feat.setAttributes([
-                pt_id,       # pt_id
-                dist_acum,   # dist_m
-                elev,        # elev
-                pt.x(),      # map_x
-                pt.y()       # map_y
+                pt_id,
+                dist_acum,
+                elev,
+                pt.x(),
+                pt.y()
             ])
 
             features.append(feat)
@@ -114,11 +115,106 @@ class ProfileManager:
 
         return features
     
-    # ---------------------------------
-    #   Construye una capa temporal de puntos del perfil a partir de una línea densificada.
-    # --------------------------------- 
+    # --------------------------------------------------------------------------------
+    #   Construye las líneas que forman el perfil y su caja:
+    #- linea_perfil : polilínea real del perfil
+    #    - base         : línea horizontal inferior
+    #    - lim_izq      : límite vertical izquierdo
+    #    - lim_der      : límite vertical derecho
 
-    def build_profile_points_layer(self, section_layer: QgsVectorLayer, dem_layer: QgsRasterLayer, ve: float = 1.0):
+    #   Parámetros
+    #   features : list[QgsFeature]
+    #       Lista de features generados por _generate_profile_points_from_vertices().
+    #       Se espera que la geometría de cada feature esté en coordenadas de perfil:
+    #       X = distancia acumulada
+    # --------------------------------------------------------------------------------
+    
+    def _build_profile_box_lines(self, features,  extra_depth: float = 100.0):
+       
+        if not features:
+            raise Exception("No hay puntos de perfil para construir la caja.")
+
+        pts = []
+        for feat in features:
+            geom = feat.geometry()
+            if geom is None or geom.isEmpty():
+                continue
+
+            pt = geom.asPoint()
+            pts.append(QgsPointXY(pt.x(), pt.y()))
+
+        if len(pts) < 2:
+            raise Exception("Se requieren al menos dos puntos válidos para construir la caja del perfil.")
+
+        pt_ini = pts[0]
+        pt_fin = pts[-1]
+
+        y1 = pt_ini.y()
+        y2 = pt_fin.y()
+        y_min_global = min(p.y() for p in pts)
+
+        # referencia inferior: el menor entre inicio, fin y mínimo global
+        y_base_ref = min(y1, y2, y_min_global)
+
+        # la geometría ya viene con VE aplicada, así que el margen también se escala
+        base_y = y_base_ref - extra_depth 
+
+        linea_perfil = QgsGeometry.fromPolylineXY(pts)
+
+        base = QgsGeometry.fromPolylineXY([
+            QgsPointXY(pt_ini.x(), base_y),
+            QgsPointXY(pt_fin.x(), base_y)
+        ])
+
+        lim_izq = QgsGeometry.fromPolylineXY([
+            QgsPointXY(pt_ini.x(), y1),
+            QgsPointXY(pt_ini.x(), base_y)
+        ])
+
+        lim_der = QgsGeometry.fromPolylineXY([
+            QgsPointXY(pt_fin.x(), y2),
+            QgsPointXY(pt_fin.x(), base_y)
+        ])
+
+        return {
+            "linea_perfil": linea_perfil,
+            "base": base,
+            "lim_izq": lim_izq,
+            "lim_der": lim_der,
+            "y1": y1,
+            "y2": y2,
+            "y_min_global": y_min_global,
+            "y_base_ref": y_base_ref,
+            "base_y": base_y
+        }
+    
+    # --------------------------------------------------------------------------------
+    #   Genera una capa temporal de líneas con:     
+    #    section_layer : QgsVectorLayer
+    #    Capa con la línea de sección. Se usará la primera geometría válida.
+    #    dem_layer : QgsRasterLayer
+    #    DEM para muestrear elevaciones.
+    #    extra_depth : float, default=100.0
+    #    Margen adicional inferior de la caja, en metros.
+    #    layer_name : str
+    #    Nombre de la capa de salida.
+    # --------------------------------------------------------------------------------
+
+
+    def build_profile_box_layer(
+        self,
+        section_layer,
+        dem_layer,
+        extra_depth: float = 100.0,
+        layer_name: str = "Perfil_topografico"
+            ):
+        """
+        Genera una capa temporal de líneas con:
+        - linea_perfil
+        - base
+        - lim_izq
+        - lim_der
+        """
 
         if section_layer is None or not section_layer.isValid():
             raise Exception("La capa de sección no es válida.")
@@ -126,66 +222,97 @@ class ProfileManager:
         if dem_layer is None or not dem_layer.isValid():
             raise Exception("La capa DEM no es válida.")
 
-        features = list(section_layer.getFeatures())
-        if not features:
-            raise Exception("La capa de sección no contiene entidades.")
+        if extra_depth <= 0:
+            extra_depth = 100.0
 
-        line_feature = features[0]
-        line_geom = line_feature.geometry()
+        # Tomar la primera geometría válida de la sección
+        line_geom = None
+        for feat in section_layer.getFeatures():
+            geom = feat.geometry()
+            if geom is not None and not geom.isEmpty():
+                line_geom = geom
+                break
 
+        if line_geom is None or line_geom.isEmpty():
+            raise Exception("No se encontró una geometría válida en la capa de sección.")
+
+        # -----------------------------
+        # DENSIFICAR SEGÚN EL DEM
+        # -----------------------------
         pixel_size = self._get_dem_pixel_size(dem_layer)
         print(f"Pixel size DEM: {pixel_size}")
 
         dense_geom = self._densify_line_geometry(line_geom, pixel_size)
         print("Línea densificada correctamente")
 
+        # -----------------------------
+        # GENERAR PUNTOS DEL PERFIL
+        # -----------------------------
+        profile_point_features = self._generate_profile_points_from_vertices(
+            line_geom=dense_geom,
+            dem_layer=dem_layer
+        )
+
+        if not profile_point_features:
+            raise Exception("No fue posible generar puntos para el perfil.")
+
+        # -----------------------------
+        # CONSTRUIR PERFIL + CAJA
+        # -----------------------------
+        box_data = self._build_profile_box_lines(
+            features=profile_point_features,
+            extra_depth=extra_depth
+        )
+
+        # -----------------------------
+        # CAPA DE SALIDA
+        # -----------------------------
         crs_authid = section_layer.crs().authid()
-        uri = (
-            f"Point?crs={crs_authid}"
-            f"&field=pt_id:integer"
-            f"&field=dist_m:double"
-            f"&field=elev:double"
-            f"&field=map_x:double"
-            f"&field=map_y:double"
-        )
+        if not crs_authid:
+            crs_authid = dem_layer.crs().authid()
 
-        points_layer = QgsVectorLayer(uri, "sec_points_profile", "memory")
-        provider = points_layer.dataProvider()
+        out_layer = QgsVectorLayer(f"LineString?crs={crs_authid}", layer_name, "memory")
+        prov = out_layer.dataProvider()
 
-        profile_features = self._generate_profile_points_from_vertices(dense_geom, dem_layer, ve)
-        provider.addFeatures(profile_features)
-        points_layer.updateExtents()
+        prov.addAttributes([
+            QgsField("tipo", QVariant.String),
+            QgsField("caja_m", QVariant.Double),
+            QgsField("y_min", QVariant.Double),
+            QgsField("base_y", QVariant.Double)
+        ])
+        out_layer.updateFields()
 
-        print(f"Puntos generados: {len(profile_features)}")
+        feature_defs = [
+            ("linea_perfil", box_data["linea_perfil"]),
+            ("base", box_data["base"]),
+            ("lim_izq", box_data["lim_izq"]),
+            ("lim_der", box_data["lim_der"])
+        ]
 
-        return points_layer
+        out_features = []
+        for tipo, geom in feature_defs:
+            feat = QgsFeature(out_layer.fields())
+            feat.setGeometry(geom)
+            feat.setAttributes([
+                tipo,
+                float(extra_depth),
+                float(box_data["y_min_global"]),
+                float(box_data["base_y"])
+            ])
+            out_features.append(feat)
+
+        prov.addFeatures(out_features)
+        out_layer.updateExtents()
+
+        # quitar capa previa con el mismo nombre
+        for lyr in QgsProject.instance().mapLayers().values():
+            if lyr.name() == layer_name:
+                QgsProject.instance().removeMapLayer(lyr.id())
+
+        QgsProject.instance().addMapLayer(out_layer)
+
+        print(f"Puntos generados para el perfil: {len(profile_point_features)}")
+
+        return out_layer
     
-    # ---------------------------------
-    #   Guarda la capa de puntos en el GeoPackage.
-    # --------------------------------- 
-
-    
-    def save_points_to_gpkg(self, points_layer, layer_name="sec_points_profile"):
-        if not self.gpkg_path:
-            raise Exception("No se ha definido la ruta del GeoPackage.")
-
-        options = QgsVectorFileWriter.SaveVectorOptions()
-        options.driverName = "GPKG"
-        options.layerName = layer_name
-        options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
-
-        writer_result = QgsVectorFileWriter.writeAsVectorFormatV3(
-            points_layer,
-            self.gpkg_path,
-            QgsProject.instance().transformContext(),
-            options
-        )
-
-        print(f"Resultado al guardar {layer_name}: {writer_result}")
-
-        result = writer_result[0]
-        error_message = writer_result[1] if len(writer_result) > 1 else ""
-
-        if result != QgsVectorFileWriter.NoError:
-            raise Exception(f"Error al guardar '{layer_name}' en el GPKG: {error_message}")
 
