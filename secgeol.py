@@ -6,13 +6,8 @@ from .secgeol_dialog import SecGeolDialog
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
-from qgis.core import ( QgsProject, 
+from qgis.core import ( 
                         QgsWkbTypes,
-                        QgsVectorFileWriter,
-                        QgsVectorLayer,
-                        QgsFields,
-                        QgsField,
-                        QgsCoordinateReferenceSystem
                        )
 
 

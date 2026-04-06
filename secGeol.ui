@@ -164,11 +164,20 @@
       <widget class="QDoubleSpinBox" name="doubleSpinBox">
        <property name="geometry">
         <rect>
-         <x>150</x>
+         <x>110</x>
          <y>90</y>
-         <width>62</width>
+         <width>81</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="minimum">
+        <double>0.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>10000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>100.000000000000000</double>
        </property>
       </widget>
       <widget class="QLabel" name="label_7">
@@ -182,19 +191,6 @@
        </property>
        <property name="text">
         <string>Adicionar caja</string>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="checkEjes">
-       <property name="geometry">
-        <rect>
-         <x>270</x>
-         <y>90</y>
-         <width>101</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Crear ejes X, Y</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_3">
@@ -276,6 +272,52 @@
      <attribute name="title">
       <string>2. Lineas a poligonos</string>
      </attribute>
+     <widget class="QCheckBox" name="checkEjes">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>70</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Crear ejes X, Y</string>
+      </property>
+     </widget>
+     <widget class="QgsFileWidget" name="mQgsFileWidget">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>110</y>
+        <width>361</width>
+        <height>27</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QgsMapLayerComboBox" name="mMapLayerComboBox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>361</width>
+        <height>27</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QDialogButtonBox" name="buttonBox_2">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>300</y>
+        <width>156</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="standardButtons">
+       <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tres">
      <attribute name="title">

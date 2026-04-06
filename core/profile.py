@@ -18,7 +18,7 @@ class ProfileManager:
     def set_gpkg_path(self, gpkg_path):
         self.gpkg_path = gpkg_path
 
-    def load_gpkg_layer(self, layer_name):
+    def load_gpkg_layer(self, layer_name):     #layer
         if not self.gpkg_path:
             raise Exception("No se ha definido la ruta del GeoPackage.")
 
@@ -30,7 +30,7 @@ class ProfileManager:
 
         return layer
 
-    def _sample_raster_value(self, raster_layer: QgsRasterLayer, x: float, y: float):
+    def _sample_raster_value(self, raster_layer: QgsRasterLayer, x: float, y: float):   #dem
         provider = raster_layer.dataProvider()
         result = provider.sample(QgsPointXY(x, y), 1)
 
@@ -60,7 +60,7 @@ class ProfileManager:
         return (abs(pixel_size_x) + abs(pixel_size_y)) / 2.0
     
     # ---------------------------------
-    #   Densifica la línea usando una distancia fija entre vértices.
+    #   Densifica la línea usando una distancia fija entre vértices.  
     # --------------------------------- 
     def _densify_line_geometry(self, line_geom: QgsGeometry, distance: float) -> QgsGeometry:
         if line_geom is None or line_geom.isEmpty():

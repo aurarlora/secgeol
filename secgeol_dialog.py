@@ -294,7 +294,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         return super().eventFilter(obj, event)
     
     # ---------------------------------
-    # Conecta la función de la sección
+    # Conecta la función de la sección      
     # ---------------------------------
 
     def preparar_seccion_trabajo(self):
@@ -368,10 +368,10 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             raise Exception("No se ha seleccionado un DEM.")
 
         # Preparar sección temporal en el CRS del DEM
-        section_layer = self.preparar_seccion_trabajo()
-        print("I: sección temporal preparada")
+        section_layer = self.preparar_seccion_trabajo()    # Borrar es de seccion
+        print("I: sección temporal preparada")      
 
-        if section_layer is None or not section_layer.isValid():
+        if section_layer is None or not section_layer.isValid():         #Seccion de trabajo
             raise Exception("No fue posible preparar la sección de trabajo.")
 
         # Metros adicionales de caja
@@ -407,7 +407,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             print(f"Output: {self.estSHP.filePath()}")
 
             self.inicializar_workspace()
-            self.preparar_seccion_trabajo()
+            self.preparar_seccion_trabajo()   
 
             print("Proceso ejecutado correctamente")
 
