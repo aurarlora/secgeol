@@ -1,4 +1,4 @@
-import os
+import os, math
 
 from qgis.core import (
     QgsFeature,
@@ -15,7 +15,7 @@ from qgis.core import (
     QgsCoordinateTransform
 )
 from qgis.PyQt.QtCore import QVariant
-from .fields import fields_section_internal
+# from .fields import fields_section_internal
 
 class SectionManager:
     def __init__(self, gpkg_path=None):
@@ -23,6 +23,52 @@ class SectionManager:
 
     def set_gpkg_path(self, gpkg_path):
         self.gpkg_path = gpkg_path
+
+    # ---------------------------------
+    #  Detecta quiebres reales en una línea y devuelve las distancias acumuladas,  donde ocurren los cambios de dirección.
+    # --------------------------------- 
+
+    def detect_section_break_distances(self, geom: QgsGeometry, angle_tolerance_deg: float = 5.0):
+
+        if geom is None or geom.isEmpty():
+            return []
+
+        pts = list(geom.vertices())
+        if len(pts) < 3:
+            return []
+
+        cumulative_dist = [0.0]
+        for i in range(1, len(pts)):
+            seg_len = math.hypot(pts[i].x() - pts[i-1].x(), pts[i].y() - pts[i-1].y())
+            cumulative_dist.append(cumulative_dist[-1] + seg_len)
+
+        break_distances = []
+
+        for i in range(1, len(pts) - 1):
+            p0 = pts[i - 1]
+            p1 = pts[i]
+            p2 = pts[i + 1]
+
+            v1x = p1.x() - p0.x()
+            v1y = p1.y() - p0.y()
+            v2x = p2.x() - p1.x()
+            v2y = p2.y() - p1.y()
+
+            norm1 = math.hypot(v1x, v1y)
+            norm2 = math.hypot(v2x, v2y)
+
+            if norm1 == 0 or norm2 == 0:
+                continue
+
+            dot = (v1x * v2x + v1y * v2y) / (norm1 * norm2)
+            dot = max(-1.0, min(1.0, dot))
+
+            angle_deg = math.degrees(math.acos(dot))
+
+            if angle_deg > angle_tolerance_deg:
+                break_distances.append(cumulative_dist[i])
+
+        return break_distances
 
     # ---------------------------------
     #  Invierte el sentido de una geometría de línea simple.
@@ -169,27 +215,23 @@ class SectionManager:
     # ---------------------------------
     #  Prepara una capa de trabajo a partir de una feature dibujada por la herramienta.
     # --------------------------------- 
-
+   
     def prepare_section_layer_from_feature(
         self,
         source_feature: QgsFeature,
         crs_authid: str,
         invertida=False
-        ) -> QgsVectorLayer:
+    ) -> QgsVectorLayer:
 
         if source_feature is None:
             raise Exception("No se proporcionó una sección dibujada.")
 
-        merged_fields = fields_section_internal()
-
-        temp_layer = self._create_memory_layer("seccion_temp", crs_authid, merged_fields)
+        temp_layer = QgsVectorLayer(f"LineString?crs={crs_authid}", "seccion_temp", "memory")
         provider = temp_layer.dataProvider()
 
         new_feat = self._prepare_section_feature(
             source_feature,
-            merged_fields,
             invertida=invertida,
-            origen="digitalizada",
             source_crs=None,
             target_crs=None
         )
@@ -198,5 +240,4 @@ class SectionManager:
         temp_layer.updateExtents()
 
         return temp_layer
-
    

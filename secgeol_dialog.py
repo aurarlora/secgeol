@@ -30,9 +30,23 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         super().__init__(parent)
         self.setupUi(self)
 
+        self.drawn_section_feature = None
+        self.btnDrawSec.clicked.connect(self.activar_dibujo_seccion)
+
+
         self.section_manager = SectionManager()
         self.workspace_manager = WorkspaceManager()
         self.gpkg_path = None
+
+                # -----------------------------
+        # CONFIGURAR CAJA
+        # -----------------------------
+        self.doubleSpinBox.setMinimum(0.0)
+        self.doubleSpinBox.setMaximum(10000.0)
+        self.doubleSpinBox.setSingleStep(10.0)     #Verificar este punto
+        self.doubleSpinBox.setSuffix(" m")
+        self.doubleSpinBox.setValue(100.0)
+
 
 
         # --------  Ejecuta herramienta ---
@@ -150,13 +164,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         except AttributeError:
             self.fileWidgetPerfil.setStorageMode(self.fileWidgetPerfil.SaveFile)
 
-        # -----------------------------
-        # CONFIGURAR CAJA
-        # -----------------------------
-        self.doubleSpinBox.setMinimum(0.0)
-        self.doubleSpinBox.setSingleStep(10.0)
-        self.doubleSpinBox.setSuffix(" m")
-        self.doubleSpinBox.setValue(100.0)
+
 
         # -----------------------------
         # EVENT FILTERS PARA AYUDA
@@ -206,6 +214,24 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.fileWidgetPerfil.setToolTip(
             "Select the output file."
         )
+
+
+    def set_drawn_section_feature(self, feature):
+        self.drawn_section_feature = feature
+    
+    def clear_drawn_section_feature(self):
+        self.drawn_section_feature = None
+
+    def activar_dibujo_seccion(self):
+        print("🖉 Botón de dibujo de sección presionado")
+
+        dem_layer = self.MapLayerDEM.currentLayer()
+        if dem_layer is None:
+            raise Exception("No se ha seleccionado un DEM.")
+
+        self.clear_drawn_section_feature()
+        print("🧹 Se limpió la sección dibujada previa")    
+
 
 
     def actualizar_ayuda_tab(self):
@@ -301,24 +327,37 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         print("A: entrar a preparar_seccion_trabajo")
 
         invertida = self.checkInvSec.isChecked()
-        source_layer = self.MapLayerSec.currentLayer()
-        print(f"C: capa origen = {source_layer.name() if source_layer else 'None'}")
-
-        if source_layer is None:
-            raise Exception("No se ha seleccionado una capa de sección.")
-
         dem_layer = self.MapLayerDEM.currentLayer()
+
         if dem_layer is None:
             raise Exception("No se ha seleccionado un DEM.")
 
         target_crs = dem_layer.crs()
+        source_layer = self.MapLayerSec.currentLayer()
 
-        temp_layer = self.section_manager.prepare_section_layer_from_user(
-            source_layer,
-            target_crs=target_crs,
-            invertida=invertida
-        )
-        print("D: capa temporal creada")
+        print(f"C: capa origen = {source_layer.name() if source_layer else 'None'}")
+        print(f"D: feature dibujada disponible = {self.drawn_section_feature is not None}")
+
+        # Caso 1: el usuario seleccionó una capa de línea
+        if source_layer is not None:
+            temp_layer = self.section_manager.prepare_section_layer_from_user(
+                source_layer=source_layer,
+                target_crs=target_crs,
+                invertida=invertida
+            )
+            print("E: sección temporal preparada desde capa del usuario")
+
+        # Caso 2: el usuario dibujó una sección
+        elif self.drawn_section_feature is not None:
+            temp_layer = self.section_manager.prepare_section_layer_from_feature(
+                source_feature=self.drawn_section_feature,
+                crs_authid=target_crs.authid(),
+                invertida=invertida
+            )
+            print("E: sección temporal preparada desde feature dibujada")
+
+        else:
+            raise Exception("No se ha seleccionado una capa de sección ni se ha dibujado una sección.")
 
         if temp_layer is None or not temp_layer.isValid():
             raise Exception("No fue posible preparar la sección de trabajo.")
@@ -367,22 +406,34 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         if dem_layer is None:
             raise Exception("No se ha seleccionado un DEM.")
 
-        # Preparar sección temporal en el CRS del DEM
-        section_layer = self.preparar_seccion_trabajo()    # Borrar es de seccion
-        print("I: sección temporal preparada")      
+        section_layer = self.preparar_seccion_trabajo()
+        print("I: sección temporal preparada")
 
-        if section_layer is None or not section_layer.isValid():         #Seccion de trabajo
+        if section_layer is None or not section_layer.isValid():
             raise Exception("No fue posible preparar la sección de trabajo.")
 
-        # Metros adicionales de caja
         caja_m = self.obtener_caja_m()
         print(f"J: caja_m = {caja_m}")
+
+        # Detectar quiebres sobre la geometría original preparada
+        section_geom = None
+        for feat in section_layer.getFeatures():
+            geom = feat.geometry()
+            if geom is not None and not geom.isEmpty():
+                section_geom = geom
+                break
+
+        break_distances = []
+        if section_geom is not None:
+            break_distances = self.section_manager.detect_section_break_distances(section_geom)
+            print(f"J.1: quiebres detectados = {break_distances}")
 
         perfil_layer = self.profile_manager.build_profile_box_layer(
             section_layer=section_layer,
             dem_layer=dem_layer,
             extra_depth=caja_m,
-            layer_name="Perfil_topografico"
+            layer_name="Perfil_topografico",
+            break_distances=break_distances
         )
         print("K: capa de perfil creada")
 

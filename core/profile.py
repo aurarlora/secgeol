@@ -15,10 +15,12 @@ class ProfileManager:
     def __init__(self, gpkg_path=None):
         self.gpkg_path = gpkg_path
 
+        
     def set_gpkg_path(self, gpkg_path):
         self.gpkg_path = gpkg_path
 
-    def load_gpkg_layer(self, layer_name):     #layer
+    #--------------------------------------lee layer
+    def load_gpkg_layer(self, layer_name):     
         if not self.gpkg_path:
             raise Exception("No se ha definido la ruta del GeoPackage.")
 
@@ -29,8 +31,8 @@ class ProfileManager:
             raise Exception(f"No se pudo cargar la capa '{layer_name}' desde el GPKG.")
 
         return layer
-
-    def _sample_raster_value(self, raster_layer: QgsRasterLayer, x: float, y: float):   #dem
+    #--------------------------------------lee dem
+    def _sample_raster_value(self, raster_layer: QgsRasterLayer, x: float, y: float):   
         provider = raster_layer.dataProvider()
         result = provider.sample(QgsPointXY(x, y), 1)
 
@@ -42,6 +44,21 @@ class ProfileManager:
             return value
 
         return result
+    
+    # ---------------------------------
+    #   Construye líneas verticales divisorias en el perfil para marcar quiebres.
+    # --------------------------------- 
+    
+    def _build_break_lines(self, break_distances, base_y, top_y):
+        break_lines = []
+        for d in break_distances:
+            geom = QgsGeometry.fromPolylineXY([
+                QgsPointXY(d, base_y- 1.0),
+                QgsPointXY(d, top_y)
+            ])
+            break_lines.append(geom)
+        return break_lines
+
     
     # ---------------------------------
     #  Obtiene un tamaño promedio de pixel del DEM.
@@ -157,6 +174,7 @@ class ProfileManager:
         y_base_ref = min(y1, y2, y_min_global)
 
         # la geometría ya viene con VE aplicada, así que el margen también se escala
+       
         base_y = y_base_ref - extra_depth 
 
         linea_perfil = QgsGeometry.fromPolylineXY(pts)
@@ -190,14 +208,10 @@ class ProfileManager:
     
     # --------------------------------------------------------------------------------
     #   Genera una capa temporal de líneas con:     
-    #    section_layer : QgsVectorLayer
-    #    Capa con la línea de sección. Se usará la primera geometría válida.
-    #    dem_layer : QgsRasterLayer
-    #    DEM para muestrear elevaciones.
-    #    extra_depth : float, default=100.0
-    #    Margen adicional inferior de la caja, en metros.
-    #    layer_name : str
-    #    Nombre de la capa de salida.
+    #    linea_perfil
+    #    base
+    #    lim_izq
+    #    lim_der
     # --------------------------------------------------------------------------------
 
 
@@ -206,15 +220,12 @@ class ProfileManager:
         section_layer,
         dem_layer,
         extra_depth: float = 100.0,
-        layer_name: str = "Perfil_topografico"
+        layer_name: str = "Perfil_topografico",
+        break_distances=None
             ):
-        """
-        Genera una capa temporal de líneas con:
-        - linea_perfil
-        - base
-        - lim_izq
-        - lim_der
-        """
+
+        if break_distances is None:
+            break_distances = []
 
         if section_layer is None or not section_layer.isValid():
             raise Exception("La capa de sección no es válida.")
@@ -264,6 +275,10 @@ class ProfileManager:
             extra_depth=extra_depth
         )
 
+        top_y = max(p.geometry().asPoint().y() for p in profile_point_features)
+        break_geoms = self._build_break_lines(break_distances, box_data["base_y"], top_y)
+
+
         # -----------------------------
         # CAPA DE SALIDA
         # -----------------------------
@@ -288,6 +303,8 @@ class ProfileManager:
             ("lim_izq", box_data["lim_izq"]),
             ("lim_der", box_data["lim_der"])
         ]
+        for geom in break_geoms:
+            feature_defs.append(("quiebre", geom))
 
         out_features = []
         for tipo, geom in feature_defs:
