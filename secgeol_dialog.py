@@ -1,10 +1,12 @@
 import os
 
 from qgis.PyQt import uic
+from qgis.PyQt.QtCore import QEvent, QUrl, Qt
 from qgis.PyQt.QtWidgets import QDialog, QSplitter
-from qgis.PyQt.QtCore import QEvent
-from qgis.PyQt.QtCore import QEvent, QUrl
-from qgis.core import QgsMapLayerProxyModel, QgsProject
+from qgis.core import QgsMapLayerProxyModel, QgsProject, Qgis, QgsFeature, QgsGeometry, QgsVectorLayer, QgsWkbTypes
+from qgis.gui import QgsMapTool, QgsRubberBand
+from qgis.utils import iface
+from qgis.PyQt.QtGui import QColor
 
 from .core.workspace import WorkspaceManager
 from .core.section import SectionManager
@@ -24,21 +26,140 @@ FORM_CLASS, _ = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), 'secGeol.ui')
 )
 
+class DrawSectionMapTool(QgsMapTool):
+    def __init__(self, canvas, finished_callback, cancel_callback=None):
+        super().__init__(canvas)
+        self.canvas = canvas
+        self.finished_callback = finished_callback
+        self.cancel_callback = cancel_callback
+        self.points = []
+
+        # línea ya confirmada
+        self.rubber_band = QgsRubberBand(self.canvas, QgsWkbTypes.LineGeometry)
+        self.rubber_band.setWidth(4)
+        self.rubber_band.setColor(QColor(255, 0, 0))  # rojo sólido
+
+        #línea de seguimiento
+        self.preview_band = QgsRubberBand(self.canvas, QgsWkbTypes.LineGeometry)
+        self.preview_band.setWidth(2)
+        self.rubber_band.setColor(QColor(255, 255, 0, 220))  # amarillo
+        
+        # vertices
+        self.vertex_band = QgsRubberBand(self.canvas, QgsWkbTypes.PointGeometry)
+        self.vertex_band.setWidth(6)
+        self.vertex_band.setColor(QColor(255, 0, 0))
+
+    def activate(self):
+        self.canvas.setCursor(Qt.CursorShape.CrossCursor)
+        super().activate()
+
+    def deactivate(self):
+        self._clear_bands()
+        super().deactivate()
+
+    def canvasPressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            pt = self.toMapCoordinates(event.pos())
+            self.points.append(pt)
+            self._update_rubber_band()
+
+        elif event.button() == Qt.MouseButton.RightButton:
+            self._finish_drawing()
+
+    def canvasMoveEvent(self, event):
+        if len(self.points) < 1:
+            return
+
+        current_pt = self.toMapCoordinates(event.pos())
+        self._update_preview_band(current_pt)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Escape:
+            self.cancel()
+
+    def _update_rubber_band(self):
+        self.rubber_band.reset(QgsWkbTypes.LineGeometry)
+        self.vertex_band.reset(QgsWkbTypes.PointGeometry)
+
+        if len(self.points) < 1:
+            return
+
+        # mostrar vértices
+        for i, pt in enumerate(self.points):
+            self.vertex_band.addPoint(pt, i == len(self.points) - 1)
+
+         # mostrar línea confirmada
+        if len(self.points) >= 2:
+            for i, pt in enumerate(self.points):
+                self.rubber_band.addPoint(pt, i == len(self.points) - 1)
+
+        self.vertex_band.show()
+        self.rubber_band.show()
+
+    def _update_preview_band(self, current_pt):
+        self.preview_band.reset(QgsWkbTypes.LineGeometry)
+
+        all_pts = self.points + [current_pt]
+        if len(all_pts) < 2:
+            return
+
+        for i, pt in enumerate(all_pts):
+            self.preview_band.addPoint(pt, i == len(all_pts) - 1)
+
+        self.preview_band.show()
+
+    def _finish_drawing(self):
+        if len(self.points) < 2:
+            return
+
+        try:
+            geom = QgsGeometry.fromPolylineXY(self.points)
+            feat = QgsFeature()
+            feat.setGeometry(geom)
+
+            self._clear_bands()
+            self.points.clear()
+
+            if self.finished_callback:
+                self.finished_callback(feat)
+
+        except Exception as e:
+            print(f"Error al finalizar dibujo: {e}")
+            self.cancel()
+
+
+    def cancel(self):
+        self._clear_bands()
+        self.points.clear()
+
+        if self.cancel_callback:
+            self.cancel_callback()
+
+    def _clear_bands(self):
+        self.rubber_band.reset(QgsWkbTypes.LineGeometry)
+        self.preview_band.reset(QgsWkbTypes.LineGeometry)
+        self.vertex_band.reset(QgsWkbTypes.PointGeometry)
+
+
+
 
 class SecGeolDialog(QDialog, FORM_CLASS):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
 
-        self.drawn_section_feature = None
-        self.btnDrawSec.clicked.connect(self.activar_dibujo_seccion)
 
+        self.drawn_section_feature = None
+        self.draw_tool = None
+
+        self.btnDrawSec.clicked.connect(self.activar_dibujo_seccion)
+        self.MapLayerSec.layerChanged.connect(self.on_section_layer_changed)
 
         self.section_manager = SectionManager()
         self.workspace_manager = WorkspaceManager()
         self.gpkg_path = None
 
-                # -----------------------------
+        # -----------------------------
         # CONFIGURAR CAJA
         # -----------------------------
         self.doubleSpinBox.setMinimum(0.0)
@@ -215,24 +336,64 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             "Select the output file."
         )
 
+    def on_section_layer_changed(self, layer):
+        if layer is not None:
+            print("📌 Se seleccionó una capa de sección; se limpiará la sección dibujada")
 
+            self.clear_drawn_section_feature()
+            self._remove_layer_by_name("seccion_dibujada")
+
+
+    def _remove_layer_by_name(self, layer_name):
+        project = QgsProject.instance()
+        for lyr in list(project.mapLayers().values()):
+            if lyr.name() == layer_name:
+                project.removeMapLayer(lyr.id())
+                
+                
     def set_drawn_section_feature(self, feature):
         self.drawn_section_feature = feature
     
     def clear_drawn_section_feature(self):
         self.drawn_section_feature = None
 
+
     def activar_dibujo_seccion(self):
-        print("🖉 Botón de dibujo de sección presionado")
+        print("🖉 Activar dibujo de sección")
 
         dem_layer = self.MapLayerDEM.currentLayer()
         if dem_layer is None:
             raise Exception("No se ha seleccionado un DEM.")
 
+        # limpiar cualquier selección de layer
+        try:
+            self.MapLayerSec.setLayer(None)
+        except Exception:
+            pass
+
+        # limpiar sección dibujada previa
         self.clear_drawn_section_feature()
-        print("🧹 Se limpió la sección dibujada previa")    
+        self._remove_layer_by_name("seccion_dibujada")
 
+        canvas = iface.mapCanvas()
+        self.draw_tool = DrawSectionMapTool(
+            canvas,
+            self.on_section_drawing_finished,
+            self.on_section_drawing_cancelled
+        )
+        canvas.setMapTool(self.draw_tool)
 
+    def on_section_drawing_finished(self, feature):
+        print("🔥 Entró a on_section_drawing_finished")
+        self.set_drawn_section_feature(feature)
+        self.mostrar_seccion_dibujada(feature)
+
+        print("🎯 Dibujo terminado con clic derecho")
+
+        iface.mapCanvas().unsetMapTool(self.draw_tool)
+        self.draw_tool = None
+
+    
 
     def actualizar_ayuda_tab(self):
         current_widget = self.tabWidget.currentWidget()
@@ -244,6 +405,77 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         elif hasattr(self, "tres") and current_widget == self.tres:
             self.textBrowserHelp.setHtml(self.help_tab_tres)
 
+
+    def on_section_drawing_cancelled(self):
+        print("❌ Dibujo cancelado")
+
+        if self.draw_tool is not None:
+            iface.mapCanvas().unsetMapTool(self.draw_tool)
+            self.draw_tool = None
+
+#--------- Muestra la sección dibujada como capa temporal visible en el mapa. Reemplaza la anterior si existe.
+
+    def mostrar_seccion_dibujada(self, feature):
+        print("🟡 Entró a mostrar_seccion_dibujada")
+
+        if feature is None:
+            print("❌ feature es None")
+            return
+
+        geom = feature.geometry()
+        if geom is None or geom.isEmpty():
+            print("❌ la geometría de la sección dibujada está vacía")
+            return
+
+        print(f"✅ geometría válida: {geom.asWkt()[:200]}")
+
+        project = QgsProject.instance()
+
+        # eliminar capa previa si existe
+        for lyr in list(project.mapLayers().values()):
+            if lyr.name() == "seccion_dibujada":
+                print("🧹 Eliminando capa previa 'seccion_dibujada'")
+                project.removeMapLayer(lyr.id())
+
+        dem_layer = self.MapLayerDEM.currentLayer()
+        if dem_layer is None:
+            raise Exception("No se ha seleccionado un DEM.")
+
+        crs_authid = dem_layer.crs().authid()
+        print(f"📌 CRS de la capa temporal: {crs_authid}")
+
+        layer = QgsVectorLayer(f"LineString?crs={crs_authid}", "seccion_dibujada", "memory")
+        if not layer.isValid():
+            print("❌ La capa temporal 'seccion_dibujada' no es válida")
+            return
+
+        provider = layer.dataProvider()
+
+        feat = QgsFeature()
+        feat.setGeometry(geom)
+
+        ok = provider.addFeatures([feat])
+        print(f"➕ addFeatures result: {ok}")
+
+        layer.updateExtents()
+        print(f"📦 extent capa: {layer.extent().toString()}")
+
+        # simbología visible
+        renderer = layer.renderer()
+        symbol = renderer.symbol()
+        symbol.setWidth(1.5)
+        symbol.setColor(QColor(255, 0, 0))  # rojo
+        layer.triggerRepaint()
+
+        project.addMapLayer(layer)
+        print("✅ Capa temporal 'seccion_dibujada' agregada al mapa")
+
+        # forzar refresco visual
+        iface.mapCanvas().refresh()
+
+        # opcional: acercar a la línea para comprobar que sí existe
+        # iface.mapCanvas().setExtent(layer.extent())
+        # iface.mapCanvas().refresh()
 
 
     # ---------------------------------

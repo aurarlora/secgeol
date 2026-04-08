@@ -70,12 +70,12 @@ class SecGeol:
     # EJECUTAR
     # -----------------------------------
     def ejecutar(self):
-
         # DEM
         dem_layer = self.dlg.MapLayerDEM.currentLayer()
 
         # Sección
         sec_layer = self.dlg.MapLayerSec.currentLayer()
+        has_drawn = self.dlg.drawn_section_feature is not None
         inv_sec = self.dlg.checkInvSec.isChecked()
 
         # Geología
@@ -111,36 +111,31 @@ class SecGeol:
             )
             return
 
-        if not sec_layer:
+        if sec_layer is None and not has_drawn:
             self.iface.messageBar().pushWarning(
                 self.tr("SecGeol"),
-                self.tr("Select a section layer.")
+                self.tr("Select a section layer or draw one.")
             )
             return
 
-        if QgsWkbTypes.geometryType(sec_layer.wkbType()) != QgsWkbTypes.LineGeometry:
-            self.iface.messageBar().pushWarning(
-                self.tr("SecGeol"),
-                self.tr("Section must be a line layer.")
-            )
-            return
-
-        """
-        if not salida:
-            self.iface.messageBar().pushWarning(
-                self.tr("SecGeol"),
-                self.tr("Select an output file. jeje")
-            )
-            return
-        """
+        # Solo validar geometría si realmente viene de un layer
+        if sec_layer is not None:
+            if QgsWkbTypes.geometryType(sec_layer.wkbType()) != QgsWkbTypes.LineGeometry:
+                self.iface.messageBar().pushWarning(
+                    self.tr("SecGeol"),
+                    self.tr("The section layer must be a line layer.")
+                )
+                return
 
         # -------------------------
         # INFORMACIÓN DE PRUEBA
         # -------------------------
 
+        section_source = sec_layer.name() if sec_layer is not None else "Drawn section"
+
         resumen = [
             f"DEM: {dem_layer.name()}",
-            f"Section: {sec_layer.name()}",
+            f"Section: {section_source}",
             f"Invert section: {inv_sec}",
             f"Geology: {geo_layer.name() if geo_layer else 'None'}",
             f"Structures: {est_layer.name() if est_layer else 'None'}",
@@ -150,20 +145,15 @@ class SecGeol:
         ]
 
         print("\n=== SecGeol PARAMETERS ===")
-
-        
         for r in resumen:
             print(r)
 
-        
         try:
-            self.dlg.inicializar_workspace()
-            layer = self.dlg.preparar_seccion_trabajo()
-            self.dlg.generar_perfil()   # LLama a profile
+            self.dlg.generar_perfil()
 
             self.iface.messageBar().pushInfo(
                 self.tr("SecGeol"),
-                self.tr("Section workspace created successfully.")
+                self.tr("Profile created successfully.")
             )
 
             self.dlg.accept()
