@@ -66,6 +66,65 @@ class SecGeol:
             self.tr("Draw section tool not implemented yet.")
         )
 
+
+    # --------------------------------------------------------------
+    # Devuelve una única feature válida de la sección del layer.
+    # Si no cumple la regla, muestra ayuda y regresa None.
+    # --------------------------------------------------------------
+
+    def _set_help(self, texto):
+        if self.dlg and hasattr(self.dlg, "textBrowserHelp"):
+            self.dlg.textBrowserHelp.setPlainText(texto)
+
+
+    def obtener_feature_seccion(self, sec_layer, has_drawn=False):
+
+        if has_drawn:
+            return None  # la sección dibujada se resolverá aparte
+
+        if sec_layer is None:
+            self._set_help("Seleccione una capa de sección o dibuje una.")
+            return None
+
+        if QgsWkbTypes.geometryType(sec_layer.wkbType()) != QgsWkbTypes.LineGeometry:
+            self._set_help("La capa de sección debe ser de tipo línea.")
+            return None
+
+        total = sec_layer.featureCount()
+        seleccionadas = sec_layer.selectedFeatureCount()
+
+        if total == 0:
+            self._set_help("La capa de sección no contiene registros.")
+            return None
+
+        if seleccionadas > 1:
+            self._set_help(
+                "Hay más de una sección seleccionada. "
+                "Deje seleccionada solo una línea."
+            )
+            return None
+
+        if seleccionadas == 1:
+            feat = next(sec_layer.getSelectedFeatures(), None)
+            if feat is None:
+                self._set_help("No fue posible recuperar la sección seleccionada.")
+                return None
+            return feat
+
+        if total == 1:
+            feat = next(sec_layer.getFeatures(), None)
+            if feat is None:
+                self._set_help("No fue posible recuperar la sección.")
+                return None
+            return feat
+
+        self._set_help(
+            "La capa contiene más de una sección. "
+            "Seleccione una sola línea para continuar."
+        )
+        return None
+
+
     # -----------------------------------
     # EJECUTAR
     # -----------------------------------
@@ -126,6 +185,10 @@ class SecGeol:
                     self.tr("The section layer must be a line layer.")
                 )
                 return
+            
+        feat_sec = self.obtener_feature_seccion(sec_layer, has_drawn=has_drawn)
+        if sec_layer is not None and not has_drawn and feat_sec is None:
+            return
 
         # -------------------------
         # INFORMACIÓN DE PRUEBA
