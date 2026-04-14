@@ -8,6 +8,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import ( 
                         QgsWkbTypes,
+                        QgsGeometry
                        )
 
 
@@ -44,7 +45,7 @@ class SecGeol:
 
     def run(self):
         if self.dlg is None:
-            self.dlg = SecGeolDialog()
+            self.dlg = SecGeolDialog(self.iface)
 
             # Botones
             self.dlg.buttonBox.accepted.connect(self.ejecutar)
@@ -123,6 +124,51 @@ class SecGeol:
             "Seleccione una sola línea para continuar."
         )
         return None
+    
+    #-------------------------------------------------------------------------
+    # Devuelve la geometría base de la sección: dibujada por el usuario, o tomada del layer/selección
+    #-------------------------------------------------------------------------
+
+    def obtener_geometria_seccion_base(self, sec_layer, has_drawn=False):
+        # Caso 1: sección dibujada
+        if has_drawn:
+            feat = self.dlg.drawn_section_feature
+            if feat is None:
+                self._set_help("No fue posible recuperar la sección dibujada.")
+                return None
+
+            geom = feat.geometry()
+            if geom is None or geom.isEmpty():
+                self._set_help("La sección dibujada no contiene una geometría válida.")
+                return None
+
+            return geom
+
+        # Caso 2: sección desde layer
+        feat = self.obtener_feature_seccion(sec_layer, has_drawn=False)
+        if feat is None:
+            return None
+
+        geom = feat.geometry()
+        if geom is None or geom.isEmpty():
+            self._set_help("No fue posible recuperar la geometría de la sección.")
+            return None
+
+        return geom
+
+
+
+
+    # --------------------------------------------------------------
+    # Devuelve la geometría efectiva de la sección. Si checkInvSec está activado, la invierte.
+    # --------------------------------------------------------------
+
+    def obtener_geometria_seccion(self, sec_layer, has_drawn=False):
+        geom = self.obtener_geometria_seccion_base(sec_layer, has_drawn)
+        if geom is None:
+            return None
+
+        return geom
 
 
     # -----------------------------------
@@ -186,9 +232,11 @@ class SecGeol:
                 )
                 return
             
-        feat_sec = self.obtener_feature_seccion(sec_layer, has_drawn=has_drawn)
-        if sec_layer is not None and not has_drawn and feat_sec is None:
-            return
+        feat_sec = None
+        if sec_layer is not None and not has_drawn:
+            feat_sec = self.obtener_feature_seccion(sec_layer, has_drawn=False)
+            if feat_sec is None:
+                return
 
         # -------------------------
         # INFORMACIÓN DE PRUEBA
@@ -208,11 +256,16 @@ class SecGeol:
         ]
 
         print("\n=== SecGeol PARAMETERS ===")
+        
         for r in resumen:
             print(r)
 
         try:
-            self.dlg.generar_perfil()
+            self.dlg.generar_perfil(
+            feat_sec=feat_sec,
+            has_drawn=has_drawn,
+            invertida=inv_sec
+        )
 
             self.iface.messageBar().pushInfo(
                 self.tr("SecGeol"),

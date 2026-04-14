@@ -75,11 +75,10 @@ class SectionManager:
     # --------------------------------- 
 
     def _reverse_linestring_geometry(self, geom: QgsGeometry) -> QgsGeometry:
-
         if geom is None or geom.isEmpty():
             return geom
 
-        if QgsWkbTypes.isMultipart(geom.wkbType()):
+        if geom.isMultipart():
             parts = geom.asMultiPolyline()
             if not parts:
                 return geom
@@ -219,12 +218,18 @@ class SectionManager:
     def prepare_section_layer_from_feature(
         self,
         source_feature: QgsFeature,
-        crs_authid: str,
+        source_crs,
+        target_crs,
         invertida=False
     ) -> QgsVectorLayer:
 
         if source_feature is None:
-            raise Exception("No se proporcionó una sección dibujada.")
+            raise Exception("No se proporcionó una sección válida.")
+
+        if target_crs is None or not target_crs.isValid():
+            raise Exception("El CRS de destino no es válido.")
+
+        crs_authid = target_crs.authid()
 
         temp_layer = QgsVectorLayer(f"LineString?crs={crs_authid}", "seccion_temp", "memory")
         provider = temp_layer.dataProvider()
@@ -232,8 +237,8 @@ class SectionManager:
         new_feat = self._prepare_section_feature(
             source_feature,
             invertida=invertida,
-            source_crs=None,
-            target_crs=None
+            source_crs=source_crs,
+            target_crs=target_crs
         )
 
         provider.addFeatures([new_feat])

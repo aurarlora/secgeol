@@ -144,8 +144,9 @@ class DrawSectionMapTool(QgsMapTool):
 
 
 class SecGeolDialog(QDialog, FORM_CLASS):
-    def __init__(self, parent=None):
+    def __init__(self, iface, parent=None):
         super().__init__(parent)
+        self.iface = iface
         self.setupUi(self)
 
 
@@ -555,41 +556,54 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     # Conecta la función de la sección      
     # ---------------------------------
 
-    def preparar_seccion_trabajo(self):
+    def preparar_seccion_trabajo(self, feat_sec=None, has_drawn=False, invertida=False):
+        print("source_feature is None?:", feat_sec is None)
         print("A: entrar a preparar_seccion_trabajo")
 
-        invertida = self.checkInvSec.isChecked()
         dem_layer = self.MapLayerDEM.currentLayer()
-
         if dem_layer is None:
             raise Exception("No se ha seleccionado un DEM.")
 
         target_crs = dem_layer.crs()
-        source_layer = self.MapLayerSec.currentLayer()
 
-        print(f"C: capa origen = {source_layer.name() if source_layer else 'None'}")
+        print(f"C: feature desde layer disponible = {feat_sec is not None}")
         print(f"D: feature dibujada disponible = {self.drawn_section_feature is not None}")
+        print(f"E: invertir sección = {invertida}")
 
-        # Caso 1: el usuario seleccionó una capa de línea
-        if source_layer is not None:
-            temp_layer = self.section_manager.prepare_section_layer_from_user(
-                source_layer=source_layer,
+        # Caso 1: el usuario dibujó una sección
+        if has_drawn:
+            if self.drawn_section_feature is None:
+                raise Exception("No se encontró la sección dibujada.")
+
+            # Ajusta aquí según el CRS real de tu sección dibujada
+            source_crs = self.iface.mapCanvas().mapSettings().destinationCrs()
+
+            temp_layer = self.section_manager.prepare_section_layer_from_feature(
+                source_feature=self.drawn_section_feature,
+                source_crs=source_crs,
                 target_crs=target_crs,
                 invertida=invertida
             )
-            print("E: sección temporal preparada desde capa del usuario")
+            print("F: sección temporal preparada desde feature dibujada")
 
-        # Caso 2: el usuario dibujó una sección
-        elif self.drawn_section_feature is not None:
+        # Caso 2: el usuario seleccionó una sola sección válida del layer
+        elif feat_sec is not None:
+            source_layer = self.MapLayerSec.currentLayer()
+            if source_layer is None:
+                raise Exception("No se encontró la capa de sección.")
+
+            source_crs = source_layer.crs()
+
             temp_layer = self.section_manager.prepare_section_layer_from_feature(
-                source_feature=self.drawn_section_feature,
-                crs_authid=target_crs.authid(),
+                source_feature=feat_sec,
+                source_crs=source_crs,
+                target_crs=target_crs,
                 invertida=invertida
             )
-            print("E: sección temporal preparada desde feature dibujada")
+            print("F: sección temporal preparada desde feature seleccionada")
 
         else:
-            raise Exception("No se ha seleccionado una capa de sección ni se ha dibujado una sección.")
+            raise Exception("No se encontró una sección válida para preparar.")
 
         if temp_layer is None or not temp_layer.isValid():
             raise Exception("No fue posible preparar la sección de trabajo.")
@@ -631,14 +645,18 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     # --------------------------------- 
 
 
-    def generar_perfil(self):
+    def generar_perfil(self, feat_sec=None, has_drawn=False, invertida=False):
         print("H: entrar a generar_perfil")
 
         dem_layer = self.MapLayerDEM.currentLayer()
         if dem_layer is None:
             raise Exception("No se ha seleccionado un DEM.")
 
-        section_layer = self.preparar_seccion_trabajo()
+        section_layer = self.preparar_seccion_trabajo(
+            feat_sec=feat_sec,
+            has_drawn=has_drawn,
+            invertida=invertida
+        )
         print("I: sección temporal preparada")
 
         if section_layer is None or not section_layer.isValid():
@@ -647,7 +665,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         caja_m = self.obtener_caja_m()
         print(f"J: caja_m = {caja_m}")
 
-        # Detectar quiebres sobre la geometría original preparada
         section_geom = None
         for feat in section_layer.getFeatures():
             geom = feat.geometry()
