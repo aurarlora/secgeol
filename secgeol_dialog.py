@@ -495,16 +495,10 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         if event.type() == 10:
 
             if obj == self.MapLayerDEM:
-                self.mostrar_ayuda(
-                    "Digital Elevation Model (DEM)",
-                    "Select a raster layer representing terrain elevation."
-                )
+                self.actualizar_info_dem()
 
             elif obj == self.MapLayerSec:
-                self.mostrar_ayuda(
-                    "Section Line",
-                    "Select a line layer representing the geological section trace."
-                )
+                self.actualizar_info_seccion()
 
             elif obj == self.btnDrawSec:
                 self.mostrar_ayuda(
@@ -551,7 +545,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             self.actualizar_ayuda_tab()
             
         return super().eventFilter(obj, event)
-    
+
     # ---------------------------------
     # Conecta la función de la sección      
     # ---------------------------------
@@ -727,3 +721,141 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             caja_m = 100.0
         return caja_m
 
+    # ---------------------------------
+    # Información DEM
+    # ---------------------------------  
+
+
+    def actualizar_info_dem(self):
+        dem_layer = self.MapLayerDEM.currentLayer()
+
+        if dem_layer is None:
+            self.textBrowserHelp.setHtml(
+                "<b>DEM:</b> No se ha seleccionado un DEM."
+            )
+            return
+
+        if dem_layer.type() != dem_layer.RasterLayer:
+            self.textBrowserHelp.setHtml(
+                "<b>DEM:</b> La capa seleccionada no es raster."
+            )
+            return
+
+        try:
+            crs_txt = dem_layer.crs().authid()
+            pixel_x = dem_layer.rasterUnitsPerPixelX()
+            pixel_y = dem_layer.rasterUnitsPerPixelY()
+
+            self.textBrowserHelp.setHtml(
+                f"<b>DEM seleccionado:</b> {dem_layer.name()}<br>"
+                f"<b>CRS:</b> {crs_txt}<br>"
+                f"<b>Tamaño de pixel:</b> {pixel_x:.3f} x {pixel_y:.3f}"
+            )
+        except Exception as e:
+            self.textBrowserHelp.setHtml(
+                f"<b>DEM:</b> Error al leer propiedades: {e}"
+            )
+
+    # ---------------------------------
+    # Información DEM
+    # --------------------------------- 
+
+    def actualizar_info_seccion(self):
+        sec_layer = self.MapLayerSec.currentLayer()
+        has_drawn = self.drawn_section_feature is not None
+        invertida = self.checkInvSec.isChecked()
+
+        if has_drawn:
+            geom = self.drawn_section_feature.geometry() if self.drawn_section_feature else None
+            if geom is None or geom.isEmpty():
+                self.textBrowserHelp.setHtml(
+                    "<b>Sección:</b> La sección dibujada no es válida."
+                )
+                return
+
+            longitud = geom.length()
+            self.textBrowserHelp.setHtml(
+                f"<b>Sección activa:</b> dibujada por el usuario<br>"
+                f"<b>Longitud:</b> {longitud:.2f}<br>"
+                f"<b>Invertida:</b> {'Sí' if invertida else 'No'}"
+            )
+            return
+
+        if sec_layer is None:
+            self.textBrowserHelp.setHtml(
+                "<b>Sección:</b> Seleccione una capa de sección o dibuje una."
+            )
+            return
+
+        if QgsWkbTypes.geometryType(sec_layer.wkbType()) != QgsWkbTypes.LineGeometry:
+            self.textBrowserHelp.setHtml(
+                "<b>Sección:</b> La capa debe ser de tipo línea."
+            )
+            return
+
+        total = sec_layer.featureCount()
+        seleccionadas = sec_layer.selectedFeatureCount()
+
+        if total == 0:
+            self.textBrowserHelp.setHtml(
+                "<b>Sección:</b> La capa no contiene registros."
+            )
+            return
+
+        if seleccionadas > 1:
+            self.textBrowserHelp.setHtml(
+                "<b>Sección:</b> Hay más de una línea seleccionada. "
+                "Debe dejar una sola."
+            )
+            return
+
+        if seleccionadas == 1:
+            feat = next(sec_layer.getSelectedFeatures(), None)
+        elif total == 1:
+            feat = next(sec_layer.getFeatures(), None)
+        else:
+            self.textBrowserHelp.setHtml(
+                "<b>Sección:</b> La capa contiene varias líneas. "
+                "Seleccione una sola para continuar."
+            )
+            return
+
+        if feat is None:
+            self.textBrowserHelp.setHtml(
+                "<b>Sección:</b> No fue posible recuperar la línea."
+            )
+            return
+
+        geom = feat.geometry()
+        if geom is None or geom.isEmpty():
+            self.textBrowserHelp.setHtml(
+                "<b>Sección:</b> La geometría está vacía."
+            )
+            return
+        
+        if geom.isMultipart():
+            partes = geom.asMultiPolyline()
+
+            if not partes:
+                self.mostrar_ayuda(
+                    "Sección",
+                    "No fue posible interpretar la geometría de la sección."
+                )
+                return
+
+            if len(partes) > 1:
+                self.mostrar_ayuda(
+                    "Sección",
+                    "La sección contiene múltiples líneas dentro de un mismo registro. "
+                    "SecGeol solo acepta una sola línea por sección."
+                )
+                return
+
+        
+
+        longitud = geom.length()
+        self.textBrowserHelp.setHtml(
+            f"<b>Sección activa:</b> {sec_layer.name()}<br>"
+            f"<b>Longitud:</b> {longitud:.2f}<br>"
+            f"<b>Invertida:</b> {'Sí' if invertida else 'No'}"
+        )

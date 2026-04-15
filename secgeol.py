@@ -46,6 +46,9 @@ class SecGeol:
     def run(self):
         if self.dlg is None:
             self.dlg = SecGeolDialog(self.iface)
+            self.dlg.MapLayerDEM.layerChanged.connect(self.dlg.actualizar_info_dem)
+            self.dlg.MapLayerSec.layerChanged.connect(self.dlg.actualizar_info_seccion)
+            self.dlg.checkInvSec.toggled.connect(self.dlg.actualizar_info_seccion)
 
             # Botones
             self.dlg.buttonBox.accepted.connect(self.ejecutar)
@@ -105,25 +108,52 @@ class SecGeol:
             )
             return None
 
+        feat = None
+
         if seleccionadas == 1:
             feat = next(sec_layer.getSelectedFeatures(), None)
             if feat is None:
                 self._set_help("No fue posible recuperar la sección seleccionada.")
                 return None
-            return feat
 
-        if total == 1:
+        elif total == 1:
             feat = next(sec_layer.getFeatures(), None)
             if feat is None:
                 self._set_help("No fue posible recuperar la sección.")
                 return None
-            return feat
 
-        self._set_help(
-            "La capa contiene más de una sección. "
-            "Seleccione una sola línea para continuar."
-        )
-        return None
+        else:
+            self._set_help(
+                "La capa contiene más de una sección. "
+                "Seleccione una sola línea para continuar."
+            )
+            return None
+
+        # -------------------------
+        # Validación geométrica del registro
+        # -------------------------
+        geom = feat.geometry()
+        if geom is None or geom.isEmpty():
+            self._set_help("La geometría de la sección está vacía.")
+            return None
+
+        if geom.isMultipart():
+            partes = geom.asMultiPolyline()
+
+            if not partes:
+                self._set_help("No fue posible interpretar la geometría de la sección.")
+                return None
+
+            if len(partes) > 1:
+                self._set_help(
+                    "La sección contiene líneas separadas dentro de un mismo registro. "
+                    "SecGeol solo acepta una sola línea por sección."
+                )
+                return None
+
+        return feat
+
+
     
     #-------------------------------------------------------------------------
     # Devuelve la geometría base de la sección: dibujada por el usuario, o tomada del layer/selección
