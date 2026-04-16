@@ -742,15 +742,76 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             return
 
         try:
-            crs_txt = dem_layer.crs().authid()
+            dem_crs = dem_layer.crs()
+
+            crs_authid = dem_crs.authid()
+            crs_name = dem_crs.description()
+
+            if crs_authid:
+                crs_info = f"{crs_authid} - {crs_name}"
+            else:
+                crs_info = crs_name
+
             pixel_x = dem_layer.rasterUnitsPerPixelX()
             pixel_y = dem_layer.rasterUnitsPerPixelY()
 
+            es_metrico = dem_crs.isValid() and dem_crs.mapUnits() == Qgis.DistanceUnit.Meters
+            una_banda = dem_layer.bandCount() == 1
+
+            provider = dem_layer.dataProvider()
+
+            tipos_validos = {
+                Qgis.DataType.Int16,
+                Qgis.DataType.UInt16,
+                Qgis.DataType.Int32,
+                Qgis.DataType.UInt32,
+                Qgis.DataType.Float32,
+                Qgis.DataType.Float64,
+            }
+
+            tipo_nombres = {
+                Qgis.DataType.Int16: "Int16",
+                Qgis.DataType.UInt16: "UInt16",
+                Qgis.DataType.Int32: "Int32",
+                Qgis.DataType.UInt32: "UInt32",
+                Qgis.DataType.Float32: "Float32",
+                Qgis.DataType.Float64: "Float64",
+            }
+
+            band_type = provider.dataType(1) if una_banda else None
+            band_type_name = tipo_nombres.get(band_type, "N/A") if una_banda else "N/A"
+
+            banda_valida = una_banda and (band_type in tipos_validos)
+
+            if es_metrico and banda_valida:
+                estado = "<span style='color:green;'><b>Estado:</b> compatible con SecGeol.</span>"
+            else:
+                detalles = []
+                if not dem_crs.isValid():
+                    detalles.append("el CRS no es válido")
+                elif not es_metrico:
+                    detalles.append("el CRS no está en metros")
+                if not una_banda:
+                    detalles.append("el raster no es de una sola banda")
+                elif band_type_name not in tipos_validos:
+                    detalles.append(f"el tipo de dato no es adecuado ({band_type_name})")
+
+                estado = (
+                        "<span style='color:red;'><b>Estado:</b> No compatible con SecGeol.<br>"
+                        "Es posible que la capa seleccionada no contenga elevación del terreno.<br>"
+                        "SecGeol requiere un modelo digital de elevación (DEM) con valores numéricos de altura.</span>"
+                    )
+                
+
             self.textBrowserHelp.setHtml(
                 f"<b>DEM seleccionado:</b> {dem_layer.name()}<br>"
-                f"<b>CRS:</b> {crs_txt}<br>"
-                f"<b>Tamaño de pixel:</b> {pixel_x:.3f} x {pixel_y:.3f}"
+                f"<b>CRS:</b> {crs_info}<br>"
+                f"<b>Tamaño de pixel:</b> {pixel_x:.3f} x {pixel_y:.3f}<br>"
+                f"<b>Bandas:</b> {dem_layer.bandCount()}<br>"
+                f"<b>Tipo de dato:</b> {band_type_name}<br>"
+                f"{estado}"
             )
+
         except Exception as e:
             self.textBrowserHelp.setHtml(
                 f"<b>DEM:</b> Error al leer propiedades: {e}"

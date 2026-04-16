@@ -8,7 +8,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import ( 
                         QgsWkbTypes,
-                        QgsGeometry
+                        Qgis
                        )
 
 
@@ -245,6 +245,92 @@ class SecGeol:
                 self.tr("Selected DEM is not a raster layer.")
             )
             return
+        
+        #------- Si no es un DEM  con elevación   -----
+
+        if not dem_layer:
+            self.iface.messageBar().pushWarning(
+                self.tr("SecGeol"),
+                self.tr("Select a DEM layer.")
+            )
+            return
+
+        if dem_layer.type() != dem_layer.RasterLayer:
+            self.iface.messageBar().pushWarning(
+                self.tr("SecGeol"),
+                self.tr("Selected DEM is not a raster layer.")
+            )
+            return
+
+
+        dem_crs = dem_layer.crs()
+
+        if not dem_crs.isValid():
+            self.iface.messageBar().pushWarning(
+                self.tr("SecGeol"),
+                self.tr("The DEM CRS is not valid.")
+            )
+            self._set_help("El sistema de referencia del DEM no es válido.")
+            return
+
+        if dem_crs.mapUnits() != Qgis.DistanceUnit.Meters:
+            self.iface.messageBar().pushWarning(
+                self.tr("SecGeol"),
+                self.tr("The DEM must use metric units.")
+            )
+            self._set_help(
+                "El modelo digital de elevación debe estar en un sistema de referencia "
+                "proyectado con unidades en metros."
+            )
+            return
+
+        if dem_layer.bandCount() != 1:
+            self.iface.messageBar().pushWarning(
+                self.tr("SecGeol"),
+                self.tr("The DEM must be a single-band raster.")
+            )
+            self._set_help(
+                "El raster seleccionado no parece corresponder a un modelo digital de elevación. "
+                "Es posible que la capa sea una imagen y no contenga elevación del terreno."
+            )
+            return
+
+        provider = dem_layer.dataProvider()
+        band_type = provider.dataType(1)
+
+        tipos_validos = {
+            Qgis.DataType.Int16,
+            Qgis.DataType.UInt16,
+            Qgis.DataType.Int32,
+            Qgis.DataType.UInt32,
+            Qgis.DataType.Float32,
+            Qgis.DataType.Float64,
+        }
+
+        tipo_nombres = {
+            Qgis.DataType.Int16: "Int16",
+            Qgis.DataType.UInt16: "UInt16",
+            Qgis.DataType.Int32: "Int32",
+            Qgis.DataType.UInt32: "UInt32",
+            Qgis.DataType.Float32: "Float32",
+            Qgis.DataType.Float64: "Float64",
+        }
+
+        band_type_name = tipo_nombres.get(band_type, str(band_type))
+
+        if band_type not in tipos_validos:
+            self.iface.messageBar().pushWarning(
+                self.tr("SecGeol"),
+                self.tr("The DEM raster type is not valid.")
+            )
+            self._set_help(
+                f"El raster seleccionado no parece corresponder a un modelo digital de elevación. "
+                f"Tipo de dato detectado: {band_type_name}."
+            )
+            return
+
+        #---------------------- Términa validación layer
+
 
         if sec_layer is None and not has_drawn:
             self.iface.messageBar().pushWarning(
