@@ -209,53 +209,52 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         # ESTADO INICIAL DE LA AYUDA
         # -----------------------------
         self.help_tab_uno = """
-       <div style="padding:10px; line-height:1.4;">
-            <h3>Geological Section Tool</h3>
+            <div style="padding:10px; line-height:1.4;">
+                <h3>Herramienta de Secciones Geológicas</h3>
 
-            <p>
-                This tool generates a topographic profile from a Digital Elevation Model (DEM)
-                along a user-defined section line. The resulting profile can be used as a base
-                for geological interpretation and cross-section construction.
-            </p>
+                <p>
+                    Esta herramienta genera un perfil topográfico a partir de un Modelo Digital de Elevación (DEM)
+                    a lo largo de una línea de sección definida por el usuario. El perfil resultante puede utilizarse
+                    como base para la interpretación geológica y la construcción de secciones.
+                </p>
 
-            <p>
-                <b>Requirements:</b><br>
-                - Load all input layers into the current QGIS project.<br>
-                - Use a projected coordinate system (recommended: UTM).<br>
-                - Ensure layers share the same CRS.
-            </p>
+                <p>
+                    <b>Requisitos:</b><br>
+                    - Cargar todas las capas de entrada en el proyecto actual de QGIS.<br>
+                    - Utilizar un sistema de referencia proyectado (recomendado: UTM).<br>
+                    - Asegurar que las capas compartan el mismo sistema de referencia.
+                </p>
 
-            <p>
-                <b>Tip:</b> Fields marked with an asterisk (*) are required.  
-                Click on each control to view a short description.
-            </p>
-        </div>
-
-        """
+                <p>
+                    <b>Tip:</b> Los campos marcados con un asterisco (*) son obligatorios.<br>
+                    Haz clic en cada control para ver una breve descripción.
+                </p>
+            </div>
+            """
         self.help_tab_dos = """
-        <div style="padding:10px; line-height:1.4; font-size:12px;">
-            <h3>Tab 2</h3>
-            <p>
-                This tab will contain additional options related to geological interpretation
-                and derived outputs.
-            </p>
-            <p>
-                Click on each control to view a short description.
-            </p>
-        </div>
-        """
+            <div style="padding:10px; line-height:1.4; font-size:12px;">
+                <h3>Opciones de Interpretación</h3>
+                <p>
+                    En esta pestaña se integrarán opciones adicionales relacionadas con la interpretación geológica
+                    y la generación de resultados derivados a partir del perfil.
+                </p>
+                <p>
+                    Haz clic en cada control para ver una breve descripción.
+                </p>
+            </div>
+            """
 
         self.help_tab_tres = """
-        <div style="padding:10px; line-height:1.4; font-size:12px;">
-            <h3>Tab 3</h3>
+            <div style="padding:10px; line-height:1.4; font-size:12px;">
+            <h3>Herramientas y Resultados</h3>
             <p>
-                This tab will contain complementary tools and final outputs.
+                Esta pestaña contendrá herramientas complementarias y opciones para la generación de resultados finales.
             </p>
             <p>
-                Click on each control to view a short description.
+                Haz clic en cada control para ver una breve descripción.
             </p>
-        </div>
-        """
+            </div>
+            """
         # -----------------------------
         # CONEXIÓN DE TABS
         # -----------------------------
@@ -310,32 +309,40 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         # TOOLTIPS
         # -----------------------------
         self.MapLayerDEM.setToolTip(
-            "Select the Digital Elevation Model (DEM) layer."
+            "Seleccione el modelo digital de elevación (DEM)."
         )
         self.MapLayerSec.setToolTip(
-            "Select the section line layer."
+            "Seleccione la capa que contiene la línea de sección."
         )
+
         self.btnDrawSec.setToolTip(
-            "Draw a temporary section line on the map canvas."
+            "Dibuje una línea de sección directamente sobre el mapa."
         )
+
         self.checkInvSec.setToolTip(
-            "Reverse the section direction."
+            "Invertir el sentido de la sección (inicio ↔ fin)."
         )
+
         self.MapLayerGeo.setToolTip(
-            "Optional geology layer."
+            "Capa de geología (opcional) para intersectar la sección."
         )
+
         self.MapLayerEst.setToolTip(
-            "Optional structural layer."
+            "Capa estructural (opcional) para intersectar la sección."
         )
+
         self.doubleSpinBox.setToolTip(
-            "Optional box size in meters. Leave 0 to skip box creation."
+            "Tamaño de la caja en metros (opcional). Use 0 para no generarla."
         )
+
         self.checkEjes.setToolTip(
-            "Create X and Y axes in the output profile."
+            "Crear ejes X y Y en el perfil generado."
         )
+
         self.fileWidgetPerfil.setToolTip(
-            "Select the output file."
+            "Seleccione el archivo de salida para guardar el perfil."
         )
+
 
     def on_section_layer_changed(self, layer):
         if layer is not None:
@@ -502,48 +509,54 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
             elif obj == self.btnDrawSec:
                 self.mostrar_ayuda(
-                    "Draw Section",
-                    "Use this button to draw a temporary section line directly on the map canvas."
+                    "Dibujar sección",
+                    "Permite dibujar una línea de sección directamente sobre el mapa.\n"
+                    "Haz clic para iniciar y clic derecho para finalizar."
                 )
 
             elif obj == self.checkInvSec:
                 self.mostrar_ayuda(
-                    "Invert Section",
-                    "Reverse the section direction from end to start."
+                    "Invertir sección",
+                    "Invierte el sentido de la sección (inicio ↔ fin).\n"
+                    "Esto cambia la orientación del perfil."
                 )
 
             elif obj == self.MapLayerGeo:
                 self.mostrar_ayuda(
-                    "Geology Layer",
-                    "Optional polygon layer used to intersect the section with geological units."
+                    "Capa de geología",
+                    "Capa poligonal opcional que se intersecta con la sección\n"
+                    "para mostrar las unidades geológicas en el perfil."
                 )
 
             elif obj == self.MapLayerEst:
                 self.mostrar_ayuda(
-                    "Structural Layer",
-                    "Optional line layer used to intersect the section with structural features."
+                    "Capa estructural",
+                    "Capa lineal opcional que se intersecta con la sección\n"
+                    "para representar estructuras geológicas en el perfil."
                 )
 
             elif obj == self.doubleSpinBox:
                 self.mostrar_ayuda(
-                    "Box Size",
-                    "Optional box size in meters. Use 0 if no box should be created."
+                    "Tamaño de caja",
+                    "Define el tamaño de la caja en metros para el perfil.\n"
+                    "Usa 0 si no deseas generar la caja."
                 )
 
             elif obj == self.checkEjes:
                 self.mostrar_ayuda(
-                    "Create Axes",
-                    "Enable this option to create X and Y axes in the generated profile."
+                    "Crear ejes",
+                    "Genera los ejes X y Y en el perfil resultante."
                 )
 
             elif obj == self.fileWidgetPerfil:
                 self.mostrar_ayuda(
-                    "Output File",
-                    "Select the output file where the generated profile will be stored."
+                    "Archivo de salida",
+                    "Selecciona el archivo donde se guardará el perfil generado."
                 )
+
         elif event.type() == 11:  # Leave
             self.actualizar_ayuda_tab()
-            
+
         return super().eventFilter(obj, event)
 
     # ---------------------------------
@@ -556,7 +569,10 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         dem_layer = self.MapLayerDEM.currentLayer()
         if dem_layer is None:
-            raise Exception("No se ha seleccionado un DEM.")
+            raise Exception(
+                "No se ha seleccionado un modelo digital de elevación (DEM). "
+                "Seleccione una capa raster válida para continuar."
+            )
 
         target_crs = dem_layer.crs()
 
