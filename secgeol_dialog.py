@@ -424,7 +424,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 #--------- Muestra la sección dibujada como capa temporal visible en el mapa. Reemplaza la anterior si existe.
 
     def mostrar_seccion_dibujada(self, feature):
-        print("🟡 Entró a mostrar_seccion_dibujada")
+        print("🟡 Entró a mostrar seccion dibujada")
 
         if feature is None:
             print("❌ feature es None")
@@ -569,9 +569,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         dem_layer = self.MapLayerDEM.currentLayer()
         if dem_layer is None:
-            raise Exception(
+            raise Exception(self.tr(
                 "No se ha seleccionado un modelo digital de elevación (DEM). "
-                "Seleccione una capa raster válida para continuar."
+                "Seleccione una capa raster válida para continuar.")
             )
 
         target_crs = dem_layer.crs()
@@ -583,7 +583,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         # Caso 1: el usuario dibujó una sección
         if has_drawn:
             if self.drawn_section_feature is None:
-                raise Exception("No se encontró la sección dibujada.")
+                raise Exception(self.tr("No se encontró la sección dibujada."))
 
             # Ajusta aquí según el CRS real de tu sección dibujada
             source_crs = self.iface.mapCanvas().mapSettings().destinationCrs()
@@ -600,7 +600,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         elif feat_sec is not None:
             source_layer = self.MapLayerSec.currentLayer()
             if source_layer is None:
-                raise Exception("No se encontró la capa de sección.")
+                raise Exception(self.tr("No se encontró la capa de sección."))
 
             source_crs = source_layer.crs()
 
@@ -613,10 +613,10 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             print("F: sección temporal preparada desde feature seleccionada")
 
         else:
-            raise Exception("No se encontró una sección válida para preparar.")
+            raise Exception(self.tr("No se encontró una sección válida para preparar."))
 
         if temp_layer is None or not temp_layer.isValid():
-            raise Exception("No fue posible preparar la sección de trabajo.")
+            raise Exception(self.tr("No fue posible preparar la sección de trabajo."))
 
         return temp_layer
     
@@ -660,7 +660,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         dem_layer = self.MapLayerDEM.currentLayer()
         if dem_layer is None:
-            raise Exception("No se ha seleccionado un DEM.")
+            raise Exception(self.tr("No se ha seleccionado un DEM."))
 
         section_layer = self.preparar_seccion_trabajo(
             feat_sec=feat_sec,
@@ -670,7 +670,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         print("I: sección temporal preparada")
 
         if section_layer is None or not section_layer.isValid():
-            raise Exception("No fue posible preparar la sección de trabajo.")
+            raise Exception(self.tr("No fue posible preparar la sección de trabajo."))
 
         caja_m = self.obtener_caja_m()
         print(f"J: caja_m = {caja_m}")

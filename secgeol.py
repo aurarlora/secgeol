@@ -67,7 +67,7 @@ class SecGeol:
     def draw_section(self):
         self.iface.messageBar().pushInfo(
             self.tr("SecGeol"),
-            self.tr("Draw section tool not implemented yet.")
+            self.tr("Dibuja la sección sobre el mapa: haz clic para iniciar y clic derecho para finalizar.")
         )
 
 
