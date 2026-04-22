@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>698</width>
-    <height>409</height>
+    <height>419</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -224,7 +224,7 @@
         <rect>
          <x>110</x>
          <y>10</y>
-         <width>261</width>
+         <width>131</width>
          <height>21</height>
         </rect>
        </property>
@@ -236,6 +236,16 @@
          <y>50</y>
          <width>261</width>
          <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QgsFieldComboBox" name="FieldClasGeo">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>10</y>
+         <width>111</width>
+         <height>27</height>
         </rect>
        </property>
       </widget>
@@ -361,6 +371,11 @@
   </widget>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QgsFieldComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsfieldcombobox.h</header>
+  </customwidget>
   <customwidget>
    <class>QgsFileWidget</class>
    <extends>QWidget</extends>

@@ -34,7 +34,7 @@ class DrawSectionMapTool(QgsMapTool):
         self.cancel_callback = cancel_callback
         self.points = []
 
-        # línea ya confirmada
+        # línea ya confirmada 
         self.rubber_band = QgsRubberBand(self.canvas, QgsWkbTypes.LineGeometry)
         self.rubber_band.setWidth(4)
         self.rubber_band.setColor(QColor(255, 0, 0))  # rojo sólido
@@ -48,6 +48,11 @@ class DrawSectionMapTool(QgsMapTool):
         self.vertex_band = QgsRubberBand(self.canvas, QgsWkbTypes.PointGeometry)
         self.vertex_band.setWidth(6)
         self.vertex_band.setColor(QColor(255, 0, 0))
+
+        # mapa de geología
+        self.MapLayerGeo.layerChanged.connect(self.actualizar_info_geologia)
+
+
 
     def activate(self):
         self.canvas.setCursor(Qt.CursorShape.CrossCursor)
@@ -935,4 +940,41 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             f"<b>Sección activa:</b> {sec_layer.name()}<br>"
             f"<b>Longitud:</b> {longitud:.2f}<br>"
             f"<b>Invertida:</b> {'Sí' if invertida else 'No'}"
+        )
+
+    # ---------------------------------
+    # Intersección con geologia
+    # --------------------------------- 
+
+    def actualizar_info_geologia(self):
+        geo_layer = self.MapLayerGeo.currentLayer()
+
+        if geo_layer is None:
+            self.FieldClasGeo.setLayer(None)
+            self.mostrar_ayuda(
+                "Capa de geología",
+                "Seleccione una capa geológica para cargar sus campos."
+            )
+            return
+
+        # Cargar automáticamente los campos en el combo
+        self.FieldClasGeo.setLayer(geo_layer)
+
+        crs = geo_layer.crs()
+        crs_authid = crs.authid()
+        crs_name = crs.description()
+
+        if crs_authid:
+            crs_info = f"{crs_authid} - {crs_name}"
+        else:
+            crs_info = crs_name
+
+        total_campos = len(geo_layer.fields())
+
+        self.mostrar_ayuda(
+            "Capa de geología",
+            f"Capa seleccionada: {geo_layer.name()}<br>"
+            f"CRS: {crs_info}<br>"
+            f"Campos disponibles: {total_campos}<br>"
+            f"Seleccione el campo que se utilizará para clasificar los segmentos de la sección."
         )

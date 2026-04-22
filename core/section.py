@@ -110,10 +110,10 @@ class SectionManager:
             return geom
 
         if not source_crs.isValid():
-            raise Exception("El CRS de origen no es válido.")
+            raise Exception(self.tr("El CRS de origen no es válido."))
 
         if not target_crs.isValid():
-            raise Exception("El CRS de destino no es válido.")
+            raise Exception(self.tr("El CRS de destino no es válido."))
 
         if source_crs == target_crs:
             return QgsGeometry(geom)
@@ -182,13 +182,13 @@ class SectionManager:
     ) -> QgsVectorLayer:
 
         if source_layer is None or not source_layer.isValid():
-            raise Exception("La capa de sección del usuario no es válida.")
+            raise Exception(self.tr("La capa de sección del usuario no es válida."))
 
         if source_layer.geometryType() != QgsWkbTypes.LineGeometry:
-            raise Exception("La capa de sección debe ser de tipo línea.")
+            raise Exception(self.tr("La capa de sección debe ser de tipo línea."))
 
         if target_crs is None or not target_crs.isValid():
-            raise Exception("El CRS de destino no es válido.")
+            raise Exception(self.tr("El CRS de destino no es válido."))
 
         source_crs = source_layer.crs()
         crs_authid = target_crs.authid()
@@ -224,10 +224,10 @@ class SectionManager:
     ) -> QgsVectorLayer:
 
         if source_feature is None:
-            raise Exception("No se proporcionó una sección válida.")
+            raise Exception(self.tr("No se proporcionó una sección válida."))
 
         if target_crs is None or not target_crs.isValid():
-            raise Exception("El CRS de destino no es válido.")
+            raise Exception(self.tr("El CRS de destino no es válido."))
 
         crs_authid = target_crs.authid()
 
