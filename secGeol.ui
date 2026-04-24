@@ -239,13 +239,13 @@
         </rect>
        </property>
       </widget>
-      <widget class="QgsFieldComboBox" name="FieldClasGeo">
+      <widget class="QComboBox" name="combofieldBox">
        <property name="geometry">
         <rect>
          <x>260</x>
          <y>10</y>
          <width>111</width>
-         <height>27</height>
+         <height>22</height>
         </rect>
        </property>
       </widget>
@@ -371,11 +371,6 @@
   </widget>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>QgsFieldComboBox</class>
-   <extends>QComboBox</extends>
-   <header>qgsfieldcombobox.h</header>
-  </customwidget>
   <customwidget>
    <class>QgsFileWidget</class>
    <extends>QWidget</extends>

@@ -680,12 +680,10 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         caja_m = self.obtener_caja_m()
         print(f"J: caja_m = {caja_m}")
 
-        section_geom = None
-        for feat in section_layer.getFeatures():
-            geom = feat.geometry()
-            if geom is not None and not geom.isEmpty():
-                section_geom = geom
-                break
+        section_geom = self.section_manager.obtener_geometria_seccion_efectiva(section_layer)
+        if section_geom is None:
+            raise Exception(self.tr("No fue posible obtener la geometría efectiva de la sección."))
+
 
         break_distances = []
         if section_geom is not None:
@@ -948,7 +946,11 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
     def actualizar_info_geologia(self):
         geo_layer = self.MapLayerGeo.currentLayer()
+        campo_geo = self.FieldClasGeo.currentField()
 
+        if not campo_geo:
+            campo_geo = None
+            
         if geo_layer is None:
             self.FieldClasGeo.setLayer(None)
             self.mostrar_ayuda(

@@ -307,6 +307,7 @@ class ProfileManager:
             ("lim_izq", box_data["lim_izq"]),
             ("lim_der", box_data["lim_der"])
         ]
+        
         for geom in break_geoms:
             feature_defs.append(("quiebre", geom))
 
