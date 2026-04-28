@@ -2,8 +2,8 @@ import os
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QEvent, QUrl, Qt
-from qgis.PyQt.QtWidgets import QDialog, QSplitter
-from qgis.core import QgsMapLayerProxyModel, QgsProject, Qgis, QgsFeature, QgsGeometry, QgsVectorLayer, QgsWkbTypes
+from qgis.PyQt.QtWidgets import QDialog, QSplitter, QMessageBox
+from qgis.core import QgsMapLayerProxyModel, QgsProject, Qgis, QgsFeature, QgsGeometry, QgsVectorLayer, QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.utils import iface
 from qgis.PyQt.QtGui import QColor
@@ -160,10 +160,17 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         self.btnDrawSec.clicked.connect(self.activar_dibujo_seccion)
         self.MapLayerSec.layerChanged.connect(self.on_section_layer_changed)
+        self.MapLayerGeo.layerChanged.connect(self.actualizar_info_geologia)
+        self.FieldClasGeo.setFilters(QgsFieldProxyModel.AllTypes)
+
+
+        ##self.FieldClasGeo.setFilters(QgsFieldProxyModel.String)
+
 
         self.section_manager = SectionManager()
         self.workspace_manager = WorkspaceManager()
         self.gpkg_path = None
+
 
         # -----------------------------
         # CONFIGURAR CAJA
@@ -533,6 +540,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                     "para mostrar las unidades geológicas en el perfil."
                 )
 
+            
+
             elif obj == self.MapLayerEst:
                 self.mostrar_ayuda(
                     "Capa estructural",
@@ -681,6 +690,25 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         print(f"J: caja_m = {caja_m}")
 
         section_geom = self.section_manager.obtener_geometria_seccion_efectiva(section_layer)
+
+        geo_layer = self.MapLayerGeo.currentLayer()
+        
+        campo_geo = self.FieldClasGeo.currentField() 
+        
+        
+        if not campo_geo:
+            campo_geo = None
+
+        segmentos_geo = []
+
+
+        #if geo_layer is not None and section_geom is not None:
+        #    segmentos_geo = self.section_manager.intersectar_seccion_con_geologia(
+        #        section_geom=section_geom,
+        #        geo_layer=geo_layer,
+        #        campo_geo=campo_geo
+        #    )
+
         if section_geom is None:
             raise Exception(self.tr("No fue posible obtener la geometría efectiva de la sección."))
 
@@ -709,25 +737,31 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     
     def ejecutar_proceso(self):
         try:
-            print("=== SecGeol PARAMETERS ===")
-            print(f"DEM: {self.MapLayerDEM.currentLayer().name() if self.MapLayerDEM.currentLayer() else 'None'}")
-            print(f"Section: {self.MapLayerSec.currentLayer().name() if self.MapLayerSec.currentLayer() else 'None'}")
-            print(f"Invert section: {self.checkInvSec.isChecked()}")
-            print(f"Geology: {self.MapLayerGeo.currentLayer().name() if self.MapLayerGeo.currentLayer() else 'None'}")
-            print(f"Structures: {self.MapLayerEst.currentLayer().name() if self.MapLayerEst.currentLayer() else 'None'}")
-            print(f"Box (m): {self.caja.value()}")
-            print(f"Create axes: {self.ejesXY.isChecked()}")
-            print(f"Output: {self.estSHP.filePath()}")
+            QMessageBox.information(self, "SecGeol", "Entró a ejecutar_proceso")
 
+            campo_geo = self.FieldClasGeo.currentField()
+            if not campo_geo:
+                campo_geo = None
+
+            QgsMessageLog.logMessage(
+                f"Entró a ejecutar_proceso. Campo geológico seleccionado: {campo_geo}",
+                "SecGeol",
+                Qgis.Info
+            )
+
+            print("Campo geológico seleccionado:", campo_geo)
+
+            # lo demás de tu función...
             self.inicializar_workspace()
-            self.preparar_seccion_trabajo()   
-
-            print("Proceso ejecutado correctamente")
-
-            ##self.accept()   # 👈 esto cierra la ventana
+            self.preparar_seccion_trabajo()
 
         except Exception as e:
-            print(f"Error: {e}")
+            QgsMessageLog.logMessage(
+                f"Error en ejecutar_proceso: {e}",
+                "SecGeol",
+                Qgis.Critical
+            )
+            QMessageBox.critical(self, "SecGeol", str(e))
 
 
     # ---------------------------------
@@ -945,12 +979,10 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     # --------------------------------- 
 
     def actualizar_info_geologia(self):
-        geo_layer = self.MapLayerGeo.currentLayer()
-        campo_geo = self.FieldClasGeo.currentField()
+        print(">> actualizar_info_geologia llamado")
 
-        if not campo_geo:
-            campo_geo = None
-            
+        geo_layer = self.MapLayerGeo.currentLayer()
+
         if geo_layer is None:
             self.FieldClasGeo.setLayer(None)
             self.mostrar_ayuda(
@@ -959,8 +991,14 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             )
             return
 
-        # Cargar automáticamente los campos en el combo
+        # Cargar campos de la capa geológica
         self.FieldClasGeo.setLayer(geo_layer)
+
+        # Opcional: leer el campo después de cargar la capa
+        campo_geo = self.FieldClasGeo.currentField()
+
+        if not campo_geo:
+            campo_geo = None
 
         crs = geo_layer.crs()
         crs_authid = crs.authid()
@@ -978,5 +1016,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             f"Capa seleccionada: {geo_layer.name()}<br>"
             f"CRS: {crs_info}<br>"
             f"Campos disponibles: {total_campos}<br>"
-            f"Seleccione el campo que se utilizará para clasificar los segmentos de la sección."
+            f"Seleccione el campo que se utilizará para clasificar los segmentos de la sección.<br>"
+            f"SecGeol generará además el campo <b>id_lito</b> como identificador interno."
         )
