@@ -289,7 +289,7 @@ class ProfileManager:
         out_layer = QgsVectorLayer(f"LineString?crs={crs_authid}", layer_name, "memory")
         prov = out_layer.dataProvider()
 
-        id_lito = 1
+        # id_lito = 1
 
 
         prov.addAttributes([
@@ -316,14 +316,13 @@ class ProfileManager:
             feat = QgsFeature(out_layer.fields())
             feat.setGeometry(geom)
             feat.setAttributes([
-                id_lito,
+                0,  # id_lito reservado para líneas base/no litológicas
                 tipo,
                 float(extra_depth),
                 float(box_data["y_min_global"]),
                 float(box_data["base_y"])
             ])
             out_features.append(feat)
-            id_lito += 1
 
         prov.addFeatures(out_features)
         out_layer.updateExtents()

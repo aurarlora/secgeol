@@ -14,6 +14,7 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform
 )
+from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.PyQt.QtCore import QVariant
 # from .fields import fields_section_internal
 
@@ -259,5 +260,55 @@ class SectionManager:
                 return geom
 
         return None
+    
+
+    # ---------------------------------
+    # Intersectar con  geologia
+    # --------------------------------- 
+
+    def intersectar_seccion_con_geologia(self, section_geom, geo_layer, campo_geo=None):
+       
+
+        segmentos = []
+        id_lito = 1
+
+        if section_geom is None or section_geom.isEmpty():
+            return segmentos
+
+        if geo_layer is None:
+            return segmentos
+
+        for feat_geo in geo_layer.getFeatures():
+            geom_geo = feat_geo.geometry()
+
+            if geom_geo is None or geom_geo.isEmpty():
+                continue
+
+            if not section_geom.intersects(geom_geo):
+                continue
+
+            inter = section_geom.intersection(geom_geo)
+
+            if inter is None or inter.isEmpty():
+                continue
+
+            valor_campo = None
+
+            if campo_geo:
+                try:
+                    valor_campo = feat_geo[campo_geo]
+                except Exception:
+                    valor_campo = None
+
+            segmentos.append({
+                "id_lito": id_lito,
+                "campo_geo": campo_geo,
+                "valor_geo": valor_campo,
+                "geometry": inter
+            })
+
+            id_lito += 1
+
+        return segmentos
 
     

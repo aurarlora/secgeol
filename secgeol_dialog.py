@@ -3,7 +3,7 @@ import os
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QEvent, QUrl, Qt
 from qgis.PyQt.QtWidgets import QDialog, QSplitter, QMessageBox
-from qgis.core import QgsMapLayerProxyModel, QgsProject, Qgis, QgsFeature, QgsGeometry, QgsVectorLayer, QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog
+from qgis.core import QgsMapLayerProxyModel, QgsProject, Qgis, QgsFeature, QgsGeometry, QgsVectorLayer, QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog, QgsCoordinateTransform
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.utils import iface
 from qgis.PyQt.QtGui import QColor
@@ -699,7 +699,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         if not campo_geo:
             campo_geo = None
 
-        segmentos_geo = []
+        ## segmentos_geo = []
 
 
         #if geo_layer is not None and section_geom is not None:
@@ -744,16 +744,96 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 campo_geo = None
 
             QgsMessageLog.logMessage(
-                f"Entró a ejecutar_proceso. Campo geológico seleccionado: {campo_geo}",
+                f"Campo geológico seleccionado: {campo_geo}",
                 "SecGeol",
                 Qgis.Info
             )
 
             print("Campo geológico seleccionado:", campo_geo)
 
-            # lo demás de tu función...
+            # 🔹 Inicializar workspace
             self.inicializar_workspace()
-            self.preparar_seccion_trabajo()
+
+            # 🔹 Obtener sección seleccionada
+            section_layer = self.MapLayerSec.currentLayer()
+
+            if section_layer is None:
+                raise Exception("No hay capa de sección seleccionada.")
+            
+            QMessageBox.information(
+                self,
+                "SecGeol - diagnóstico sección",
+                f"Capa: {section_layer.name()}\n"
+                f"Total entidades: {section_layer.featureCount()}\n"
+                f"Entidades seleccionadas: {section_layer.selectedFeatureCount()}"
+            )
+
+            selected = section_layer.selectedFeatures()
+
+            if len(selected) == 1:
+                    feat_sec = selected[0]
+
+            elif len(selected) == 0 and section_layer.featureCount() == 1:
+                feat_sec = next(section_layer.getFeatures())
+
+            else:
+                raise Exception(
+                    "Seleccione solo una línea de sección, o use una capa que contenga una sola línea."
+                )
+
+           
+            geo_layer = self.MapLayerGeo.currentLayer()
+
+             # 🔹 Preparar sección
+            section_work_layer = self.preparar_seccion_trabajo(feat_sec=feat_sec)
+
+            QMessageBox.information(
+                self,
+                "Diagnóstico CRS",
+                f"CRS sección trabajo: {section_work_layer.crs().authid()}\n"
+                f"CRS geología: {geo_layer.crs().authid()}\n"
+                f"Extensión sección: {section_work_layer.extent().toString()}\n"
+                f"Extensión geología: {geo_layer.extent().toString()}"
+            )
+            
+
+
+            segmentos_geo = []
+
+            if geo_layer is not None and section_work_layer is not None:
+                section_geom = None
+
+                for f in section_work_layer.getFeatures():
+                    section_geom = QgsGeometry(f.geometry())
+
+                    if section_work_layer.crs() != geo_layer.crs():
+                        transform = QgsCoordinateTransform(
+                            section_work_layer.crs(),
+                            geo_layer.crs(),
+                            QgsProject.instance()
+                        )
+                        section_geom.transform(transform)
+                    break
+
+                segmentos_geo = self.section_manager.intersectar_seccion_con_geologia(
+                    section_geom=section_geom,
+                    geo_layer=geo_layer,
+                    campo_geo=campo_geo
+                )
+
+                QgsMessageLog.logMessage(
+                    f"Segmentos geológicos: {segmentos_geo}",
+                    "SecGeol",
+                    Qgis.Info
+                )
+
+                QMessageBox.information(
+                    self,
+                    "SecGeol",
+                    f"Número de segmentos geológicos encontrados: {len(segmentos_geo)}"
+                )
+
+            print("Proceso ejecutado correctamente")
 
         except Exception as e:
             QgsMessageLog.logMessage(
@@ -763,6 +843,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             )
             QMessageBox.critical(self, "SecGeol", str(e))
 
+         
 
     # ---------------------------------
     # Valor de caja en metros
@@ -975,7 +1056,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         )
 
     # ---------------------------------
-    # Intersección con geologia
+    # Actualizar  geologia
     # --------------------------------- 
 
     def actualizar_info_geologia(self):
@@ -991,12 +1072,12 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             )
             return
 
-        # Cargar campos de la capa geológica
         self.FieldClasGeo.setLayer(geo_layer)
 
-        # Opcional: leer el campo después de cargar la capa
-        campo_geo = self.FieldClasGeo.currentField()
+        campos = geo_layer.fields()
+        total_campos = len(campos)
 
+        campo_geo = self.FieldClasGeo.currentField()
         if not campo_geo:
             campo_geo = None
 
@@ -1004,18 +1085,29 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         crs_authid = crs.authid()
         crs_name = crs.description()
 
-        if crs_authid:
-            crs_info = f"{crs_authid} - {crs_name}"
-        else:
-            crs_info = crs_name
+        crs_info = f"{crs_authid} - {crs_name}" if crs_authid else crs_name
 
-        total_campos = len(geo_layer.fields())
+        if total_campos == 0:
+            mensaje_campo = (
+                "La capa geológica no contiene campos de atributos.<br>"
+                "SecGeol continuará usando únicamente <b>id_lito</b>."
+            )
+        else:
+            mensaje_campo = (
+                "Seleccione el campo que se utilizará para clasificar los segmentos de la sección.<br>"
+                "SecGeol generará además el campo <b>id_lito</b> como identificador interno."
+            )
 
         self.mostrar_ayuda(
             "Capa de geología",
             f"Capa seleccionada: {geo_layer.name()}<br>"
             f"CRS: {crs_info}<br>"
             f"Campos disponibles: {total_campos}<br>"
-            f"Seleccione el campo que se utilizará para clasificar los segmentos de la sección.<br>"
-            f"SecGeol generará además el campo <b>id_lito</b> como identificador interno."
+            f"{mensaje_campo}"
         )
+
+
+   
+
+
+    
