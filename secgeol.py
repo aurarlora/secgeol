@@ -8,7 +8,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import ( 
                         QgsWkbTypes,
-                        Qgis
+                        Qgis, QgsGeometry
                        )
 
 
@@ -205,6 +205,10 @@ class SecGeol:
     # EJECUTAR
     # -----------------------------------
     def ejecutar(self):
+        segmentos_geo = []
+        # Geologia
+        
+
         # DEM
         dem_layer = self.dlg.MapLayerDEM.currentLayer()
 
@@ -214,7 +218,9 @@ class SecGeol:
         inv_sec = self.dlg.checkInvSec.isChecked()
 
         # Geología
+        
         geo_layer = self.dlg.MapLayerGeo.currentLayer()
+        campo_geo = self.dlg.FieldClasGeo.currentField()
 
         # Estructuras
         est_layer = self.dlg.MapLayerEst.currentLayer()
@@ -353,6 +359,57 @@ class SecGeol:
             feat_sec = self.obtener_feature_seccion(sec_layer, has_drawn=False)
             if feat_sec is None:
                 return
+            
+
+        #--------------------- Validación geología
+
+
+        if not campo_geo:
+            campo_geo = None
+
+        
+
+        if geo_layer is not None:
+            section_work_layer = self.dlg.preparar_seccion_trabajo(
+                feat_sec=feat_sec,
+                has_drawn=has_drawn,
+                invertida=inv_sec
+            )
+
+            section_geom = None
+
+            for f in section_work_layer.getFeatures():
+                section_geom = QgsGeometry(f.geometry())
+                break
+
+            segmentos_geo = self.dlg.section_manager.intersectar_seccion_con_geologia(
+                section_geom=section_geom,
+                section_crs=section_work_layer.crs(),
+                geo_layer=geo_layer,
+                campo_geo=campo_geo
+            )
+
+        
+        try:
+            self.dlg.generar_perfil(
+                feat_sec=feat_sec,
+                has_drawn=has_drawn,
+                invertida=inv_sec,
+                segmentos_geo=segmentos_geo
+            )
+
+            self.iface.messageBar().pushInfo(
+                self.tr("SecGeol"),
+                self.tr("Profile created successfully.")
+            )
+
+            self.dlg.accept()
+
+        except Exception as e:
+            self.iface.messageBar().pushWarning(
+                self.tr("SecGeol"),
+                str(e)
+            )
 
         # -------------------------
         # INFORMACIÓN DE PRUEBA
@@ -376,25 +433,6 @@ class SecGeol:
         for r in resumen:
             print(r)
 
-        try:
-            self.dlg.generar_perfil(
-            feat_sec=feat_sec,
-            has_drawn=has_drawn,
-            invertida=inv_sec
-        )
-
-            self.iface.messageBar().pushInfo(
-                self.tr("SecGeol"),
-                self.tr("Profile created successfully.")
-            )
-
-            self.dlg.accept()
-
-        except Exception as e:
-            self.iface.messageBar().pushWarning(
-                self.tr("SecGeol"),
-                str(e)
-            )
-            print(f"Error en SecGeol: {e}")
+      
 
         

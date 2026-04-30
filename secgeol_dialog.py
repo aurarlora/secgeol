@@ -669,7 +669,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     # --------------------------------- 
 
 
-    def generar_perfil(self, feat_sec=None, has_drawn=False, invertida=False):
+    def generar_perfil(self, feat_sec=None, has_drawn=False, invertida=False, segmentos_geo=None):
         print("H: entrar a generar_perfil")
 
         dem_layer = self.MapLayerDEM.currentLayer()
@@ -699,15 +699,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         if not campo_geo:
             campo_geo = None
 
-        ## segmentos_geo = []
-
-
-        #if geo_layer is not None and section_geom is not None:
-        #    segmentos_geo = self.section_manager.intersectar_seccion_con_geologia(
-        #        section_geom=section_geom,
-        #        geo_layer=geo_layer,
-        #        campo_geo=campo_geo
-        #    )
 
         if section_geom is None:
             raise Exception(self.tr("No fue posible obtener la geometría efectiva de la sección."))
@@ -723,8 +714,10 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             dem_layer=dem_layer,
             extra_depth=caja_m,
             layer_name="Perfil_topografico",
-            break_distances=break_distances
+            break_distances=break_distances,
+            segmentos_geo=segmentos_geo
         )
+
         print("K: capa de perfil creada")
 
         return perfil_layer
@@ -805,21 +798,15 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
                 for f in section_work_layer.getFeatures():
                     section_geom = QgsGeometry(f.geometry())
-
-                    if section_work_layer.crs() != geo_layer.crs():
-                        transform = QgsCoordinateTransform(
-                            section_work_layer.crs(),
-                            geo_layer.crs(),
-                            QgsProject.instance()
-                        )
-                        section_geom.transform(transform)
                     break
 
                 segmentos_geo = self.section_manager.intersectar_seccion_con_geologia(
                     section_geom=section_geom,
+                    section_crs=section_work_layer.crs(),
                     geo_layer=geo_layer,
                     campo_geo=campo_geo
                 )
+               
 
                 QgsMessageLog.logMessage(
                     f"Segmentos geológicos: {segmentos_geo}",

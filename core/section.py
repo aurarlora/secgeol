@@ -6,7 +6,7 @@ from qgis.core import (
     QgsField,
     QgsFields,
     QgsGeometry,
-    QgsPoint,
+    QgsPointXY,
     QgsProject,
     QgsVectorFileWriter,
     QgsVectorLayer,
@@ -266,9 +266,7 @@ class SectionManager:
     # Intersectar con  geologia
     # --------------------------------- 
 
-    def intersectar_seccion_con_geologia(self, section_geom, geo_layer, campo_geo=None):
-       
-
+    def intersectar_seccion_con_geologia(self, section_geom, section_crs, geo_layer, campo_geo=None):
         segmentos = []
         id_lito = 1
 
@@ -278,11 +276,22 @@ class SectionManager:
         if geo_layer is None:
             return segmentos
 
+        transform = None
+        if geo_layer.crs() != section_crs:
+            transform = QgsCoordinateTransform(
+                geo_layer.crs(),
+                section_crs,
+                QgsProject.instance()
+            )
+
         for feat_geo in geo_layer.getFeatures():
-            geom_geo = feat_geo.geometry()
+            geom_geo = QgsGeometry(feat_geo.geometry())
 
             if geom_geo is None or geom_geo.isEmpty():
                 continue
+
+            if transform is not None:
+                geom_geo.transform(transform)
 
             if not section_geom.intersects(geom_geo):
                 continue
@@ -292,6 +301,23 @@ class SectionManager:
             if inter is None or inter.isEmpty():
                 continue
 
+            # Calcular distancia inicial y final sobre la sección
+            vertices = list(inter.vertices())
+
+            if len(vertices) < 2:
+                continue
+
+            p_ini = vertices[0]
+            p_fin = vertices[-1]
+
+            dist_ini = section_geom.lineLocatePoint(QgsGeometry.fromPointXY(QgsPointXY(p_ini)))
+            dist_fin = section_geom.lineLocatePoint(QgsGeometry.fromPointXY(QgsPointXY(p_fin)))
+
+            if dist_ini > dist_fin:
+                dist_ini, dist_fin = dist_fin, dist_ini
+
+            ## ----
+            
             valor_campo = None
 
             if campo_geo:
@@ -304,9 +330,10 @@ class SectionManager:
                 "id_lito": id_lito,
                 "campo_geo": campo_geo,
                 "valor_geo": valor_campo,
+                "dist_ini": dist_ini,
+                "dist_fin": dist_fin,
                 "geometry": inter
             })
-
             id_lito += 1
 
         return segmentos

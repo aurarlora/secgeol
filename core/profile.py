@@ -1,11 +1,12 @@
 from qgis.core import (
+    Qgis,
     QgsFeature,
     QgsGeometry,
     QgsPointXY,
     QgsProject,
     QgsRasterLayer,
     QgsField,
-    QgsVectorFileWriter,
+    QgsMessageLog,
     QgsVectorLayer
 )
 
@@ -221,11 +222,15 @@ class ProfileManager:
         dem_layer,
         extra_depth: float = 100.0,
         layer_name: str = "Perfil_topografico",
-        break_distances=None
+        break_distances=None,
+        segmentos_geo=None
             ):
 
         if break_distances is None:
             break_distances = []
+
+        if segmentos_geo is None:
+            segmentos_geo = []
 
         if section_layer is None or not section_layer.isValid():
             raise Exception("La capa de sección no es válida.")
@@ -275,8 +280,50 @@ class ProfileManager:
             extra_depth=extra_depth
         )
 
+        linea_perfil = box_data["linea_perfil"]
+
+
         top_y = max(p.geometry().asPoint().y() for p in profile_point_features)
         break_geoms = self._build_break_lines(break_distances, box_data["base_y"], top_y)
+
+
+        segmentos_linea = []
+
+        for seg in segmentos_geo:
+            d_ini = seg["dist_ini"]
+            d_fin = seg["dist_fin"]
+
+            p1 = linea_perfil.interpolate(d_ini)
+            p2 = linea_perfil.interpolate(d_fin)
+
+            if p1 is None or p2 is None:
+                continue
+
+            pt1 = p1.asPoint()
+            pt2 = p2.asPoint()
+
+            sub_geom = QgsGeometry.fromPolylineXY([pt1, pt2])
+
+            if sub_geom is None or sub_geom.isEmpty():
+                continue
+
+            segmentos_linea.append({
+                "id_lito": seg["id_lito"],
+                "valor_geo": seg["valor_geo"],
+                "geometry": sub_geom
+            })
+
+        QgsMessageLog.logMessage(
+            f"Segmentos recibidos en profile.py: {len(segmentos_geo)}",
+            "SecGeol",
+            Qgis.Info
+        )
+
+        QgsMessageLog.logMessage(
+            f"Segmentos de perfil generados: {len(segmentos_linea)}",
+            "SecGeol",
+            Qgis.Info
+        )
 
 
         # -----------------------------
@@ -335,7 +382,7 @@ class ProfileManager:
         QgsProject.instance().addMapLayer(out_layer)
 
         print(f"Puntos generados para el perfil: {len(profile_point_features)}")
-
+        print("Segmentos recibidos en profile:", len(segmentos_geo))
         return out_layer
     
 
