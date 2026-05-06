@@ -669,19 +669,23 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     # --------------------------------- 
 
 
-    def generar_perfil(self, feat_sec=None, has_drawn=False, invertida=False, segmentos_geo=None):
+    def generar_perfil(self, feat_sec=None, has_drawn=False, invertida=False, segmentos_geo=None, section_layer=None):
         print("H: entrar a generar_perfil")
 
         dem_layer = self.MapLayerDEM.currentLayer()
         if dem_layer is None:
             raise Exception(self.tr("No se ha seleccionado un DEM."))
 
-        section_layer = self.preparar_seccion_trabajo(
-            feat_sec=feat_sec,
-            has_drawn=has_drawn,
-            invertida=invertida
-        )
-        print("I: sección temporal preparada")
+        if section_layer is None:
+            section_layer = self.preparar_seccion_trabajo(
+                feat_sec=feat_sec,
+                has_drawn=has_drawn,
+                invertida=invertida
+            )
+            print("I: sección temporal preparada")
+        else:
+            print("I: sección temporal recibida desde ejecutar()")
+
 
         if section_layer is None or not section_layer.isValid():
             raise Exception(self.tr("No fue posible preparar la sección de trabajo."))

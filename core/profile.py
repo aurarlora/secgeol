@@ -133,6 +133,68 @@ class ProfileManager:
 
         return features
     
+        #-----------------------------------------------------------------------
+        # Recorta una línea usando distancias acumuladas sobre la geometría.
+        # Conserva los vértices intermedios para seguir la forma real del perfil.
+        # -------------------------------------------------------------------------
+
+    def recortar_linea_por_distancia(self, linea_geom, dist_ini, dist_fin):
+
+        if linea_geom is None or linea_geom.isEmpty():
+            return None
+
+        if dist_ini > dist_fin:
+            dist_ini, dist_fin = dist_fin, dist_ini
+
+        vertices = list(linea_geom.vertices())
+
+        if len(vertices) < 2:
+            return None
+
+        puntos_salida = []
+
+        for i in range(len(vertices) - 1):
+            p1 = vertices[i]
+            p2 = vertices[i + 1]
+
+            x1, y1 = p1.x(), p1.y()
+            x2, y2 = p2.x(), p2.y()
+
+            # segmento fuera del rango
+            if max(x1, x2) < dist_ini:
+                continue
+
+            if min(x1, x2) > dist_fin:
+                break
+
+            # punto inicial
+            if x1 <= dist_ini <= x2:
+                ratio = (dist_ini - x1) / (x2 - x1) if x2 != x1 else 0
+                y_ini = y1 + ratio * (y2 - y1)
+                puntos_salida.append(QgsPointXY(dist_ini, y_ini))
+
+            # vértice intermedio
+            if dist_ini <= x1 <= dist_fin:
+                puntos_salida.append(QgsPointXY(x1, y1))
+
+            # punto final
+            if x1 <= dist_fin <= x2:
+                ratio = (dist_fin - x1) / (x2 - x1) if x2 != x1 else 0
+                y_fin = y1 + ratio * (y2 - y1)
+                puntos_salida.append(QgsPointXY(dist_fin, y_fin))
+                break
+
+        # limpiar duplicados consecutivos
+        puntos_limpios = []
+        for p in puntos_salida:
+            if not puntos_limpios or p != puntos_limpios[-1]:
+                puntos_limpios.append(p)
+
+        if len(puntos_limpios) < 2:
+            return None
+
+        return QgsGeometry.fromPolylineXY(puntos_limpios)
+
     # --------------------------------------------------------------------------------
     #   Construye las líneas que forman el perfil y su caja:
     #- linea_perfil : polilínea real del perfil
@@ -282,6 +344,22 @@ class ProfileManager:
 
         linea_perfil = box_data["linea_perfil"]
 
+        vertices_perfil = list(linea_perfil.vertices())
+        max_x_perfil = max(v.x() for v in vertices_perfil)
+
+        QgsMessageLog.logMessage(
+            f"Distancia máxima X perfil: {max_x_perfil}",
+            "SecGeol",
+            Qgis.Info
+        )
+
+        if segmentos_geo:
+            max_dist_fin = max(seg["dist_fin"] for seg in segmentos_geo)
+            QgsMessageLog.logMessage(
+                f"Máximo dist_fin geología: {max_dist_fin}",
+                "SecGeol",
+                Qgis.Info
+            )
 
         top_y = max(p.geometry().asPoint().y() for p in profile_point_features)
         break_geoms = self._build_break_lines(break_distances, box_data["base_y"], top_y)
@@ -293,16 +371,11 @@ class ProfileManager:
             d_ini = seg["dist_ini"]
             d_fin = seg["dist_fin"]
 
-            p1 = linea_perfil.interpolate(d_ini)
-            p2 = linea_perfil.interpolate(d_fin)
-
-            if p1 is None or p2 is None:
-                continue
-
-            pt1 = p1.asPoint()
-            pt2 = p2.asPoint()
-
-            sub_geom = QgsGeometry.fromPolylineXY([pt1, pt2])
+            sub_geom = self.recortar_linea_por_distancia(
+                linea_perfil,
+                d_ini,
+                d_fin
+            )
 
             if sub_geom is None or sub_geom.isEmpty():
                 continue
@@ -342,33 +415,56 @@ class ProfileManager:
         prov.addAttributes([
             QgsField("id_lito", QVariant.Int),
             QgsField("tipo", QVariant.String),
+            QgsField("valor_geo", QVariant.String),
             QgsField("caja_m", QVariant.Double),
             QgsField("y_min", QVariant.Double),
             QgsField("base_y", QVariant.Double)
         ])
         out_layer.updateFields()
 
-        feature_defs = [
-            ("linea_perfil", box_data["linea_perfil"]),
+        feature_defs = []
+
+        if not segmentos_geo:
+            feature_defs.append(("linea_perfil", box_data["linea_perfil"]))
+
+        feature_defs.extend([
             ("base", box_data["base"]),
             ("lim_izq", box_data["lim_izq"]),
             ("lim_der", box_data["lim_der"])
-        ]
+        ])
         
         for geom in break_geoms:
             feature_defs.append(("quiebre", geom))
 
         out_features = []
+
         for tipo, geom in feature_defs:
             feat = QgsFeature(out_layer.fields())
             feat.setGeometry(geom)
             feat.setAttributes([
                 0,  # id_lito reservado para líneas base/no litológicas
                 tipo,
+                None,
                 float(extra_depth),
                 float(box_data["y_min_global"]),
                 float(box_data["base_y"])
             ])
+            out_features.append(feat)
+
+        for seg in segmentos_linea:
+        #    print(seg["geometry"].asWkt())
+
+            feat = QgsFeature(out_layer.fields())
+            feat.setGeometry(seg["geometry"])
+            feat.setAttributes([
+                seg["id_lito"],
+                "geologia",
+                seg["valor_geo"],
+                float(extra_depth),
+                float(box_data["y_min_global"]),
+                float(box_data["base_y"])
+            ])
+
             out_features.append(feat)
 
         prov.addFeatures(out_features)

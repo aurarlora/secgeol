@@ -8,7 +8,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import ( 
                         QgsWkbTypes,
-                        Qgis, QgsGeometry
+                        Qgis, QgsGeometry, QgsMessageLog
                        )
 
 
@@ -392,11 +392,12 @@ class SecGeol:
         
         try:
             self.dlg.generar_perfil(
-                feat_sec=feat_sec,
-                has_drawn=has_drawn,
-                invertida=inv_sec,
-                segmentos_geo=segmentos_geo
-            )
+            feat_sec=feat_sec,
+            has_drawn=has_drawn,
+            invertida=inv_sec,
+            segmentos_geo=segmentos_geo,
+            section_layer=section_work_layer
+        )
 
             self.iface.messageBar().pushInfo(
                 self.tr("SecGeol"),
@@ -410,6 +411,18 @@ class SecGeol:
                 self.tr("SecGeol"),
                 str(e)
             )
+
+        QgsMessageLog.logMessage(
+            f"Longitud sección trabajo: {section_geom.length()}",
+            "SecGeol",
+            Qgis.Info 
+        )
+
+        QgsMessageLog.logMessage(
+            f"CRS sección trabajo: {section_work_layer.crs().authid()} | CRS geología: {geo_layer.crs().authid()}",
+            "SecGeol",
+            Qgis.Info
+        )
 
         # -------------------------
         # INFORMACIÓN DE PRUEBA
