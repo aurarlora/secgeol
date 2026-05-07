@@ -409,9 +409,6 @@ class ProfileManager:
         out_layer = QgsVectorLayer(f"LineString?crs={crs_authid}", layer_name, "memory")
         prov = out_layer.dataProvider()
 
-        # id_lito = 1
-
-
         prov.addAttributes([
             QgsField("id_lito", QVariant.Int),
             QgsField("tipo", QVariant.String),
@@ -452,8 +449,6 @@ class ProfileManager:
             out_features.append(feat)
 
         for seg in segmentos_linea:
-        #    print(seg["geometry"].asWkt())
-
             feat = QgsFeature(out_layer.fields())
             feat.setGeometry(seg["geometry"])
             feat.setAttributes([

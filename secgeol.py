@@ -187,8 +187,6 @@ class SecGeol:
         return geom
 
 
-
-
     # --------------------------------------------------------------
     # Devuelve la geometría efectiva de la sección. Si checkInvSec está activado, la invierte.
     # --------------------------------------------------------------

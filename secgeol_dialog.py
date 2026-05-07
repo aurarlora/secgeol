@@ -309,6 +309,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             self.btnDrawSec,
             self.checkInvSec,
             self.MapLayerGeo,
+            self.FieldClasGeo,
             self.MapLayerEst,
             self.doubleSpinBox,
             self.checkEjes,
@@ -337,6 +338,10 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         self.MapLayerGeo.setToolTip(
             "Capa de geología (opcional) para intersectar la sección."
+        )
+
+        self.FieldClasGeo.setToolTip(
+            "Campo utilizado para clasificar los segmentos geológicos del perfil."
         )
 
         self.MapLayerEst.setToolTip(
@@ -540,6 +545,16 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                     "para mostrar las unidades geológicas en el perfil."
                 )
 
+            elif obj == self.FieldClasGeo:
+                self.mostrar_ayuda(
+                    "Campo de clasificación geológica",
+                    "Seleccione el campo de atributos que se utilizará para clasificar y etiquetar los segmentos geológicos del perfil."
+                    """
+                    <p>
+                    El valor seleccionado se almacenará en el campo <b>valor_geo</b>.
+                    </p>
+                    """
+                )
             
 
             elif obj == self.MapLayerEst:

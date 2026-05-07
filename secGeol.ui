@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>698</width>
-    <height>419</height>
+    <width>695</width>
+    <height>451</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>9</x>
      <y>9</y>
      <width>431</width>
-     <height>391</height>
+     <height>431</height>
     </rect>
    </property>
    <widget class="QTabWidget" name="tabWidget">
@@ -28,7 +28,7 @@
       <x>10</x>
       <y>10</y>
       <width>411</width>
-      <height>371</height>
+      <height>411</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -56,7 +56,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>260</y>
+        <y>290</y>
         <width>121</width>
         <height>20</height>
        </rect>
@@ -69,7 +69,7 @@
       <property name="geometry">
        <rect>
         <x>110</x>
-        <y>310</y>
+        <y>350</y>
         <width>161</width>
         <height>32</height>
        </rect>
@@ -87,7 +87,7 @@
         <x>10</x>
         <y>50</y>
         <width>381</width>
-        <height>71</height>
+        <height>101</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -101,7 +101,7 @@
         <rect>
          <x>20</x>
          <y>40</y>
-         <width>51</width>
+         <width>71</width>
          <height>24</height>
         </rect>
        </property>
@@ -112,8 +112,8 @@
       <widget class="QCheckBox" name="checkInvSec">
        <property name="geometry">
         <rect>
-         <x>190</x>
-         <y>40</y>
+         <x>10</x>
+         <y>80</y>
          <width>181</width>
          <height>20</height>
         </rect>
@@ -145,27 +145,11 @@
         </rect>
        </property>
       </widget>
-     </widget>
-     <widget class="QFrame" name="frame_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>130</y>
-        <width>381</width>
-        <height>121</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Shape::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Shadow::Raised</enum>
-      </property>
       <widget class="QDoubleSpinBox" name="doubleSpinBox">
        <property name="geometry">
         <rect>
-         <x>110</x>
-         <y>90</y>
+         <x>290</x>
+         <y>50</y>
          <width>81</width>
          <height>22</height>
         </rect>
@@ -183,48 +167,38 @@
       <widget class="QLabel" name="label_7">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>80</y>
+         <x>210</x>
+         <y>40</y>
          <width>81</width>
          <height>31</height>
         </rect>
        </property>
        <property name="text">
-        <string>Adicionar caja</string>
+        <string>Profundidad</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_3">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>51</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Geología</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_6">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>50</y>
-         <width>61</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Estructural</string>
-       </property>
-      </widget>
+     </widget>
+     <widget class="QFrame" name="frame_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>160</y>
+        <width>381</width>
+        <height>121</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Shape::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Shadow::Raised</enum>
+      </property>
       <widget class="QgsMapLayerComboBox" name="MapLayerGeo">
        <property name="geometry">
         <rect>
          <x>110</x>
          <y>10</y>
-         <width>131</width>
+         <width>141</width>
          <height>21</height>
         </rect>
        </property>
@@ -242,11 +216,83 @@
       <widget class="QgsFieldComboBox" name="FieldClasGeo">
        <property name="geometry">
         <rect>
-         <x>250</x>
+         <x>270</x>
          <y>10</y>
-         <width>121</width>
+         <width>101</width>
          <height>21</height>
         </rect>
+       </property>
+      </widget>
+      <widget class="QgsFieldComboBox" name="FieldAzimuthEst">
+       <property name="geometry">
+        <rect>
+         <x>270</x>
+         <y>90</y>
+         <width>101</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QgsFieldComboBox" name="FieldDipEst">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>90</y>
+         <width>91</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_8">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>90</y>
+         <width>49</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Echado</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="FieldAzimuthEst_2">
+       <property name="geometry">
+        <rect>
+         <x>210</x>
+         <y>90</y>
+         <width>51</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Azimuth</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkGeo">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>76</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Geología</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkEst">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>50</y>
+         <width>76</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Estructural</string>
        </property>
       </widget>
      </widget>
@@ -254,7 +300,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>280</y>
+        <y>320</y>
         <width>361</width>
         <height>27</height>
        </rect>
@@ -355,7 +401,7 @@
      <x>445</x>
      <y>9</y>
      <width>241</width>
-     <height>391</height>
+     <height>431</height>
     </rect>
    </property>
    <widget class="QTextBrowser" name="textBrowserHelp">
@@ -364,7 +410,7 @@
       <x>10</x>
       <y>10</y>
       <width>221</width>
-      <height>361</height>
+      <height>411</height>
      </rect>
     </property>
    </widget>
