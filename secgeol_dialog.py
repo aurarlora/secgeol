@@ -155,6 +155,23 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+        # Estado inicial de controles opcionales
+        self.MapLayerGeo.setEnabled(False)
+        self.FieldClasGeo.setEnabled(False)
+
+        self.MapLayerEst.setEnabled(False)
+        self.FieldDipEst.setEnabled(False)
+        self.FieldAzimuthEst.setEnabled(False)
+
+        # Conectar checks
+        self.checkGeo.toggled.connect(self.actualizar_estado_geologia)
+        self.checkEst.toggled.connect(self.actualizar_estado_estructuras)
+
+        # Aplicar estado inicial
+        self.actualizar_estado_geologia()
+        self.actualizar_estado_estructuras()
+
+
         self.drawn_section_feature = None
         self.draw_tool = None
 
@@ -686,8 +703,12 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
     def generar_perfil(self, feat_sec=None, has_drawn=False, invertida=False, segmentos_geo=None, section_layer=None):
         print("H: entrar a generar_perfil")
+        
+        if segmentos_geo is None:
+            segmentos_geo = []
 
         dem_layer = self.MapLayerDEM.currentLayer()
+
         if dem_layer is None:
             raise Exception(self.tr("No se ha seleccionado un DEM."))
 
@@ -709,14 +730,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         print(f"J: caja_m = {caja_m}")
 
         section_geom = self.section_manager.obtener_geometria_seccion_efectiva(section_layer)
-
-        geo_layer = self.MapLayerGeo.currentLayer()
-        
-        campo_geo = self.FieldClasGeo.currentField() 
-        
-        
-        if not campo_geo:
-            campo_geo = None
 
 
         if section_geom is None:
@@ -796,50 +809,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
            
             geo_layer = self.MapLayerGeo.currentLayer()
 
-             # 🔹 Preparar sección
-            section_work_layer = self.preparar_seccion_trabajo(feat_sec=feat_sec)
-
-            QMessageBox.information(
-                self,
-                "Diagnóstico CRS",
-                f"CRS sección trabajo: {section_work_layer.crs().authid()}\n"
-                f"CRS geología: {geo_layer.crs().authid()}\n"
-                f"Extensión sección: {section_work_layer.extent().toString()}\n"
-                f"Extensión geología: {geo_layer.extent().toString()}"
-            )
-            
-
-
-            segmentos_geo = []
-
-            if geo_layer is not None and section_work_layer is not None:
-                section_geom = None
-
-                for f in section_work_layer.getFeatures():
-                    section_geom = QgsGeometry(f.geometry())
-                    break
-
-                segmentos_geo = self.section_manager.intersectar_seccion_con_geologia(
-                    section_geom=section_geom,
-                    section_crs=section_work_layer.crs(),
-                    geo_layer=geo_layer,
-                    campo_geo=campo_geo
-                )
-               
-
-                QgsMessageLog.logMessage(
-                    f"Segmentos geológicos: {segmentos_geo}",
-                    "SecGeol",
-                    Qgis.Info
-                )
-
-                QMessageBox.information(
-                    self,
-                    "SecGeol",
-                    f"Número de segmentos geológicos encontrados: {len(segmentos_geo)}"
-                )
-
-            print("Proceso ejecutado correctamente")
+           
 
         except Exception as e:
             QgsMessageLog.logMessage(
@@ -1062,8 +1032,29 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         )
 
     # ---------------------------------
-    # Actualizar  geologia
+    # Existe Geologia
     # --------------------------------- 
+
+    def actualizar_estado_geologia(self):
+        activo = self.checkGeo.isChecked()
+
+        self.MapLayerGeo.setEnabled(activo)
+        self.FieldClasGeo.setEnabled(activo)
+
+        if not activo:
+            self.MapLayerGeo.setLayer(None)
+            self.FieldClasGeo.setLayer(None)
+            self.mostrar_ayuda(
+                "Geología desactivada",
+                "Active esta opción si desea intersectar una capa geológica con la sección."
+            )
+        else:
+            self.actualizar_info_geologia()
+
+    # ---------------------------------
+    # Si existe Geologia
+    # --------------------------------- 
+
 
     def actualizar_info_geologia(self):
         print(">> actualizar_info_geologia llamado")
@@ -1113,7 +1104,26 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         )
 
 
-   
+    # ---------------------------------
+    # Estructuras
+    # --------------------------------- 
+
+
+    def actualizar_estado_estructuras(self):
+        activo = self.checkEst.isChecked()
+
+        self.MapLayerEst.setEnabled(activo)
+        self.FieldDipEst.setEnabled(activo)
+        self.FieldAzimuthEst.setEnabled(activo)
+
+        if not activo:
+            self.MapLayerEst.setLayer(None)
+            self.FieldDipEst.setLayer(None)
+            self.FieldAzimuthEst.setLayer(None)
+            self.mostrar_ayuda(
+                "Estructuras desactivadas",
+                "Active esta opción si desea proyectar estructuras sobre el perfil."
+            )
 
 
     

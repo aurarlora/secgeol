@@ -217,11 +217,18 @@ class SecGeol:
 
         # Geología
         
-        geo_layer = self.dlg.MapLayerGeo.currentLayer()
-        campo_geo = self.dlg.FieldClasGeo.currentField()
+        geo_layer = None
+        if self.dlg.checkGeo.isChecked():
+            geo_layer = self.dlg.MapLayerGeo.currentLayer()
+
+        campo_geo = None
+        if self.dlg.checkGeo.isChecked():
+            campo_geo = self.dlg.FieldClasGeo.currentField()
 
         # Estructuras
-        est_layer = self.dlg.MapLayerEst.currentLayer()
+        est_layer = None
+        if self.dlg.checkEst.isChecked():
+            est_layer = self.dlg.MapLayerEst.currentLayer()
 
         # Caja
         caja_m = self.dlg.doubleSpinBox.value()
@@ -362,12 +369,19 @@ class SecGeol:
         #--------------------- Validación geología
 
 
+        campo_geo = None
+
+        if self.dlg.checkGeo.isChecked():
+            campo_geo = self.dlg.FieldClasGeo.currentField()
+
         if not campo_geo:
             campo_geo = None
 
-        
+        segmentos_geo = []
+        section_work_layer = None
 
         if geo_layer is not None:
+
             section_work_layer = self.dlg.preparar_seccion_trabajo(
                 feat_sec=feat_sec,
                 has_drawn=has_drawn,
@@ -387,15 +401,14 @@ class SecGeol:
                 campo_geo=campo_geo
             )
 
-        
         try:
             self.dlg.generar_perfil(
-            feat_sec=feat_sec,
-            has_drawn=has_drawn,
-            invertida=inv_sec,
-            segmentos_geo=segmentos_geo,
-            section_layer=section_work_layer
-        )
+                feat_sec=feat_sec,
+                has_drawn=has_drawn,
+                invertida=inv_sec,
+                segmentos_geo=segmentos_geo,
+                section_layer=section_work_layer
+            )
 
             self.iface.messageBar().pushInfo(
                 self.tr("SecGeol"),
@@ -410,17 +423,9 @@ class SecGeol:
                 str(e)
             )
 
-        QgsMessageLog.logMessage(
-            f"Longitud sección trabajo: {section_geom.length()}",
-            "SecGeol",
-            Qgis.Info 
-        )
+        
 
-        QgsMessageLog.logMessage(
-            f"CRS sección trabajo: {section_work_layer.crs().authid()} | CRS geología: {geo_layer.crs().authid()}",
-            "SecGeol",
-            Qgis.Info
-        )
+        
 
         # -------------------------
         # INFORMACIÓN DE PRUEBA
