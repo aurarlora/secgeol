@@ -49,9 +49,7 @@ class DrawSectionMapTool(QgsMapTool):
         self.vertex_band.setWidth(6)
         self.vertex_band.setColor(QColor(255, 0, 0))
 
-        # mapa de geología
-        self.MapLayerGeo.layerChanged.connect(self.actualizar_info_geologia)
-
+        
 
 
     def activate(self):
@@ -157,9 +155,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         # Estado inicial de controles opcionales
         self.MapLayerGeo.setEnabled(False)
-        self.FieldClasGeo.setEnabled(False)
-
         self.MapLayerEst.setEnabled(False)
+
+        self.FieldClasGeo.setEnabled(False)
         self.FieldDipEst.setEnabled(False)
         self.FieldAzimuthEst.setEnabled(False)
 
@@ -178,12 +176,16 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.btnDrawSec.clicked.connect(self.activar_dibujo_seccion)
         self.MapLayerSec.layerChanged.connect(self.on_section_layer_changed)
         self.MapLayerGeo.layerChanged.connect(self.actualizar_info_geologia)
+        self.MapLayerEst.layerChanged.connect(self.actualizar_info_estructuras)
+
+
+        #Campos filtrados
+        self.FieldDipEst.setFilters(QgsFieldProxyModel.Numeric)
+        self.FieldAzimuthEst.setFilters(QgsFieldProxyModel.Numeric)
         self.FieldClasGeo.setFilters(QgsFieldProxyModel.AllTypes)
 
 
-        ##self.FieldClasGeo.setFilters(QgsFieldProxyModel.String)
-
-
+        
         self.section_manager = SectionManager()
         self.workspace_manager = WorkspaceManager()
         self.gpkg_path = None
@@ -214,8 +216,11 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
 
 
+
+
+
         if self.splitter_main:
-            self.splitter_main.setSizes([300, 100])
+            self.splitter_main.setSizes([300, 100])   #Tamaño de la ventana
              # 0 = panel izquierdo (controles)
              # 1 = panel derecho (ayuda)
             self.splitter_main.setStretchFactor(0, 1)  # ayuda
@@ -331,6 +336,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             self.doubleSpinBox,
             self.checkEjes,
             self.fileWidgetPerfil,
+            self.FieldDipEst,
+            self.FieldAzimuthEst,
         ]:
             w.installEventFilter(self)
             
@@ -585,7 +592,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 self.mostrar_ayuda(
                     "Tamaño de caja",
                     "Define el tamaño de la caja en metros para el perfil.\n"
-                    "Usa 0 si no deseas generar la caja."
+                    "Se ocuparan 100 m a partir del valor mínimo de la elevación."
                 )
 
             elif obj == self.checkEjes:
@@ -599,6 +606,27 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                     "Archivo de salida",
                     "Selecciona el archivo donde se guardará el perfil generado."
                 )
+
+            #Estructuras
+
+            elif obj == self.FieldDipEst:
+                self.mostrar_ayuda(
+                    "Campo de echado",
+                    "Seleccione el campo numérico que contiene el <b>echado</b> de la estructura.<br><br>"
+                    "El valor debe estar en grados, entre <b>0 y 90</b>. "
+                    "Si el valor está fuera de rango, la estructura no se dibujará."
+                )
+
+            elif obj == self.FieldAzimuthEst:
+                self.mostrar_ayuda(
+                    "Campo de azimuth",
+                    "Seleccione el campo numérico que contiene el <b>azimuth de buzamiento</b> "
+                    "de la estructura.<br><br>"
+                    "El valor debe estar en grados, entre <b>0 y 360</b>. "
+                    "Si el valor es <b>-1</b> o está fuera de rango, la estructura no se dibujará."
+                )
+
+
 
         elif event.type() == 11:  # Leave
             self.actualizar_ayuda_tab()
@@ -1124,6 +1152,52 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 "Estructuras desactivadas",
                 "Active esta opción si desea proyectar estructuras sobre el perfil."
             )
+        else:
+            self.actualizar_info_estructuras()
 
+
+    def actualizar_info_estructuras(self):
+        print(">> actualizar_info_estructuras llamado")
+        print("Tipo FieldDipEst:", type(self.FieldDipEst))
+        print("Tipo FieldAzimuthEst:", type(self.FieldAzimuthEst))
+
+
+        est_layer = self.MapLayerEst.currentLayer()
+
+        print("Capa estructuras:", est_layer.name() if est_layer else None)
+        print("Campos estructuras:", [f.name() for f in est_layer.fields()] if est_layer else [])
+
+
+       
+
+        if est_layer is None:
+            self.FieldDipEst.setLayer(None)
+            self.FieldAzimuthEst.setLayer(None)
+            self.mostrar_ayuda(
+                "Capa de estructuras",
+                "Seleccione una capa lineal de estructuras para cargar sus campos numéricos."
+            )
+            return
+
+        self.FieldDipEst.setLayer(est_layer)
+        self.FieldAzimuthEst.setLayer(est_layer)
+
+        crs = est_layer.crs()
+        crs_authid = crs.authid()
+        crs_name = crs.description()
+
+        crs_info = f"{crs_authid} - {crs_name}" if crs_authid else crs_name
+        total_campos = len(est_layer.fields())
+
+        self.mostrar_ayuda(
+            "Capa de estructuras",
+            f"Capa seleccionada: {est_layer.name()}<br>"
+            f"CRS: {crs_info}<br>"
+            f"Campos disponibles: {total_campos}<br><br>"
+            "Seleccione los campos numéricos de <b>echado</b> y <b>azimuth</b> "
+            "que se utilizarán para proyectar las estructuras sobre el perfil."
+        )
+
+    
 
     

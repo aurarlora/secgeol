@@ -444,7 +444,7 @@ class SecGeol:
             f"Output: {salida}",
         ]
 
-        print("\n=== SecGeol PARAMETERS ===")
+        
         
         for r in resumen:
             print(r)
