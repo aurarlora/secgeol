@@ -2,6 +2,8 @@ import os, math
 
 from qgis.core import (
     QgsFeature,
+    Qgis,
+    QgsMessageLog,
     QgsFeatureRequest,
     QgsField,
     QgsFields,
@@ -337,5 +339,98 @@ class SectionManager:
             id_lito += 1
 
         return segmentos
+    
 
+    def intersectar_seccion_con_estructuras(
+        self,
+        section_geom,
+        section_crs,
+        est_layer,
+        campo_dip,
+        campo_azimuth
+    ):
+
+        estructuras = []
+
+        if section_geom is None or section_geom.isEmpty():
+            return estructuras
+
+        if est_layer is None:
+            return estructuras
+
+        # -----------------------------------------
+        # Reproyección si es necesario
+        # -----------------------------------------
+        est_crs = est_layer.crs()
+
+        transform = None
+
+        if est_crs != section_crs:
+            transform = QgsCoordinateTransform(
+                est_crs,
+                section_crs,
+                QgsProject.instance()
+            )
+
+        # -----------------------------------------
+        # Recorrer estructuras
+        # -----------------------------------------
+        for feat in est_layer.getFeatures():
+
+            geom_est = QgsGeometry(feat.geometry())
+
+            if geom_est is None or geom_est.isEmpty():
+                continue
+
+            # reproyectar geometría
+            if transform is not None:
+                geom_est.transform(transform)
+
+            # atributos
+            dip = feat[campo_dip]
+            azimuth = feat[campo_azimuth]
+
+            # -----------------------------------------
+            # Validaciones
+            # -----------------------------------------
+            if dip is None or azimuth is None:
+                continue
+
+            if dip <= 0 or dip > 90:
+                continue
+
+            if azimuth < 0 or azimuth > 360:
+                continue
+
+            # -----------------------------------------
+            # Intersección
+            # -----------------------------------------
+            inter = geom_est.intersection(section_geom)
+
+            if inter.isEmpty():
+                continue
+
+            # queremos un punto
+            if inter.type() != Qgis.GeometryType.Point:
+                continue
+
+            pt = inter.asPoint()
+
+            punto_geom = QgsGeometry.fromPointXY(pt)
+
+            dist = section_geom.lineLocatePoint(punto_geom)
+
+            estructuras.append({
+                "dist": dist,
+                "echado": dip,
+                "azimuth": azimuth
+            })
+
+        QgsMessageLog.logMessage(
+            f"Estructuras intersectadas: {estructuras}",
+            "SecGeol",
+            Qgis.Info
+        )
+
+        return estructuras
     

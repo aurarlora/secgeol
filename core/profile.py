@@ -285,7 +285,8 @@ class ProfileManager:
         extra_depth: float = 100.0,
         layer_name: str = "Perfil_topografico",
         break_distances=None,
-        segmentos_geo=None
+        segmentos_geo=None,
+        estructuras=None
             ):
 
         if break_distances is None:
@@ -394,6 +395,12 @@ class ProfileManager:
 
         QgsMessageLog.logMessage(
             f"Segmentos de perfil generados: {len(segmentos_linea)}",
+            "SecGeol",
+            Qgis.Info
+        )
+
+        QgsMessageLog.logMessage(
+            f"Estructuras recibidas en profile.py: {len(estructuras)}",
             "SecGeol",
             Qgis.Info
         )

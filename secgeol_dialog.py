@@ -729,11 +729,14 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     # --------------------------------- 
 
 
-    def generar_perfil(self, feat_sec=None, has_drawn=False, invertida=False, segmentos_geo=None, section_layer=None):
+    def generar_perfil(self, feat_sec=None, has_drawn=False, invertida=False, segmentos_geo=None, estructuras=None, section_layer=None):
         print("H: entrar a generar_perfil")
         
         if segmentos_geo is None:
             segmentos_geo = []
+
+        if estructuras is None:
+            estructuras = []
 
         dem_layer = self.MapLayerDEM.currentLayer()
 
@@ -775,7 +778,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             extra_depth=caja_m,
             layer_name="Perfil_topografico",
             break_distances=break_distances,
-            segmentos_geo=segmentos_geo
+            segmentos_geo=segmentos_geo,
+            estructuras=estructuras
         )
 
         print("K: capa de perfil creada")
