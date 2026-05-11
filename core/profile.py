@@ -269,6 +269,50 @@ class ProfileManager:
             "base_y": base_y
         }
     
+    #-------------------------------------------
+    # ----------------Línea de estrcutura
+    #-------------------------------------------
+
+    def construir_linea_estructura(
+            self,
+            dist,
+            z,
+            base_y,
+            echado,
+            lado,
+            margen=1.0
+        ):
+        """
+        Construye una línea estructural desde ligeramente arriba del perfil
+        hasta ligeramente debajo de la base.
+        """
+
+        import math
+
+        y_sup = z + margen
+        y_inf = base_y - margen
+
+        delta_y = y_sup - y_inf
+
+        ang_rad = math.radians(echado)
+
+        if abs(math.tan(ang_rad)) < 1e-9:
+            return None
+
+        dx = delta_y / math.tan(ang_rad)
+
+        if lado == "derecha":
+            x_sup = dist
+            x_inf = dist + dx
+        else:
+            x_sup = dist
+            x_inf = dist - dx
+
+        return QgsGeometry.fromPolylineXY([
+            QgsPointXY(x_sup, y_sup),
+            QgsPointXY(x_inf, y_inf)
+        ])
+
     # --------------------------------------------------------------------------------
     #   Genera una capa temporal de líneas con:     
     #    linea_perfil
@@ -345,6 +389,8 @@ class ProfileManager:
 
         linea_perfil = box_data["linea_perfil"]
 
+        lineas_estructura = []
+
         vertices_perfil = list(linea_perfil.vertices())
         max_x_perfil = max(v.x() for v in vertices_perfil)
 
@@ -386,6 +432,8 @@ class ProfileManager:
                 "valor_geo": seg["valor_geo"],
                 "geometry": sub_geom
             })
+
+
 
         QgsMessageLog.logMessage(
             f"Segmentos recibidos en profile.py: {len(segmentos_geo)}",
@@ -462,6 +510,57 @@ class ProfileManager:
                 seg["id_lito"],
                 "geologia",
                 seg["valor_geo"],
+                float(extra_depth),
+                float(box_data["y_min_global"]),
+                float(box_data["base_y"])
+            ])
+
+            out_features.append(feat)
+
+        for est in estructuras:
+            dist = est["dist"]
+            echado = est["echado"]
+            lado = est["lado"]
+
+            punto = linea_perfil.interpolate(dist)
+
+            if punto.isEmpty():
+                continue
+
+            pt = punto.asPoint()
+
+            z = pt.y()
+
+            geom_est = self.construir_linea_estructura(
+                dist=dist,
+                z=z,
+                base_y=float(box_data["base_y"]),
+                echado=echado,
+                lado=lado,
+                margen=1.0
+            )
+
+            lineas_estructura.append({
+                "geometry": geom_est,
+                "echado": echado,
+                "azimuth": est["azimuth"],
+                "lado": lado
+            })
+
+            QgsMessageLog.logMessage(
+                f"Línea estructura creada: dist={dist}, lado={lado}",
+                "SecGeol",
+                Qgis.Info
+            )
+
+
+        for est in lineas_estructura:
+            feat = QgsFeature(out_layer.fields())
+            feat.setGeometry(est["geometry"])
+            feat.setAttributes([
+                99,
+                "estructura",
+                None,
                 float(extra_depth),
                 float(box_data["y_min_global"]),
                 float(box_data["base_y"])

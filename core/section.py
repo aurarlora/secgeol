@@ -357,6 +357,12 @@ class SectionManager:
 
         if est_layer is None:
             return estructuras
+        
+        QgsMessageLog.logMessage(
+            f"CRS sección: {section_crs.authid()} | CRS estructuras: {est_layer.crs().authid()}",
+            "SecGeol",
+            Qgis.Info
+        )
 
         # -----------------------------------------
         # Reproyección si es necesario
@@ -390,12 +396,22 @@ class SectionManager:
             dip = feat[campo_dip]
             azimuth = feat[campo_azimuth]
 
+
+
             # -----------------------------------------
             # Validaciones
             # -----------------------------------------
-            if dip is None or azimuth is None:
+            try:
+                dip = float(dip)
+                azimuth = float(azimuth)
+            except (TypeError, ValueError):
                 continue
 
+            # -1 o valores sin dato
+            if dip == -1 or azimuth == -1:
+                continue
+
+            # rangos válidos
             if dip <= 0 or dip > 90:
                 continue
 
@@ -419,11 +435,24 @@ class SectionManager:
             punto_geom = QgsGeometry.fromPointXY(pt)
 
             dist = section_geom.lineLocatePoint(punto_geom)
+            azimuth_seccion = self.calcular_azimuth_local_seccion(section_geom, dist)
 
+            if azimuth_seccion is None:
+                continue
+
+            delta = (azimuth - azimuth_seccion) % 360
+
+            if 0 <= delta <= 180:
+                lado = "derecha"
+            else:
+                lado = "izquierda"
+                
             estructuras.append({
                 "dist": dist,
                 "echado": dip,
-                "azimuth": azimuth
+                "azimuth": azimuth, 
+                "azimuth_seccion": azimuth_seccion,
+                "lado": lado
             })
 
         QgsMessageLog.logMessage(
@@ -433,4 +462,39 @@ class SectionManager:
         )
 
         return estructuras
+    
+    #    """
+    #    Calcula el azimuth local de la sección en la distancia dada.
+    #    Azimuth en grados: 0=N, 90=E, 180=S, 270=W.
+    #    """
+
+
+    def calcular_azimuth_local_seccion(self, section_geom, dist_objetivo):
+
+
+        vertices = list(section_geom.vertices())
+
+        if len(vertices) < 2:
+            return None
+
+        distancia_acum = 0.0
+
+        for i in range(len(vertices) - 1):
+            p1 = vertices[i]
+            p2 = vertices[i + 1]
+
+            seg_len = p1.distance(p2)
+            seg_ini = distancia_acum
+            seg_fin = distancia_acum + seg_len
+
+            if seg_ini <= dist_objetivo <= seg_fin:
+                dx = p2.x() - p1.x()
+                dy = p2.y() - p1.y()
+
+                azimuth = math.degrees(math.atan2(dx, dy)) % 360
+                return azimuth
+
+            distancia_acum = seg_fin
+
+        return None
     

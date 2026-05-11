@@ -383,7 +383,7 @@ class SecGeol:
         segmentos_geo = []
         estructuras = []
         section_work_layer = None
-
+        
         if geo_layer is not None:
 
             section_work_layer = self.dlg.preparar_seccion_trabajo(
@@ -403,6 +403,41 @@ class SecGeol:
                 section_crs=section_work_layer.crs(),
                 geo_layer=geo_layer,
                 campo_geo=campo_geo
+            )
+
+        # -----------------------------------------
+        # ESTRUCTURAS
+        # -----------------------------------------
+
+        campo_dip = None
+        campo_azimuth = None
+
+        if self.dlg.checkEst.isChecked():
+            campo_dip = self.dlg.FieldDipEst.currentField()
+            campo_azimuth = self.dlg.FieldAzimuthEst.currentField()
+
+        if est_layer is not None:
+
+            if section_work_layer is None:
+
+                section_work_layer = self.dlg.preparar_seccion_trabajo(
+                    feat_sec=feat_sec,
+                    has_drawn=has_drawn,
+                    invertida=inv_sec
+                )
+
+            section_geom = None
+
+            for f in section_work_layer.getFeatures():
+                section_geom = QgsGeometry(f.geometry())
+                break
+
+            estructuras = self.dlg.section_manager.intersectar_seccion_con_estructuras(
+                section_geom=section_geom,
+                section_crs=section_work_layer.crs(),
+                est_layer=est_layer,
+                campo_dip=campo_dip,
+                campo_azimuth=campo_azimuth
             )
 
         try:
@@ -455,42 +490,6 @@ class SecGeol:
                 campo_geo=campo_geo
             )
 
-        # -----------------------------------------
-        # ESTRUCTURAS
-        # -----------------------------------------
-
-        #estructuras = []
-
-        campo_dip = None
-        campo_azimuth = None
-
-        if self.dlg.checkEst.isChecked():
-            campo_dip = self.dlg.FieldDipEst.currentField()
-            campo_azimuth = self.dlg.FieldAzimuthEst.currentField()
-
-        if est_layer is not None:
-
-            if section_work_layer is None:
-
-                section_work_layer = self.dlg.preparar_seccion_trabajo(
-                    feat_sec=feat_sec,
-                    has_drawn=has_drawn,
-                    invertida=inv_sec
-                )
-
-            section_geom = None
-
-            for f in section_work_layer.getFeatures():
-                section_geom = QgsGeometry(f.geometry())
-                break
-
-            estructuras = self.dlg.section_manager.intersectar_seccion_con_estructuras(
-                section_geom=section_geom,
-                section_crs=section_work_layer.crs(),
-                est_layer=est_layer,
-                campo_dip=campo_dip,
-                campo_azimuth=campo_azimuth
-            )
         
 
         # -------------------------
