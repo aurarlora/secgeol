@@ -273,6 +273,7 @@ class ProfileManager:
     # ----------------Línea de estrcutura
     #-------------------------------------------
 
+
     def construir_linea_estructura(
             self,
             dist,
@@ -282,7 +283,7 @@ class ProfileManager:
             lado,
             x_min,
             x_max,
-            margen=1.0
+            margen=10.0
         ):
         """
         Construye una línea estructural desde ligeramente arriba del perfil
@@ -314,12 +315,12 @@ class ProfileManager:
         if x_inf < x_min:
             ratio = (x_min - x_sup) / (x_inf - x_sup)
             y_inf = y_sup + ratio * (y_inf - y_sup)
-            x_inf = x_min
+            x_inf = x_min - margen
 
         elif x_inf > x_max:
             ratio = (x_max - x_sup) / (x_inf - x_sup)
             y_inf = y_sup + ratio * (y_inf - y_sup)
-            x_inf = x_max
+            x_inf = x_max + margen
 
         return QgsGeometry.fromPolylineXY([
             QgsPointXY(x_sup, y_sup),
@@ -475,6 +476,36 @@ class ProfileManager:
                 "geometry": sub_geom
             })
 
+        # -----------------------------------------
+        # FORZAR CIERRE EXACTO EN EXTREMOS
+        # -----------------------------------------
+        if segmentos_linea:
+
+            vertices_perfil = list(linea_perfil.vertices())
+
+            p_ini_perfil = vertices_perfil[0]
+            p_fin_perfil = vertices_perfil[-1]
+
+            geom_ini = segmentos_linea[0]["geometry"]
+            pts_ini = list(geom_ini.vertices())
+
+            if len(pts_ini) >= 2:
+                pts_ini[0] = p_ini_perfil
+
+                segmentos_linea[0]["geometry"] = QgsGeometry.fromPolylineXY([
+                    QgsPointXY(p.x(), p.y()) for p in pts_ini
+                ])
+
+            geom_fin = segmentos_linea[-1]["geometry"]
+            pts_fin = list(geom_fin.vertices())
+
+            if len(pts_fin) >= 2:
+                pts_fin[-1] = p_fin_perfil
+
+                segmentos_linea[-1]["geometry"] = QgsGeometry.fromPolylineXY([
+                    QgsPointXY(p.x(), p.y()) for p in pts_fin
+                ])
+
 
 
         QgsMessageLog.logMessage(
@@ -579,7 +610,7 @@ class ProfileManager:
                 lado=lado,
                 x_min=x_min,
                 x_max=x_max,
-                margen=1.0
+                margen=10.0
             )
 
             lineas_estructura.append({
