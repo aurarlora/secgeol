@@ -280,6 +280,8 @@ class ProfileManager:
             base_y,
             echado,
             lado,
+            x_min,
+            x_max,
             margen=1.0
         ):
         """
@@ -308,11 +310,51 @@ class ProfileManager:
             x_sup = dist
             x_inf = dist - dx
 
+        # Recortar contra límites laterales conservando el ángulo
+        if x_inf < x_min:
+            ratio = (x_min - x_sup) / (x_inf - x_sup)
+            y_inf = y_sup + ratio * (y_inf - y_sup)
+            x_inf = x_min
+
+        elif x_inf > x_max:
+            ratio = (x_max - x_sup) / (x_inf - x_sup)
+            y_inf = y_sup + ratio * (y_inf - y_sup)
+            x_inf = x_max
+
         return QgsGeometry.fromPolylineXY([
             QgsPointXY(x_sup, y_sup),
             QgsPointXY(x_inf, y_inf)
         ])
 
+    # ---------------------------------------------------
+    # Obtiene la elevación Y del perfil para una coordenada X dada.
+    # En el perfil, X representa la distancia acumulada sobre la sección.
+    # ---------------------------------------------------
+
+    def obtener_y_en_x(self, linea_geom, x_objetivo):
+        
+
+        vertices = list(linea_geom.vertices())
+
+        if len(vertices) < 2:
+            return None
+
+        for i in range(len(vertices) - 1):
+            p1 = vertices[i]
+            p2 = vertices[i + 1]
+
+            x1, y1 = p1.x(), p1.y()
+            x2, y2 = p2.x(), p2.y()
+
+            if min(x1, x2) <= x_objetivo <= max(x1, x2):
+                if x2 == x1:
+                    return y1
+
+                ratio = (x_objetivo - x1) / (x2 - x1)
+                return y1 + ratio * (y2 - y1)
+
+        return None
+    
     # --------------------------------------------------------------------------------
     #   Genera una capa temporal de líneas con:     
     #    linea_perfil
@@ -453,7 +495,6 @@ class ProfileManager:
             Qgis.Info
         )
 
-
         # -----------------------------
         # CAPA DE SALIDA
         # -----------------------------
@@ -521,15 +562,14 @@ class ProfileManager:
             dist = est["dist"]
             echado = est["echado"]
             lado = est["lado"]
+            vertices_perfil = list(linea_perfil.vertices())
+            x_min = min(v.x() for v in vertices_perfil)
+            x_max = max(v.x() for v in vertices_perfil)
 
-            punto = linea_perfil.interpolate(dist)
+            z = self.obtener_y_en_x(linea_perfil, dist)
 
-            if punto.isEmpty():
+            if z is None:
                 continue
-
-            pt = punto.asPoint()
-
-            z = pt.y()
 
             geom_est = self.construir_linea_estructura(
                 dist=dist,
@@ -537,6 +577,8 @@ class ProfileManager:
                 base_y=float(box_data["base_y"]),
                 echado=echado,
                 lado=lado,
+                x_min=x_min,
+                x_max=x_max,
                 margen=1.0
             )
 
