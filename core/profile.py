@@ -7,7 +7,8 @@ from qgis.core import (
     QgsRasterLayer,
     QgsField,
     QgsMessageLog,
-    QgsVectorLayer
+    QgsVectorLayer,
+
 )
 
 from qgis.PyQt.QtCore import QVariant
@@ -654,5 +655,96 @@ class ProfileManager:
         print(f"Puntos generados para el perfil: {len(profile_point_features)}")
         print("Segmentos recibidos en profile:", len(segmentos_geo))
         return out_layer
-    
 
+
+        # """
+        # Crea una capa temporal de polígonos para el perfil geológico.
+        # Versión inicial de diagnóstico.
+        # """
+
+
+    def build_geological_polygon_layer(self, line_layer, layer_name="perfil_geologico"):
+
+        if line_layer is None or not line_layer.isValid():
+            raise Exception("La capa de líneas del perfil no es válida.")
+
+        crs_authid = line_layer.crs().authid()
+        if not crs_authid:
+            crs_authid = "EPSG:4326"
+
+        out_layer = QgsVectorLayer(
+            f"Polygon?crs={crs_authid}",
+            layer_name,
+            "memory"
+        )
+
+        prov = out_layer.dataProvider()
+
+        prov.addAttributes([
+            QgsField("id_lito", QVariant.Int),
+            QgsField("tipo", QVariant.String),
+            QgsField("valor_geo", QVariant.String)
+        ])
+        out_layer.updateFields()
+
+        line_geoms = []
+
+        for feat in line_layer.getFeatures():
+
+            geom = feat.geometry()
+
+            if geom is None or geom.isEmpty():
+                continue
+
+            if geom.type() != Qgis.GeometryType.Line:
+                continue
+
+            line_geoms.append(geom)
+
+        merged = QgsGeometry.unaryUnion(line_geoms)
+        polygon_geoms = QgsGeometry.polygonize([merged])
+
+
+        if polygon_geoms is None or polygon_geoms.isEmpty():
+
+            QgsMessageLog.logMessage(
+                "Polygonize no generó polígonos.",
+                "SecGeol",
+                Qgis.Warning
+            )
+
+            QgsProject.instance().addMapLayer(out_layer)
+
+            return out_layer
+        
+        multi = polygon_geoms.asGeometryCollection()
+
+        out_features = []
+
+        for poly_geom in multi:
+
+            feat = QgsFeature(out_layer.fields())
+
+            feat.setGeometry(poly_geom)
+
+            feat.setAttributes([
+                0,
+                "poligono",
+                None
+            ])
+
+            out_features.append(feat)
+
+        prov.addFeatures(out_features)
+
+        out_layer.updateExtents()
+
+        QgsProject.instance().addMapLayer(out_layer)
+
+        QgsMessageLog.logMessage(
+            f"Capa temporal creada: {layer_name}",
+            "SecGeol",
+            Qgis.Info
+        )
+
+        return out_layer

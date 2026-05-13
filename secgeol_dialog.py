@@ -184,6 +184,13 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.FieldAzimuthEst.setFilters(QgsFieldProxyModel.Numeric)
         self.FieldClasGeo.setFilters(QgsFieldProxyModel.AllTypes)
 
+        self.MapLayerSecLin.setFilters(QgsMapLayerProxyModel.LineLayer)
+
+
+        #Conectar TAB 2
+
+        self.buttonBox_2.accepted.connect(self.ejecutar_lineas_a_poligonos)
+        self.buttonBox_2.rejected.connect(self.reject)
 
         
         self.section_manager = SectionManager()
@@ -1203,5 +1210,32 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         )
 
     
+    def ejecutar_lineas_a_poligonos(self):
+        try:
+            line_layer = self.MapLayerSecLin.currentLayer()
 
+            if line_layer is None:
+                raise Exception("Seleccione una capa de líneas del perfil.")
+
+            perfil_poly_layer = self.profile_manager.build_geological_polygon_layer(
+                line_layer=line_layer,
+                layer_name="perfil_geologico"
+            )
+
+            if self.checkEjes.isChecked():
+                self.profile_manager.build_axes_layer(
+                    line_layer=line_layer,
+                    layer_name="ejes"
+                )
+
+            self.mostrar_ayuda(
+                "Líneas a polígonos",
+                "Se generó la capa temporal <b>perfil_geologico</b>."
+            )
+
+        except Exception as e:
+            self.mostrar_ayuda(
+                "Error",
+                str(e)
+            )
     
