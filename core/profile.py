@@ -688,6 +688,7 @@ class ProfileManager:
         out_layer.updateFields()
 
         line_geoms = []
+        geologia_lineas = []
 
         for feat in line_layer.getFeatures():
 
@@ -698,6 +699,18 @@ class ProfileManager:
 
             if geom.type() != Qgis.GeometryType.Line:
                 continue
+
+            tipo = feat["tipo"] if "tipo" in feat.fields().names() else None
+
+            if tipo == "geologia":
+                id_lito = feat["id_lito"] if "id_lito" in feat.fields().names() else None
+                valor_geo = feat["valor_geo"] if "valor_geo" in feat.fields().names() else None
+
+                geologia_lineas.append({
+                    "id_lito": id_lito,
+                    "valor_geo": valor_geo,
+                    "geometry": geom
+                })
 
             line_geoms.append(geom)
 
@@ -727,10 +740,24 @@ class ProfileManager:
 
             feat.setGeometry(poly_geom)
 
+            id_lito_poly = 0
+            valor_geo_poly = None
+
+            for geo in geologia_lineas:
+                geom_geo = geo["geometry"]
+
+                if poly_geom.buffer(0.01, 1).intersects(geom_geo):
+
+                    id_lito_poly = geo["id_lito"]
+                    valor_geo_poly = geo["valor_geo"]
+
+                    break
+
+
             feat.setAttributes([
-                0,
+                id_lito_poly,
                 "poligono",
-                None
+                valor_geo_poly
             ])
 
             out_features.append(feat)
@@ -748,3 +775,7 @@ class ProfileManager:
         )
 
         return out_layer
+    
+
+    # area de vinculación
+    # Gilberto 
