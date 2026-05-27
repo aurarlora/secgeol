@@ -1,3 +1,4 @@
+import math
 from qgis.core import (
     Qgis,
     QgsFeature,
@@ -776,6 +777,201 @@ class ProfileManager:
 
         return out_layer
     
+    #------ Para agregar los tics -----
+    def build_axes_layer(
+            self,
+            line_layer,
+            layer_name="ejes"
+        ):
+
+        if line_layer is None or not line_layer.isValid():
+            raise Exception("La capa de líneas no es válida.")
+
+        crs_authid = line_layer.crs().authid()
+
+        out_layer = QgsVectorLayer(
+            f"LineString?crs={crs_authid}",
+            layer_name,
+            "memory"
+        )
+
+        prov = out_layer.dataProvider()
+
+        prov.addAttributes([
+            QgsField("tipo", QVariant.String),
+            QgsField("ejes", QVariant.String)
+        ])
+
+        out_layer.updateFields()
+        
+        # Obtener extensión de las líneas del perfil
+        extent = line_layer.extent()
+
+        x_min = extent.xMinimum()
+        x_max = extent.xMaximum()
+
+        y_min = extent.yMinimum()
+        y_max = extent.yMaximum()
+
+        longitud_x = x_max - x_min
+        altura_y = y_max - y_min
+
+        # Número adaptable de divisiones
+        ticks_deseados_x = max(5, min(20, int(longitud_x / 500)))
+        ticks_deseados_y = max(4, min(12, int(altura_y / 100)))
+
+        # Pasos agradables
+        paso_x = self.nice_number(longitud_x / ticks_deseados_x)
+        paso_y = self.nice_number(altura_y / ticks_deseados_y)
+
+        QgsMessageLog.logMessage(
+            f"Ejes: X={longitud_x:.2f}, pasoX={paso_x} | "
+            f"Y={altura_y:.2f}, pasoY={paso_y}",
+            "SecGeol",
+            Qgis.Info
+        )
+        
+        out_features = []
+
+        # separación respecto a la caja
+        offset = altura_y * 0.10
+
+        offset_x = offset
+        offset_y = offset
+
+        # longitud proporcional de los ticks
+        tick_len = max(5, min(40, altura_y * 0.04))
+
+        # --------------------
+        # EJE X
+        # --------------------
+
+        y_eje = y_min - offset_y
+
+        geom_x = QgsGeometry.fromPolylineXY([
+            QgsPointXY(x_min, y_eje),
+            QgsPointXY(x_max, y_eje)
+        ])
+
+        feat = QgsFeature(out_layer.fields())
+        feat.setGeometry(geom_x)
+
+        feat.setAttributes([
+            "eje_x",
+            None
+        ])
+
+        out_features.append(feat)
+
+        # --------------------
+        # TICKS EJE X
+        # --------------------
+
+        x_tick = 0
+
+        while x_tick <= x_max:
+
+            geom_tick = QgsGeometry.fromPolylineXY([
+                QgsPointXY(x_tick, y_eje - tick_len/2),
+                QgsPointXY(x_tick, y_eje + tick_len/2)
+            ])
+
+            feat = QgsFeature(out_layer.fields())
+            feat.setGeometry(geom_tick)
+
+            feat.setAttributes([
+                "tick_x",
+                f"{int(x_tick)}"
+            ])
+
+            out_features.append(feat)
+
+            x_tick += paso_x
+
+            QgsMessageLog.logMessage(
+                f"Tick X creado en: {x_tick}",
+                "SecGeol",
+                Qgis.Info
+            )
+
+
+        # --------------------
+        # EJE Y
+        # --------------------
+
+        x_eje = x_min - offset_x
+
+        geom_y = QgsGeometry.fromPolylineXY([
+            QgsPointXY(x_eje, y_min),
+            QgsPointXY(x_eje, y_max)
+        ])
+
+        feat = QgsFeature(out_layer.fields())
+        feat.setGeometry(geom_y)
+
+        feat.setAttributes([
+            "eje_y",
+            None
+        ])
+
+        out_features.append(feat)
+
+        # --------------------
+        # TICKS EJE Y
+        # --------------------
+
+        y_tick = math.ceil(y_min / paso_y) * paso_y
+
+        while y_tick <= y_max:
+
+            geom_tick = QgsGeometry.fromPolylineXY([
+                QgsPointXY(x_eje - tick_len/2, y_tick),
+                QgsPointXY(x_eje + tick_len/2, y_tick)
+            ])
+
+            feat = QgsFeature(out_layer.fields())
+            feat.setGeometry(geom_tick)
+
+            feat.setAttributes([
+                "tick_y",
+                f"{int(round(y_tick))}"
+            ])
+
+            out_features.append(feat)
+
+            y_tick += paso_y
+
+        prov.addFeatures(out_features)
+        out_layer.updateExtents()
+
+        for lyr in QgsProject.instance().mapLayers().values():
+            if lyr.name() == layer_name:
+                QgsProject.instance().removeMapLayer(lyr.id())
+
+        QgsProject.instance().addMapLayer(out_layer)
+
+        return out_layer
+    
+
+    def nice_number(self, value):
+        import math
+
+        if value <= 0:
+            return 1
+
+        exp = math.floor(math.log10(value))
+        fraction = value / (10 ** exp)
+
+        if fraction < 1.5:
+            nice = 1
+        elif fraction < 3:
+            nice = 2
+        elif fraction < 7:
+            nice = 5
+        else:
+            nice = 10
+
+        return nice * (10 ** exp)
 
     # area de vinculación
     # Gilberto 

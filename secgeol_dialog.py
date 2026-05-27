@@ -1222,6 +1222,12 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 layer_name="perfil_geologico"
             )
 
+            QgsMessageLog.logMessage(
+                f"checkEjes activado: {self.checkEjes.isChecked()}",
+                "SecGeol",
+                Qgis.Info
+            )
+
             if self.checkEjes.isChecked():
                 self.profile_manager.build_axes_layer(
                     line_layer=line_layer,
@@ -1234,6 +1240,12 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             )
 
         except Exception as e:
+            QgsMessageLog.logMessage(
+            f"Error en líneas a polígonos/ejes: {e}",
+            "SecGeol",
+            Qgis.Critical
+            )
+
             self.mostrar_ayuda(
                 "Error",
                 str(e)
