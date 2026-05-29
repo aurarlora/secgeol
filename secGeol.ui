@@ -32,7 +32,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="uno">
      <attribute name="title">
@@ -341,11 +341,11 @@
        <string>Crear ejes X, Y</string>
       </property>
      </widget>
-     <widget class="QgsFileWidget" name="mQgsFileWidget">
+     <widget class="QgsFileWidget" name="fileWidgetPerfilGeo">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>140</y>
+        <y>290</y>
         <width>361</width>
         <height>27</height>
        </rect>
@@ -364,8 +364,8 @@
      <widget class="QDialogButtonBox" name="buttonBox_2">
       <property name="geometry">
        <rect>
-        <x>120</x>
-        <y>300</y>
+        <x>110</x>
+        <y>340</y>
         <width>156</width>
         <height>24</height>
        </rect>
@@ -384,7 +384,20 @@
        </rect>
       </property>
       <property name="text">
-       <string>Perfil líneas a poligonos</string>
+       <string>* Perfil topográfico</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>260</y>
+        <width>211</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>* Perfil geológico de salida (*.shp)</string>
       </property>
      </widget>
     </widget>
@@ -392,6 +405,65 @@
      <attribute name="title">
       <string>3. Perfil 2D a 3D</string>
      </attribute>
+     <widget class="QgsMapLayerComboBox" name="MapLayerPerGeo">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>40</y>
+        <width>331</width>
+        <height>27</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_9">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>10</y>
+        <width>201</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>* Perfil geológico de polígonos</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>100</y>
+        <width>171</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>* Perfil geológico 3D (*.shp)</string>
+      </property>
+     </widget>
+     <widget class="QgsFileWidget" name="fileWidgetPerfilGeo3D">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>120</y>
+        <width>331</width>
+        <height>61</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QDialogButtonBox" name="buttonBox_3">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>300</y>
+        <width>156</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="standardButtons">
+       <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>

@@ -183,14 +183,19 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.FieldDipEst.setFilters(QgsFieldProxyModel.Numeric)
         self.FieldAzimuthEst.setFilters(QgsFieldProxyModel.Numeric)
         self.FieldClasGeo.setFilters(QgsFieldProxyModel.AllTypes)
-
         self.MapLayerSecLin.setFilters(QgsMapLayerProxyModel.LineLayer)
+        self.MapLayerPerGeo.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 
 
         #Conectar TAB 2
 
         self.buttonBox_2.accepted.connect(self.ejecutar_lineas_a_poligonos)
         self.buttonBox_2.rejected.connect(self.reject)
+
+        #Conectar TAB 3
+        self.buttonBox_3.accepted.connect(self.ejecutar_perfil_3d)
+        self.buttonBox_3.rejected.connect(self.reject)
+
 
         
         self.section_manager = SectionManager()
@@ -1251,3 +1256,30 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 str(e)
             )
     
+
+
+    ### Tab 3
+
+    def ejecutar_perfil_3d(self):
+        try:
+            poly_layer = self.MapLayerPerGeo.currentLayer()
+
+            if poly_layer is None:
+                raise Exception("Seleccione una capa poligonal del perfil geológico.")
+
+            salida = self.fileWidgetPerfilGeo3D.filePath()
+
+            if not salida:
+                raise Exception("Seleccione una ruta de salida para el perfil 3D.")
+
+            self.mostrar_ayuda(
+                "Perfil geológico 3D",
+                f"Capa seleccionada: <b>{poly_layer.name()}</b><br>"
+                f"Salida: {salida}"
+            )
+
+        except Exception as e:
+            self.mostrar_ayuda(
+                "Error",
+                str(e)
+            )
