@@ -8,7 +8,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import ( 
                         QgsWkbTypes,
-                        Qgis, QgsGeometry, QgsMessageLog
+                        Qgis, QgsGeometry,QgsMessageLog
                        )
 
 
@@ -451,6 +451,19 @@ class SecGeol:
                 
             )
 
+            if section_work_layer is None:
+                section_work_layer = self.dlg.preparar_seccion_trabajo(
+                    feat_sec=feat_sec,
+                    has_drawn=has_drawn,
+                    invertida=inv_sec
+                )
+
+            self.dlg.crear_seccion_guia(
+                section_layer=section_work_layer,
+                invertida=inv_sec,
+                layer_name="Seccion_guia"
+            )
+            
             self.iface.messageBar().pushInfo(
                 self.tr("SecGeol"),
                 self.tr("Profile created successfully.")

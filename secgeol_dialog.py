@@ -1,9 +1,11 @@
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QEvent, QUrl, Qt
+from qgis.PyQt.QtCore import QEvent, QUrl, Qt, QVariant
 from qgis.PyQt.QtWidgets import QDialog, QSplitter, QMessageBox
-from qgis.core import QgsMapLayerProxyModel, QgsProject, Qgis, QgsFeature, QgsGeometry, QgsVectorLayer, QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog, QgsCoordinateTransform
+from qgis.core import (QgsMapLayerProxyModel, QgsProject, Qgis,
+                       QgsFeature, QgsGeometry, QgsVectorLayer, QgsField, 
+                       QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog, QgsCoordinateTransform)
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.utils import iface
 from qgis.PyQt.QtGui import QColor
@@ -1256,9 +1258,68 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 str(e)
             )
     
+ 
+        #       Crea una capa temporal con la sección efectiva usada para generar el perfil.
+        #       Esta capa servirá como guía espacial para reconstrucción 3D.
+ 
 
 
-    ### Tab 3
+    def crear_seccion_guia(self, section_layer, invertida=False, layer_name="Seccion_guia"):
+        
+
+        if section_layer is None or not section_layer.isValid():
+            raise Exception("No hay sección de trabajo válida para crear la sección guía.")
+
+        crs_authid = section_layer.crs().authid()
+
+        guia_layer = QgsVectorLayer(
+            f"LineString?crs={crs_authid}",
+            layer_name,
+            "memory"
+        )
+
+        prov = guia_layer.dataProvider()
+
+        prov.addAttributes([
+            QgsField("sec_id", QVariant.Int),
+            QgsField("long_m", QVariant.Double),
+            QgsField("invert", QVariant.Int),
+            QgsField("crs", QVariant.String)
+
+        ])
+
+        guia_layer.updateFields()
+
+        out_features = []
+
+        for f in section_layer.getFeatures():
+            geom = QgsGeometry(f.geometry())
+
+            feat = QgsFeature(guia_layer.fields())
+            feat.setGeometry(geom)
+            feat.setAttributes([
+                1,
+                float(geom.length()),
+                1 if invertida else 0,
+                section_layer.crs().authid()
+            ])
+
+            out_features.append(feat)
+            break
+
+        prov.addFeatures(out_features)
+        guia_layer.updateExtents()
+
+        for lyr in QgsProject.instance().mapLayers().values():
+            if lyr.name() == layer_name:
+                QgsProject.instance().removeMapLayer(lyr.id())
+
+        QgsProject.instance().addMapLayer(guia_layer)
+
+        return guia_layer
+
+
+    ###---------------------------------------------------------- Tab 3
 
     def ejecutar_perfil_3d(self):
         try:
