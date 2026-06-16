@@ -972,6 +972,3 @@ class ProfileManager:
             nice = 10
 
         return nice * (10 ** exp)
-
-    # area de vinculación
-    # Gilberto 

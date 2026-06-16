@@ -6,7 +6,7 @@ from qgis.PyQt.QtWidgets import QDialog, QSplitter, QMessageBox
 from qgis.core import (QgsMapLayerProxyModel, QgsProject, Qgis,
                        QgsFeature, QgsGeometry, QgsVectorLayer, QgsField, 
                        QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog, QgsCoordinateTransform)
-from qgis.gui import QgsMapTool, QgsRubberBand
+from qgis.gui import QgsMapTool, QgsRubberBand, QgsFileWidget
 from qgis.utils import iface
 from qgis.PyQt.QtGui import QColor
 
@@ -51,7 +51,13 @@ class DrawSectionMapTool(QgsMapTool):
         self.vertex_band.setWidth(6)
         self.vertex_band.setColor(QColor(255, 0, 0))
 
-        
+        # Para guardar Tab3
+        self.fileWidgetPerfilGeo3D.setStorageMode(QgsFileWidget.SaveFile)
+        self.fileWidgetPerfilGeo3D.setFilter("Shapefile (*.shp);;GeoPackage (*.gpkg)")
+
+        # Guardar tab2
+        self.fileWidgetPerfilGeo.setStorageMode(QgsFileWidget.SaveFile)
+        self.fileWidgetPerfilGeo.setFilter("Shapefile (*.shp);;GeoPackage (*.gpkg)")
 
 
     def activate(self):
@@ -187,7 +193,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.FieldClasGeo.setFilters(QgsFieldProxyModel.AllTypes)
         self.MapLayerSecLin.setFilters(QgsMapLayerProxyModel.LineLayer)
         self.MapLayerPerGeo.setFilters(QgsMapLayerProxyModel.PolygonLayer)
-
+        self.MapLayerSecGuia.setFilters(QgsMapLayerProxyModel.LineLayer)
 
         #Conectar TAB 2
 
@@ -294,12 +300,19 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         self.help_tab_tres = """
             <div style="padding:10px; line-height:1.4; font-size:12px;">
-            <h3>Herramientas y Resultados</h3>
+            <h3>Reconstrucción Geológica 3D</h3>
             <p>
-                Esta pestaña contendrá herramientas complementarias y opciones para la generación de resultados finales.
+                Seleccione el perfil geológico interpretado generado en el módulo 2 y la sección guía creada en el módulo 1.
+
+
             </p>
             <p>
-                Haz clic en cada control para ver una breve descripción.
+                La sección guía conserva la referencia espacial utilizada para generar el perfil topográfico y permite reconstruir la geometría en coordenadas reales para su visualización en entornos 3D.
+            </p>
+            <p>
+            Salida:
+                Perfil_geologico3D
+
             </p>
             </div>
             """
@@ -324,14 +337,50 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.MapLayerEst.setFilters(QgsMapLayerProxyModel.LineLayer)
 
         # -----------------------------
-        # CONFIGURAR SALIDA
+        # CONFIGURAR SALIDAS
         # -----------------------------
-        self.fileWidgetPerfil.setFilter("Shapefile (*.shp);;GeoPackage (*.gpkg)")
+
+        # Módulo 1
+        self.fileWidgetPerfil.setFilter(
+            "Shapefile (*.shp);;GeoPackage (*.gpkg)"
+        )
 
         try:
-            self.fileWidgetPerfil.setStorageMode(self.fileWidgetPerfil.StorageMode.SaveFile)
+            self.fileWidgetPerfil.setStorageMode(
+                self.fileWidgetPerfil.StorageMode.SaveFile
+            )
         except AttributeError:
-            self.fileWidgetPerfil.setStorageMode(self.fileWidgetPerfil.SaveFile)
+            self.fileWidgetPerfil.setStorageMode(
+                self.fileWidgetPerfil.SaveFile
+            )
+
+        # Módulo 2
+        self.fileWidgetPerfilGeo.setFilter(
+            "Shapefile (*.shp);;GeoPackage (*.gpkg)"
+        )
+
+        try:
+            self.fileWidgetPerfilGeo.setStorageMode(
+                self.fileWidgetPerfilGeo.StorageMode.SaveFile
+            )
+        except AttributeError:
+            self.fileWidgetPerfilGeo.setStorageMode(
+                self.fileWidgetPerfilGeo.SaveFile
+            )
+
+        # Módulo 3
+        self.fileWidgetPerfilGeo3D.setFilter(
+            "Shapefile (*.shp);;GeoPackage (*.gpkg)"
+        )
+
+        try:
+            self.fileWidgetPerfilGeo3D.setStorageMode(
+                self.fileWidgetPerfilGeo3D.StorageMode.SaveFile
+            )
+        except AttributeError:
+            self.fileWidgetPerfilGeo3D.setStorageMode(
+                self.fileWidgetPerfilGeo3D.SaveFile
+            )
 
 
 
@@ -352,6 +401,13 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             self.fileWidgetPerfil,
             self.FieldDipEst,
             self.FieldAzimuthEst,
+            self.MapLayerSecLin,
+            self.checkEjes,
+            self.MapLayerPerGeo,
+            self.MapLayerSecGuia,
+            self.fileWidgetPerfilGeo3D,
+            self.fileWidgetPerfilGeo
+
         ]:
             w.installEventFilter(self)
             
@@ -640,6 +696,42 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                     "Si el valor es <b>-1</b> o está fuera de rango, la estructura no se dibujará."
                 )
 
+            elif obj == self.MapLayerSecGuia:
+                self.mostrar_ayuda(
+                    "Sección guía",
+                    "Seleccione el perfil geológico interpretado y la sección guía generada en el módulo 1.<br><br>"
+                    "La sección guía contiene la referencia espacial necesaria para reconstruir el perfil en coordenadas reales."
+                )
+
+            elif obj == self.MapLayerPerGeo:
+                self.mostrar_ayuda(
+                    "Perfil geológico",
+                    "Seleccione la capa poligonal generada en el módulo 2. "
+                    "Esta capa contiene la interpretación geológica que será reconstruida en 3D."
+                )
+           
+
+            elif obj == self.fileWidgetPerfilGeo:
+                self.mostrar_ayuda(
+                    "Salida perfil geológico",
+                    "Seleccione la ubicación donde se guardará la capa poligonal del perfil geológico. "
+                    "Esta capa contendrá la interpretación geológica y podrá utilizarse posteriormente "
+                    "en el módulo de reconstrucción 3D."
+                )
+
+            elif obj == self.fileWidgetPerfilGeo3D:
+                self.mostrar_ayuda(
+                    "Salida perfil geológico 3D",
+                    "Seleccione la ubicación donde se guardará el perfil geológico reconstruido "
+                    "en coordenadas espaciales reales para su visualización y análisis tridimensional."
+                )
+
+            elif obj == self.MapLayerSecLin:
+                self.mostrar_ayuda(
+                    "Perfil topográfico",
+                    "Seleccione la capa Perfil_topografico generada en el módulo 1 y ajustada de acuerdo con la interpretación geológica. "
+                    "Las líneas se convertirán en polígonos para construir el perfil geológico final, asignar simbología litológica y generar salidas cartográficas con escalas reales."
+                )
 
 
         elif event.type() == 11:  # Leave
@@ -1328,10 +1420,54 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             if poly_layer is None:
                 raise Exception("Seleccione una capa poligonal del perfil geológico.")
 
+            sec_layer = self.MapLayerSecGuia.currentLayer()
+
+            if sec_layer is None:
+                raise Exception(
+                    "Seleccione la capa Seccion_guia."
+            )
+
+
             salida = self.fileWidgetPerfilGeo3D.filePath()
 
             if not salida:
                 raise Exception("Seleccione una ruta de salida para el perfil 3D.")
+            
+            sec_feat = next(sec_layer.getFeatures())
+            sec_geom = sec_feat.geometry()
+
+            QgsMessageLog.logMessage(
+                f"Longitud sección guía: {sec_geom.length()}",
+                "SecGeol",
+                Qgis.Info
+            )
+
+            feat = next(poly_layer.getFeatures())
+            geom = feat.geometry()
+
+            QgsMessageLog.logMessage(
+                f"WKB perfil geológico: {geom.wkbType()}",
+                "SecGeol",
+                Qgis.Info
+            )
+
+            QgsMessageLog.logMessage(
+                f"Polígonos: {poly_layer.featureCount()}",
+                "SecGeol",
+                Qgis.Info
+            )
+
+            for feat in poly_layer.getFeatures():
+
+                geom = feat.geometry()
+
+                QgsMessageLog.logMessage(
+                    f"WKB Type: {geom.wkbType()}",
+                    "SecGeol",
+                    Qgis.Info
+                )
+
+                break
 
             self.mostrar_ayuda(
                 "Perfil geológico 3D",
