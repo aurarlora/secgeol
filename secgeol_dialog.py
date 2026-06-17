@@ -3,8 +3,8 @@ import os
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QEvent, QUrl, Qt, QVariant
 from qgis.PyQt.QtWidgets import QDialog, QSplitter, QMessageBox
-from qgis.core import (QgsMapLayerProxyModel, QgsProject, Qgis,
-                       QgsFeature, QgsGeometry, QgsVectorLayer, QgsField, 
+from qgis.core import (QgsMapLayerProxyModel, QgsProject, Qgis,QgsPoint, QgsPolygon,
+                       QgsFeature, QgsGeometry, QgsVectorLayer, QgsField, QgsLineString,
                        QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog, QgsCoordinateTransform)
 from qgis.gui import QgsMapTool, QgsRubberBand, QgsFileWidget
 from qgis.utils import iface
@@ -1442,8 +1442,97 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 Qgis.Info
             )
 
-            feat = next(poly_layer.getFeatures())
-            geom = feat.geometry()
+            
+
+
+
+
+            crs_authid = sec_layer.crs().authid()
+
+            out_layer = QgsVectorLayer(
+                f"PolygonZ?crs={crs_authid}",
+                "perfil_geologico3D",
+                "memory"
+            )
+
+            prov = out_layer.dataProvider()
+            prov.addAttributes(poly_layer.fields())
+            out_layer.updateFields()
+
+            total_3d = 0
+
+            for feat in poly_layer.getFeatures():
+
+                geom = feat.geometry()
+
+                if geom is None or geom.isEmpty():
+                    continue
+
+                multi = geom.asMultiPolygon()
+
+                if not multi:
+                    continue
+
+                for poly in multi:
+
+                    if not poly:
+                        continue
+
+                    exterior_ring = poly[0]
+
+                    nuevos_vertices = []
+
+                    for pt in exterior_ring:
+
+                        x_perfil = pt.x()
+                        z_perfil = pt.y()
+
+                        punto_real = sec_geom.interpolate(x_perfil)
+
+                        if punto_real is None or punto_real.isEmpty():
+                            continue
+
+                        xy = punto_real.asPoint()
+
+                        nuevos_vertices.append(
+                            QgsPoint(
+                                xy.x(),
+                                xy.y(),
+                                z_perfil
+                            )
+                        )
+
+                    if len(nuevos_vertices) < 4:
+                        continue
+
+                    ring = QgsLineString(nuevos_vertices)
+
+                    poly_3d = QgsPolygon()
+                    poly_3d.setExteriorRing(ring)
+
+                    geom_3d = QgsGeometry(poly_3d)
+
+                    feat_3d = QgsFeature(out_layer.fields())
+                    feat_3d.setGeometry(geom_3d)
+                    feat_3d.setAttributes(feat.attributes())
+
+                    prov.addFeature(feat_3d)
+
+                    total_3d += 1
+
+            out_layer.updateExtents()
+
+            for lyr in QgsProject.instance().mapLayers().values():
+                if lyr.name() == "perfil_geologico3D":
+                    QgsProject.instance().removeMapLayer(lyr.id())
+
+            QgsProject.instance().addMapLayer(out_layer)
+
+            QgsMessageLog.logMessage(
+                f"perfil_geologico3D creado con {total_3d} polígonos.",
+                "SecGeol",
+                Qgis.Info
+            )
 
             QgsMessageLog.logMessage(
                 f"WKB perfil geológico: {geom.wkbType()}",
@@ -1456,6 +1545,65 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 "SecGeol",
                 Qgis.Info
             )
+
+            if not multi:
+                raise Exception("No fue posible leer la geometría multipolígono.")
+
+            primer_anillo = multi[0][0]
+
+            nuevos_vertices = []
+
+            for pt in primer_anillo:
+
+                x_perfil = pt.x()
+                z_perfil = pt.y()
+
+                punto_real = sec_geom.interpolate(x_perfil)
+
+                if punto_real is None or punto_real.isEmpty():
+                    continue
+
+                xy = punto_real.asPoint()
+
+                nuevos_vertices.append(
+                    QgsPoint(
+                        xy.x(),
+                        xy.y(),
+                        z_perfil
+                    )
+                )
+            # ← FUERA DEL FOR
+
+            QgsMessageLog.logMessage(
+                f"Vertices reconstruidos: {len(nuevos_vertices)}",
+                "SecGeol",
+                Qgis.Info
+            )
+
+            if nuevos_vertices:
+
+                QgsMessageLog.logMessage(
+                    f"Primer XYZ: "
+                    f"{nuevos_vertices[0].x()}, "
+                    f"{nuevos_vertices[0].y()}, "
+                    f"{nuevos_vertices[0].z()}",
+                    "SecGeol",
+                    Qgis.Info
+                ) 
+
+            if len(nuevos_vertices) < 4:
+                raise Exception(
+                    "No hay suficientes vértices para construir un polígono."
+                )
+            
+
+            QgsMessageLog.logMessage(
+                f"Anillo válido: {len(nuevos_vertices)} vértices",
+                "SecGeol",
+                Qgis.Info
+            )
+
+           
 
             for feat in poly_layer.getFeatures():
 
