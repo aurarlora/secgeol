@@ -1,4 +1,4 @@
-import os
+import os, re, unicodedata
 import tempfile
 from datetime import datetime
 from .secgeol_dialog import SecGeolDialog
@@ -7,11 +7,10 @@ from qgis.PyQt.QtCore import QCoreApplication, QVariant
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import ( 
-                        QgsWkbTypes,
+                        QgsWkbTypes,QgsVectorLayer,
+                        QgsProject,QgsVectorFileWriter,
                         Qgis, QgsGeometry,QgsMessageLog
                        )
-
-
 
 class SecGeol:
     def __init__(self, iface):
@@ -198,17 +197,221 @@ class SecGeol:
 
         return geom
 
+    # --------------------------------------------------------------
+    # Guarda el perfil y la sección guía como dos Shapefiles relacionados
+    # --------------------------------------------------------------
+
+    def guardar_capas_salida(self, perfil_layer, guia_layer, salida):
+        """
+        Retorna:
+            dict: rutas de los archivos guardados.
+        """
+
+        # -------------------------------- 1. Validaciones
+        
+        if not salida:
+            raise ValueError(
+                self.tr("You must specify an output file.")
+            )
+
+        if perfil_layer is None or not perfil_layer.isValid():
+            raise ValueError(
+                self.tr("The profile layer is not valid.")
+            )
+
+        if guia_layer is None or not guia_layer.isValid():
+            raise ValueError(
+                self.tr("The guide section layer is not valid.")
+            )
+
+        
+        # 2. Obtener carpeta y nombre base
+        
+        carpeta = os.path.dirname(salida)
+
+        if not carpeta:
+            raise ValueError(
+                self.tr("The output folder is not valid.")
+            )
+
+        if not os.path.isdir(carpeta):
+            os.makedirs(carpeta, exist_ok=True)
+
+        nombre_archivo = os.path.basename(salida)
+        nombre_base, _ = os.path.splitext(nombre_archivo)
+
+        
+        # 3. Normalizar el nombre
+        
+        nombre_base = unicodedata.normalize("NFKD", nombre_base)
+        nombre_base = nombre_base.encode("ascii", "ignore").decode("ascii")
+
+        nombre_base = nombre_base.lower().strip()
+        nombre_base = re.sub(r"\s+", "_", nombre_base)
+        nombre_base = re.sub(r"[^a-z0-9_-]", "", nombre_base)
+        nombre_base = re.sub(r"_+", "_", nombre_base)
+        nombre_base = nombre_base.strip("_-")
+
+        if not nombre_base:
+            nombre_base = "perfil"
+
+        # Máximo acordado para el nombre base
+        nombre_base = nombre_base[:30].rstrip("_-")
+
+       
+        # 4. Buscar un nombre disponible para ambas capas
+       
+        extensiones_shapefile = (
+            ".shp",
+            ".shx",
+            ".dbf",
+            ".prj",
+            ".cpg",
+            ".qpj"
+        )
+
+        def conjunto_existe(ruta_sin_extension):
+            return any(
+                os.path.exists(ruta_sin_extension + extension)
+                for extension in extensiones_shapefile
+            )
+
+        contador = 0
+
+        while True:
+            if contador == 0:
+                nombre_disponible = nombre_base
+            else:
+                nombre_disponible = f"{nombre_base}_{contador}"
+
+            base_perfil = os.path.join(
+                carpeta,
+                nombre_disponible
+            )
+
+            base_guia = os.path.join(
+                carpeta,
+                f"{nombre_disponible}_guia"
+            )
+
+            if (
+                not conjunto_existe(base_perfil)
+                and not conjunto_existe(base_guia)
+            ):
+                break
+
+            contador += 1
+
+        ruta_perfil = base_perfil + ".shp"
+        ruta_guia = base_guia + ".shp"
+
+        
+        # 5. Configuración de escritura
+        
+        opciones = QgsVectorFileWriter.SaveVectorOptions()
+        opciones.driverName = "ESRI Shapefile"
+        opciones.fileEncoding = "UTF-8"
+        opciones.actionOnExistingFile = (
+            QgsVectorFileWriter.CreateOrOverwriteFile
+        )
+
+        contexto_transformacion = (
+            QgsProject.instance().transformContext()
+        )
+
+       
+        # 6. Guardar el perfil
+       
+        resultado_perfil = QgsVectorFileWriter.writeAsVectorFormatV3(
+            perfil_layer,
+            ruta_perfil,
+            contexto_transformacion,
+            opciones
+        )
+
+        error_perfil = resultado_perfil[0]
+        mensaje_perfil = resultado_perfil[1]
+
+        if error_perfil != QgsVectorFileWriter.NoError:
+            raise RuntimeError(
+                self.tr("The profile could not be saved: ")
+                + str(mensaje_perfil)
+            )
+
+        
+        # 7. Guardar la sección guía
+        
+        resultado_guia = QgsVectorFileWriter.writeAsVectorFormatV3(
+            guia_layer,
+            ruta_guia,
+            contexto_transformacion,
+            opciones
+        )
+
+        error_guia = resultado_guia[0]
+        mensaje_guia = resultado_guia[1]
+
+        if error_guia != QgsVectorFileWriter.NoError:
+            raise RuntimeError(
+                self.tr("The guide section could not be saved: ")
+                + str(mensaje_guia)
+            )
+
+
+
+        # ---------------------------------------------------------
+        # 8. Cargar las capas guardadas al proyecto
+        # ---------------------------------------------------------
+        perfil_guardado = QgsVectorLayer(
+            ruta_perfil,
+            nombre_disponible,
+            "ogr"
+        )
+
+        guia_guardada = QgsVectorLayer(
+            ruta_guia,
+            f"{nombre_disponible}_guia",
+            "ogr"
+        )
+
+        if not perfil_guardado.isValid():
+            raise RuntimeError(
+                self.tr("The saved profile layer could not be loaded.")
+            )
+
+        if not guia_guardada.isValid():
+            raise RuntimeError(
+                self.tr("The saved guide section layer could not be loaded.")
+            )
+
+        QgsProject.instance().addMapLayer(perfil_guardado)
+        QgsProject.instance().addMapLayer(guia_guardada)
+
+        # ---------------------------------------------------------
+        # 9. Eliminar las capas temporales
+        # ---------------------------------------------------------
+        if perfil_layer.id() in QgsProject.instance().mapLayers():
+            QgsProject.instance().removeMapLayer(perfil_layer.id())
+
+        if guia_layer.id() in QgsProject.instance().mapLayers():
+            QgsProject.instance().removeMapLayer(guia_layer.id())
+
+        # ---------------------------------------------------------
+        # 10. Devolver resultados
+        # ---------------------------------------------------------
+        return {
+            "perfil": ruta_perfil,
+            "guia": ruta_guia,
+            "perfil_layer": perfil_guardado,
+            "guia_layer": guia_guardada
+        }
+    
 
     # -----------------------------------
-    # EJECUTAR
+    # EJECUTAR, aceptar Tab_1
     # -----------------------------------
     def ejecutar(self):
 
-        #segmentos_geo = []
-        
-        #section_work_layer = None
-        
-        
 
         # DEM
         dem_layer = self.dlg.MapLayerDEM.currentLayer()
@@ -441,7 +644,7 @@ class SecGeol:
             )
 
         try:
-            self.dlg.generar_perfil(
+            perfil_layer = self.dlg.generar_perfil(
                 feat_sec=feat_sec,
                 has_drawn=has_drawn,
                 invertida=inv_sec,
@@ -458,10 +661,16 @@ class SecGeol:
                     invertida=inv_sec
                 )
 
-            self.dlg.crear_seccion_guia(
+            guia_layer = self.dlg.crear_seccion_guia(
                 section_layer=section_work_layer,
                 invertida=inv_sec,
                 layer_name="Seccion_guia"
+            )
+
+            rutas_guardadas = self.guardar_capas_salida(
+                perfil_layer=perfil_layer,
+                guia_layer=guia_layer,
+                salida=salida
             )
             
             self.iface.messageBar().pushInfo(
@@ -479,29 +688,29 @@ class SecGeol:
 
 #-------------------------------- Estructuras----------------------------
 
-        segmentos_geo = []
-        section_work_layer = None
+        # segmentos_geo = []
+        # section_work_layer = None
 
-        if geo_layer is not None:
+        # if geo_layer is not None:
 
-            section_work_layer = self.dlg.preparar_seccion_trabajo(
-                feat_sec=feat_sec,
-                has_drawn=has_drawn,
-                invertida=inv_sec
-            )
+        #     section_work_layer = self.dlg.preparar_seccion_trabajo(
+        #         feat_sec=feat_sec,
+        #         has_drawn=has_drawn,
+        #         invertida=inv_sec
+        #     )
 
-            section_geom = None
+        #     section_geom = None
 
-            for f in section_work_layer.getFeatures():
-                section_geom = QgsGeometry(f.geometry())
-                break
+        #     for f in section_work_layer.getFeatures():
+        #         section_geom = QgsGeometry(f.geometry())
+        #         break
 
-            segmentos_geo = self.dlg.section_manager.intersectar_seccion_con_geologia(
-                section_geom=section_geom,
-                section_crs=section_work_layer.crs(),
-                geo_layer=geo_layer,
-                campo_geo=campo_geo
-            )
+        #     segmentos_geo = self.dlg.section_manager.intersectar_seccion_con_geologia(
+        #         section_geom=section_geom,
+        #         section_crs=section_work_layer.crs(),
+        #         geo_layer=geo_layer,
+        #         campo_geo=campo_geo
+        #     )
 
         
 
