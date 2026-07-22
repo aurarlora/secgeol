@@ -1,9 +1,9 @@
-import os
+import os, re, unicodedata
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QEvent, QUrl, Qt, QVariant
 from qgis.PyQt.QtWidgets import QDialog, QSplitter, QMessageBox
-from qgis.core import (QgsMapLayerProxyModel, QgsProject, Qgis,QgsPoint, QgsPolygon,
+from qgis.core import (QgsMapLayerProxyModel, QgsProject, Qgis,QgsPoint, QgsPolygon,QgsVectorFileWriter,
                        QgsFeature, QgsGeometry, QgsVectorLayer, QgsField, QgsLineString,
                        QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog, QgsCoordinateTransform)
 from qgis.gui import QgsMapTool, QgsRubberBand, QgsFileWidget
@@ -13,6 +13,9 @@ from qgis.PyQt.QtGui import QColor
 from .core.workspace import WorkspaceManager
 from .core.section import SectionManager
 from .core.profile import ProfileManager
+
+
+
 
 
 try:
@@ -56,8 +59,8 @@ class DrawSectionMapTool(QgsMapTool):
         self.fileWidgetPerfilGeo3D.setFilter("Shapefile (*.shp);;GeoPackage (*.gpkg)")
 
         # Guardar tab2
-        self.fileWidgetPerfilGeo.setStorageMode(QgsFileWidget.SaveFile)
-        self.fileWidgetPerfilGeo.setFilter("Shapefile (*.shp);;GeoPackage (*.gpkg)")
+        #self.fileWidgetPerfilGeo.setStorageMode(QgsFileWidget.SaveFile)
+        #self.fileWidgetPerfilGeo.setFilter("Shapefile (*.shp);;GeoPackage (*.gpkg)")
 
 
     def activate(self):
@@ -1308,10 +1311,11 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             "que se utilizarán para proyectar las estructuras sobre el perfil."
         )
 
-    
+    #---------------------Tab 2---------------------------------------    
     def ejecutar_lineas_a_poligonos(self):
         try:
             line_layer = self.MapLayerSecLin.currentLayer()
+            salida_perfil_geo = self.fileWidgetPerfilGeo.filePath().strip()
 
             if line_layer is None:
                 raise Exception("Seleccione una capa de líneas del perfil.")
@@ -1327,16 +1331,31 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 Qgis.Info
             )
 
+            ejes_layer = None
+
             if self.checkEjes.isChecked():
-                self.profile_manager.build_axes_layer(
+                ejes_layer = self.profile_manager.build_axes_layer(
                     line_layer=line_layer,
                     layer_name="ejes"
                 )
 
+            capas_guardadas = self.guardar_salida_tab2(
+                perfil_poly_layer=perfil_poly_layer,
+                ejes_layer=ejes_layer,
+                salida_perfil_geo=salida_perfil_geo
+            )
+
             self.mostrar_ayuda(
                 "Líneas a polígonos",
                 "Se generó la capa temporal <b>perfil_geologico</b>."
+                + (
+                    " y la capa <b>ejes</b>."
+                    if ejes_layer is not None
+                    else "."
+                )
             )
+            
+            self.accept()
 
         except Exception as e:
             QgsMessageLog.logMessage(
@@ -1354,8 +1373,145 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         #       Crea una capa temporal con la sección efectiva usada para generar el perfil.
         #       Esta capa servirá como guía espacial para reconstrucción 3D.
  
+    #--------------------------------Tab2
+
+    def guardar_salida_tab2(
+        self,
+        perfil_poly_layer,
+        ejes_layer,
+        salida_perfil_geo
+    ):
+       
+        if perfil_poly_layer is None:
+            raise Exception("No se generó la capa del perfil geológico.")
+
+        if not salida_perfil_geo:
+            raise Exception("Seleccione una ruta de salida.")
+
+        carpeta = os.path.dirname(salida_perfil_geo)
+        nombre_archivo = os.path.basename(salida_perfil_geo)
+        nombre_base, extension = os.path.splitext(nombre_archivo)
+
+        if not extension:
+            extension = ".shp"
+
+        nombre_base = unicodedata.normalize("NFKD", nombre_base)
+        nombre_base = "".join(
+            caracter for caracter in nombre_base
+            if not unicodedata.combining(caracter)
+        )
+
+        nombre_base = nombre_base.lower()
+        nombre_base = nombre_base.replace(" ", "_")
+        nombre_base = re.sub(r"[^a-z0-9_]", "", nombre_base)
+        nombre_base = re.sub(r"_+", "_", nombre_base).strip("_")
+        nombre_base = nombre_base[:30]
+
+        if not nombre_base:
+            nombre_base = "perfil_geologico"
+
+        contador = 0
+
+        while True:
+            sufijo = "" if contador == 0 else f"_{contador}"
+
+            ruta_perfil = os.path.join(
+                carpeta,
+                f"{nombre_base}{sufijo}.shp"
+            )
+
+            ruta_ejes = os.path.join(
+                carpeta,
+                f"{nombre_base}{sufijo}_ejes.shp"
+            )
+
+            existe_perfil = os.path.exists(ruta_perfil)
+            existe_ejes = (
+                ejes_layer is not None
+                and os.path.exists(ruta_ejes)
+            )
+
+            if not existe_perfil and not existe_ejes:
+                break
+
+            contador += 1
+
+        opciones = QgsVectorFileWriter.SaveVectorOptions()
+        opciones.driverName = "ESRI Shapefile"
+        opciones.fileEncoding = "UTF-8"
+
+        contexto = QgsProject.instance().transformContext()
+
+        resultado_perfil = QgsVectorFileWriter.writeAsVectorFormatV3(
+            perfil_poly_layer,
+            ruta_perfil,
+            contexto,
+            opciones
+        )
+
+        if resultado_perfil[0] != QgsVectorFileWriter.NoError:
+            raise Exception(
+                f"No fue posible guardar el perfil geológico: "
+                f"{resultado_perfil[1]}"
+            )
+
+        perfil_guardado = QgsVectorLayer(
+            ruta_perfil,
+            os.path.splitext(os.path.basename(ruta_perfil))[0],
+            "ogr"
+        )
+
+        if not perfil_guardado.isValid():
+            raise Exception(
+                "El perfil geológico se guardó, pero no pudo cargarse."
+            )
+
+        QgsProject.instance().addMapLayer(perfil_guardado)
+
+        ejes_guardada = None
+
+        if ejes_layer is not None:
+            resultado_ejes = QgsVectorFileWriter.writeAsVectorFormatV3(
+                ejes_layer,
+                ruta_ejes,
+                contexto,
+                opciones
+            )
+
+            if resultado_ejes[0] != QgsVectorFileWriter.NoError:
+                raise Exception(
+                    f"No fue posible guardar la capa de ejes: "
+                    f"{resultado_ejes[1]}"
+                )
+
+            ejes_guardada = QgsVectorLayer(
+                ruta_ejes,
+                os.path.splitext(os.path.basename(ruta_ejes))[0],
+                "ogr"
+            )
+
+            if not ejes_guardada.isValid():
+                raise Exception(
+                    "La capa de ejes se guardó, pero no pudo cargarse."
+                )
+
+            QgsProject.instance().addMapLayer(ejes_guardada)
+
+        QgsProject.instance().removeMapLayer(perfil_poly_layer.id())
+
+        if ejes_layer is not None:
+            QgsProject.instance().removeMapLayer(ejes_layer.id())
+
+        return {
+            "perfil": ruta_perfil,
+            "ejes": ruta_ejes if ejes_layer is not None else None,
+            "perfil_layer": perfil_guardado,
+            "ejes_layer": ejes_guardada
+        }
 
 
+
+    #--------------------------------Tab 1
     def crear_seccion_guia(self, section_layer, invertida=False, layer_name="Seccion_guia"):
         
 
