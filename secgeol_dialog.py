@@ -1584,9 +1584,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             )
 
 
-            salida = self.fileWidgetPerfilGeo3D.filePath()
+            salida_perfil_3d  = self.fileWidgetPerfilGeo3D.filePath()
 
-            if not salida:
+            if not salida_perfil_3d :
                 raise Exception("Seleccione una ruta de salida para el perfil 3D.")
             
             sec_feat = next(sec_layer.getFeatures())
@@ -1768,11 +1768,78 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
                 break
 
+
+            # ---------------------------------------------------------
+            # GUARDAR PERFIL GEOLÓGICO 3D
+            # ---------------------------------------------------------
+
+
+            opciones = QgsVectorFileWriter.SaveVectorOptions()
+            opciones.fileEncoding = "UTF-8"
+
+            extension = os.path.splitext(salida_perfil_3d)[1].lower()
+
+            if extension == ".shp":
+                opciones.driverName = "ESRI Shapefile"
+
+            elif extension == ".gpkg":
+                opciones.driverName = "GPKG"
+                opciones.layerName = os.path.splitext(
+                    os.path.basename(salida_perfil_3d)
+                )[0]
+
+            else:
+                raise Exception(
+                    "La salida debe tener extensión .shp o .gpkg."
+                )
+
+            resultado = QgsVectorFileWriter.writeAsVectorFormatV3(
+                out_layer,
+                salida_perfil_3d,
+                QgsProject.instance().transformContext(),
+                opciones
+            )
+
+            if resultado[0] != QgsVectorFileWriter.NoError:
+                raise Exception(
+                    f"No fue posible guardar el perfil geológico 3D.\n"
+                    f"Error: {resultado[1]}"
+                )        
+
+
+            # Después cargamos la capa guardada:
+
+            nombre_capa = os.path.splitext(
+                os.path.basename(salida_perfil_3d)
+            )[0]
+
+            perfil_3d_guardado = QgsVectorLayer(
+                salida_perfil_3d,
+                nombre_capa,
+                "ogr"
+            )
+
+            if not perfil_3d_guardado.isValid():
+                raise Exception(
+                    "El archivo fue generado, pero no pudo cargarse en QGIS."
+                )
+
+            QgsProject.instance().addMapLayer(perfil_3d_guardado)
+
+        #------ quitamos la capa temporal:
+
+            if out_layer.id() in QgsProject.instance().mapLayers():
+                QgsProject.instance().removeMapLayer(out_layer.id())
+
+
             self.mostrar_ayuda(
                 "Perfil geológico 3D",
-                f"Capa seleccionada: <b>{poly_layer.name()}</b><br>"
-                f"Salida: {salida}"
+                f"Perfil geológico 3D generado correctamente.<br>"
+                f"Polígonos creados: <b>{total_3d}</b><br>"
+                f"Salida: <b>{salida_perfil_3d}</b>"
             )
+
+            self.accept()
 
         except Exception as e:
             self.mostrar_ayuda(
