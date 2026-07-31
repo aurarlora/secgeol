@@ -38,6 +38,7 @@ secgeol/
 ├── icon.png
 └── perfil_ejemplo.png
 
+```
 
 ## License
 
