@@ -47,5 +47,3 @@ SecGeol is distributed under the GNU General Public License v3.0 (GPL-3.0).
 Copyright (C) 2026
 
 - Aura Ramos Lora
-- Cesaré M. Ovando Vázquez
-- Daniela A. Moctezuma Ochoa
