@@ -39,11 +39,16 @@ secgeol/
 └── perfil_ejemplo.png
 
 ```
+## Author
+
+**Aura Ramos Lora**
+
+Developer and maintainer of SecGeol.
 
 ## License
 
 SecGeol is distributed under the GNU General Public License v3.0 (GPL-3.0).
 
-Copyright (C) 2026
+Copyright © 2026 Aura Ramos Lora.
 
-- Aura Ramos Lora
+See the LICENSE file for details.
