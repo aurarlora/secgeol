@@ -897,70 +897,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
 
 
-    # ---------------------------------
-    # ACEPTAR
-    # ---------------------------------
-    
-    # def ejecutar_proceso(self):
-    #     try:
-    #         QMessageBox.information(self, "SecGeol", "Entró a ejecutar_proceso")
-
-    #         campo_geo = self.FieldClasGeo.currentField()
-    #         if not campo_geo:
-    #             campo_geo = None
-
-    #         QgsMessageLog.logMessage(
-    #             f"Campo geológico seleccionado: {campo_geo}",
-    #             "SecGeol",
-    #             Qgis.Info
-    #         )
-
-    #         print("Campo geológico seleccionado:", campo_geo)
-
-    #         # 🔹 Inicializar workspace
-    #         self.inicializar_workspace()
-
-    #         # 🔹 Obtener sección seleccionada
-    #         section_layer = self.MapLayerSec.currentLayer()
-
-    #         if section_layer is None:
-    #             raise Exception("No hay capa de sección seleccionada.")
-            
-    #         QMessageBox.information(
-    #             self,
-    #             "SecGeol - diagnóstico sección",
-    #             f"Capa: {section_layer.name()}\n"
-    #             f"Total entidades: {section_layer.featureCount()}\n"
-    #             f"Entidades seleccionadas: {section_layer.selectedFeatureCount()}"
-    #         )
-
-    #         selected = section_layer.selectedFeatures()
-
-    #         if len(selected) == 1:
-    #                 feat_sec = selected[0]
-
-    #         elif len(selected) == 0 and section_layer.featureCount() == 1:
-    #             feat_sec = next(section_layer.getFeatures())
-
-    #         else:
-    #             raise Exception(
-    #                 "Seleccione solo una línea de sección, o use una capa que contenga una sola línea."
-    #             )
-
-           
-    #         geo_layer = self.MapLayerGeo.currentLayer()
-
-           
-
-    #     except Exception as e:
-    #         QgsMessageLog.logMessage(
-    #             f"Error en ejecutar_proceso: {e}",
-    #             "SecGeol",
-    #             Qgis.Critical
-    #         )
-    #         QMessageBox.critical(self, "SecGeol", str(e))
-
-    
 
     # ---------------------------------
     # Valor de caja en metros
@@ -1173,7 +1109,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         )
 
     # ---------------------------------
-    # Existe Geologia
+    # Existe comentarios de ayuda de la capa Geologia
     # --------------------------------- 
 
     def actualizar_estado_geologia(self):
@@ -1246,7 +1182,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
 
     # ---------------------------------
-    # Estructuras
+    # Actualizar información de ayuda si es que se selecciona Estructuras
     # --------------------------------- 
 
 

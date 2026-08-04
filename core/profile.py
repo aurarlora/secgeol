@@ -94,18 +94,28 @@ class ProfileManager:
     # ---------------------------------
     #   Genera puntos del perfil a partir de los vértices de una línea densificada. X = distancia acumulada  
     # --------------------------------- 
-    def _generate_profile_points_from_vertices(self, line_geom: QgsGeometry, dem_layer: QgsRasterLayer):
+    def _generate_profile_points_from_vertices(
+        self,
+        line_geom: QgsGeometry,
+        dem_layer: QgsRasterLayer
+        ):
         if line_geom is None or line_geom.isEmpty():
             raise Exception("La geometría de la sección está vacía.")
 
         vertices = list(line_geom.vertices())
+
         if len(vertices) < 2:
-            raise Exception("La línea densificada no tiene suficientes vértices.")
+            raise Exception(
+                "La línea densificada no tiene suficientes vértices."
+            )
 
         features = []
         dist_acum = 0.0
         pt_id = 1
         prev_pt = None
+
+        # Última elevación válida obtenida del DEM
+        last_valid_elev = None
 
         for pt in vertices:
             if prev_pt is not None:
@@ -113,11 +123,33 @@ class ProfileManager:
                 dy = pt.y() - prev_pt.y()
                 dist_acum += (dx**2 + dy**2) ** 0.5
 
-            elev = self._sample_raster_value(dem_layer, pt.x(), pt.y())
-            if elev is None:
-                elev = 0.0
+            elev = self._sample_raster_value(
+                dem_layer,
+                pt.x(),
+                pt.y()
+            )
 
-            perfil_geom = QgsGeometry.fromPointXY(QgsPointXY(dist_acum, elev))
+            if elev is None:
+                if last_valid_elev is None:
+                    raise Exception(
+                        "No fue posible obtener una elevación válida "
+                        f"para el primer punto del perfil: "
+                        f"X={pt.x():.3f}, Y={pt.y():.3f}."
+                    )
+
+                elev = last_valid_elev
+
+                print(
+                    "Elevación no disponible. "
+                    f"Se utilizó el valor anterior en el punto {pt_id}: "
+                    f"{elev:.3f} m"
+                )
+            else:
+                last_valid_elev = elev
+
+            perfil_geom = QgsGeometry.fromPointXY(
+                QgsPointXY(dist_acum, elev)
+            )
 
             feat = QgsFeature()
             feat.setGeometry(perfil_geom)
@@ -130,6 +162,7 @@ class ProfileManager:
             ])
 
             features.append(feat)
+
             prev_pt = pt
             pt_id += 1
 
@@ -169,7 +202,7 @@ class ProfileManager:
             if min(x1, x2) > dist_fin:
                 break
 
-            # punto inicial
+            # punto inicial       # no recuerdo si funciona cuando cambie de sentido la línea, verificar
             if x1 <= dist_ini <= x2:
                 ratio = (dist_ini - x1) / (x2 - x1) if x2 != x1 else 0
                 y_ini = y1 + ratio * (y2 - y1)

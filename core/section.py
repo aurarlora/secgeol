@@ -74,7 +74,7 @@ class SectionManager:
         return break_distances
 
     # ---------------------------------
-    #  Invierte el sentido de una geometría de línea simple.
+    #  Invierte el sentido de una geometría de línea simple.  Verificar que las partes tambien se cambien
     # --------------------------------- 
 
     def _reverse_linestring_geometry(self, geom: QgsGeometry) -> QgsGeometry:

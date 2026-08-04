@@ -9,7 +9,7 @@ def fields_section_internal():
     fields.append(QgsField("invertida", QVariant.Int))
     return fields
 
-
+# Campos de la sección 3D
 def fields_profile_points():
     fields = QgsFields()
     fields.append(QgsField("pt_id", QVariant.Int))
