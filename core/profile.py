@@ -15,26 +15,7 @@ from qgis.core import (
 from qgis.PyQt.QtCore import QVariant
 
 class ProfileManager:
-    def __init__(self, gpkg_path=None):
-        self.gpkg_path = gpkg_path
-
-        
-    def set_gpkg_path(self, gpkg_path):
-        self.gpkg_path = gpkg_path
-
-    #--------------------------------------lee layer
-    def load_gpkg_layer(self, layer_name):     
-        if not self.gpkg_path:
-            raise Exception("No se ha definido la ruta del GeoPackage.")
-
-        uri = f"{self.gpkg_path}|layername={layer_name}"
-        layer = QgsVectorLayer(uri, layer_name, "ogr")
-
-        if not layer.isValid():
-            raise Exception(f"No se pudo cargar la capa '{layer_name}' desde el GPKG.")
-
-        return layer
-    #--------------------------------------lee dem
+    #--------------------------------------lee un valor del DEM
     def _sample_raster_value(self, raster_layer: QgsRasterLayer, x: float, y: float):   
         provider = raster_layer.dataProvider()
         result = provider.sample(QgsPointXY(x, y), 1)
