@@ -1,11 +1,11 @@
 import os, re, unicodedata
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QEvent, QUrl, Qt, QVariant
-from qgis.PyQt.QtWidgets import QDialog, QSplitter, QMessageBox
+from qgis.PyQt.QtCore import Qt, QVariant
+from qgis.PyQt.QtWidgets import QDialog, QSplitter
 from qgis.core import (QgsMapLayerProxyModel, QgsProject, Qgis,QgsPoint, QgsPolygon,QgsVectorFileWriter,
                        QgsFeature, QgsGeometry, QgsVectorLayer, QgsField, QgsLineString,
-                       QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog, QgsCoordinateTransform)
+                       QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog)
 from qgis.gui import QgsMapTool, QgsRubberBand, QgsFileWidget
 from qgis.utils import iface
 from qgis.PyQt.QtGui import QColor
@@ -13,10 +13,6 @@ from qgis.PyQt.QtGui import QColor
 from .core.workspace import WorkspaceManager
 from .core.section import SectionManager
 from .core.profile import ProfileManager
-
-
-
-
 
 try:
     EVENT_ENTER = 10
@@ -58,9 +54,6 @@ class DrawSectionMapTool(QgsMapTool):
         self.fileWidgetPerfilGeo3D.setStorageMode(QgsFileWidget.SaveFile)
         self.fileWidgetPerfilGeo3D.setFilter("Shapefile (*.shp);;GeoPackage (*.gpkg)")
 
-        # Guardar tab2
-        #self.fileWidgetPerfilGeo.setStorageMode(QgsFileWidget.SaveFile)
-        #self.fileWidgetPerfilGeo.setFilter("Shapefile (*.shp);;GeoPackage (*.gpkg)")
 
 
     def activate(self):
@@ -208,6 +201,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.buttonBox_3.rejected.connect(self.reject)
 
 
+        # Conectar TAB 1
+        self.buttonBox.rejected.connect(self.reject)
         
         self.section_manager = SectionManager()
         self.workspace_manager = WorkspaceManager()
@@ -225,9 +220,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
 
 
-        # --------  Ejecuta herramienta ---
-        #self.buttonBox.accepted.connect(self.ejecutar_proceso)
-        self.buttonBox.rejected.connect(self.reject)
 
         # -----------------------------
         # SPLITTER DE AYUDA / CONTROLES

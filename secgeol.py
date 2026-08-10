@@ -3,13 +3,13 @@ import tempfile
 from datetime import datetime
 from .secgeol_dialog import SecGeolDialog
 
-from qgis.PyQt.QtCore import QCoreApplication, QVariant
+from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import ( 
                         QgsWkbTypes,QgsVectorLayer,
                         QgsProject,QgsVectorFileWriter,
-                        Qgis, QgsGeometry,QgsMessageLog
+                        Qgis, QgsGeometry
                        )
 
 class SecGeol:
@@ -49,7 +49,7 @@ class SecGeol:
             self.dlg.MapLayerSec.layerChanged.connect(self.dlg.actualizar_info_seccion)
             self.dlg.checkInvSec.toggled.connect(self.dlg.actualizar_info_seccion)
 
-            # Botones
+            # Botones Aceptar y cerrar
             self.dlg.buttonBox.accepted.connect(self.ejecutar)
             self.dlg.buttonBox.rejected.connect(self.dlg.close)
 

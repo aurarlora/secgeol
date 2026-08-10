@@ -4,21 +4,15 @@ from qgis.core import (
     QgsFeature,
     Qgis,
     QgsMessageLog,
-    QgsFeatureRequest,
-    QgsField,
-    QgsFields,
     QgsGeometry,
     QgsPointXY,
     QgsProject,
-    QgsVectorFileWriter,
     QgsVectorLayer,
-    QgsWkbTypes,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform
 )
 from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.PyQt.QtCore import QVariant
-# from .fields import fields_section_internal
 
 class SectionManager:
     def __init__(self, gpkg_path=None):
@@ -131,19 +125,7 @@ class SectionManager:
         return new_geom
 
     
-    # ---------------------------------
-    #  Crea una capa temporal en memoria con los campos deseados.
-    # --------------------------------- 
-
-    def _create_memory_layer(self, layer_name: str, crs_authid: str, fields: QgsFields) -> QgsVectorLayer:
-
-        uri = f"LineString?crs={crs_authid}"
-        layer = QgsVectorLayer(uri, layer_name, "memory")
-        provider = layer.dataProvider()
-        provider.addAttributes(fields)
-        layer.updateFields()
-        return layer
-    
+   
     # ---------------------------------
     #   Copia una feature conservando atributos existentes y agregando internos.
     # --------------------------------- 
@@ -171,49 +153,7 @@ class SectionManager:
 
         return new_feat
     
-    # ---------------------------------
-    #   Toma una capa del usuario, conserva sus campos y agrega los internos.
-    #    Devuelve una capa temporal lista para guardar.
-    # --------------------------------- 
-
-
-    def prepare_section_layer_from_user(
-        self,
-        source_layer: QgsVectorLayer,
-        target_crs: QgsCoordinateReferenceSystem,
-        invertida=False
-    ) -> QgsVectorLayer:
-
-        if source_layer is None or not source_layer.isValid():
-            raise Exception(self.tr("La capa de sección del usuario no es válida."))
-
-        if source_layer.geometryType() != QgsWkbTypes.LineGeometry:
-            raise Exception(self.tr("La capa de sección debe ser de tipo línea."))
-
-        if target_crs is None or not target_crs.isValid():
-            raise Exception(self.tr("El CRS de destino no es válido."))
-
-        source_crs = source_layer.crs()
-        crs_authid = target_crs.authid()
-
-        temp_layer = QgsVectorLayer(f"LineString?crs={crs_authid}", "seccion_temp", "memory")
-        provider = temp_layer.dataProvider()
-
-        features_to_add = []
-        for feat in source_layer.getFeatures():
-            new_feat = self._prepare_section_feature(
-                feat,
-                invertida=invertida,
-                source_crs=source_crs,
-                target_crs=target_crs
-            )
-            features_to_add.append(new_feat)
-
-        provider.addFeatures(features_to_add)
-        temp_layer.updateExtents()
-
-        return temp_layer
-    
+     
     # ---------------------------------
     #  Prepara una capa de trabajo a partir de una feature dibujada por la herramienta.
     # --------------------------------- 

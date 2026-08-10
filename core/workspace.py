@@ -1,19 +1,15 @@
 import os
 import tempfile
 from datetime import datetime
+from qgis.PyQt.QtCore import QVariant
 
 from qgis.core import (
     QgsVectorFileWriter,
     QgsVectorLayer,
     QgsProject,
-    QgsWkbTypes
+    QgsWkbTypes,QgsFields, QgsField
 )
 
-from .fields import (
-    fields_section_internal,
-    fields_profile_points,
-    fields_draw_lines
-)
 
 
 class WorkspaceManager:
@@ -66,7 +62,17 @@ class WorkspaceManager:
     def create_base_geopackage(self, crs_authid):
         gpkg_path = self.create_workspace_path()
         self.create_layer(
-            gpkg_path, "sec_draw_lines", QgsWkbTypes.LineString, crs_authid, fields_draw_lines()
+            gpkg_path, "sec_draw_lines", QgsWkbTypes.LineString, crs_authid, self._fields_draw_lines()
         )
-
         return gpkg_path
+
+
+    ## Campos de la línea dibujada
+    
+    @staticmethod
+    def _fields_draw_lines():
+        fields = QgsFields()
+        fields.append(QgsField("line_id", QVariant.Int))
+        fields.append(QgsField("clv_lito", QVariant.String, len=30))
+        fields.append(QgsField("nombre", QVariant.String, len=80))
+        return fields
