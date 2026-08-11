@@ -21,10 +21,8 @@ class SectionManager:
     def set_gpkg_path(self, gpkg_path):
         self.gpkg_path = gpkg_path
 
-    # ---------------------------------
     #  Detecta quiebres reales en una línea y devuelve las distancias acumuladas,  donde ocurren los cambios de dirección.
-    # --------------------------------- 
-
+    
     def detect_section_break_distances(self, geom: QgsGeometry, angle_tolerance_deg: float = 5.0):
 
         if geom is None or geom.isEmpty():
@@ -67,9 +65,7 @@ class SectionManager:
 
         return break_distances
 
-    # ---------------------------------
     #  Invierte el sentido de una geometría de línea simple.  Verificar que las partes tambien se cambien
-    # --------------------------------- 
 
     def _reverse_linestring_geometry(self, geom: QgsGeometry) -> QgsGeometry:
         if geom is None or geom.isEmpty():
@@ -93,10 +89,9 @@ class SectionManager:
         reversed_line = list(reversed(line))
         return QgsGeometry.fromPolylineXY(reversed_line)
     
-    # ---------------------------------
+    
     #  Transforma una geometría desde source_crs hacia target_crs.
-    # --------------------------------- 
-
+    
     def _transform_geometry_to_crs(
         self,
         geom: QgsGeometry,
@@ -125,11 +120,8 @@ class SectionManager:
         return new_geom
 
     
-   
-    # ---------------------------------
     #   Copia una feature conservando atributos existentes y agregando internos.
-    # --------------------------------- 
-
+   
     def _prepare_section_feature(
         self,
         source_feature: QgsFeature,
@@ -153,10 +145,8 @@ class SectionManager:
 
         return new_feat
     
-     
-    # ---------------------------------
+
     #  Prepara una capa de trabajo a partir de una feature dibujada por la herramienta.
-    # --------------------------------- 
    
     def prepare_section_layer_from_feature(
         self,
@@ -190,7 +180,7 @@ class SectionManager:
         return temp_layer
     
 
-    #------- sacar la geometría efectiva de la sección------
+    # Obtener la geometría efectiva de la sección
 
     def obtener_geometria_seccion_efectiva(self, section_layer):
         if section_layer is None or not section_layer.isValid():
@@ -203,11 +193,8 @@ class SectionManager:
 
         return None
     
-
-    # ---------------------------------
     # Intersectar con  geologia
-    # --------------------------------- 
-
+    
     def intersectar_seccion_con_geologia(self, section_geom, section_crs, geo_layer, campo_geo=None):
         segmentos = []
         id_lito = 1
@@ -258,8 +245,7 @@ class SectionManager:
             if dist_ini > dist_fin:
                 dist_ini, dist_fin = dist_fin, dist_ini
 
-            ## ----
-            
+                        
             valor_campo = None
 
             if campo_geo:
@@ -304,9 +290,8 @@ class SectionManager:
             Qgis.Info
         )
 
-        # -----------------------------------------
         # Reproyección si es necesario
-        # -----------------------------------------
+        
         est_crs = est_layer.crs()
 
         transform = None
@@ -318,9 +303,8 @@ class SectionManager:
                 QgsProject.instance()
             )
 
-        # -----------------------------------------
         # Recorrer estructuras
-        # -----------------------------------------
+        
         for feat in est_layer.getFeatures():
 
             geom_est = QgsGeometry(feat.geometry())
@@ -337,10 +321,8 @@ class SectionManager:
             azimuth = feat[campo_azimuth]
 
 
-
-            # -----------------------------------------
             # Validaciones
-            # -----------------------------------------
+
             try:
                 dip = float(dip)
                 azimuth = float(azimuth)
@@ -358,15 +340,15 @@ class SectionManager:
             if azimuth < 0 or azimuth > 360:
                 continue
 
-            # -----------------------------------------
+
             # Intersección
-            # -----------------------------------------
+
             inter = geom_est.intersection(section_geom)
 
             if inter.isEmpty():
                 continue
 
-            # queremos un punto
+            # Obtenemos un punto
             if inter.type() != Qgis.GeometryType.Point:
                 continue
 
@@ -403,12 +385,9 @@ class SectionManager:
 
         return estructuras
     
-    #    """
     #    Calcula el azimuth local de la sección en la distancia dada.
     #    Azimuth en grados: 0=N, 90=E, 180=S, 270=W.
-    #    """
-
-
+    
     def calcular_azimuth_local_seccion(self, section_geom, dist_objetivo):
 
 

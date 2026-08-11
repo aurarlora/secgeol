@@ -15,7 +15,7 @@ from qgis.core import (
 from qgis.PyQt.QtCore import QVariant
 
 class ProfileManager:
-    #--------------------------------------lee un valor del DEM
+    #Lee un valor del DEM
     def _sample_raster_value(self, raster_layer: QgsRasterLayer, x: float, y: float):   
         provider = raster_layer.dataProvider()
         result = provider.sample(QgsPointXY(x, y), 1)
@@ -29,9 +29,7 @@ class ProfileManager:
 
         return result
     
-    # ---------------------------------
     #   Construye líneas verticales divisorias en el perfil para marcar quiebres.
-    # --------------------------------- 
     
     def _build_break_lines(self, break_distances, base_y, top_y):
         break_lines = []
@@ -44,9 +42,8 @@ class ProfileManager:
         return break_lines
 
     
-    # ---------------------------------
     #  Obtiene un tamaño promedio de pixel del DEM.
-    # --------------------------------- 
+    
     def _get_dem_pixel_size(self, dem_layer: QgsRasterLayer):
         extent = dem_layer.extent()
         width = dem_layer.width()
@@ -60,9 +57,9 @@ class ProfileManager:
 
         return (abs(pixel_size_x) + abs(pixel_size_y)) / 2.0
     
-    # ---------------------------------
+    
     #   Densifica la línea usando una distancia fija entre vértices.  
-    # --------------------------------- 
+    
     def _densify_line_geometry(self, line_geom: QgsGeometry, distance: float) -> QgsGeometry:
         if line_geom is None or line_geom.isEmpty():
             raise Exception("La geometría de la sección está vacía.")
@@ -72,9 +69,9 @@ class ProfileManager:
 
         return line_geom.densifyByDistance(distance)
      
-    # ---------------------------------
+    
     #   Genera puntos del perfil a partir de los vértices de una línea densificada. X = distancia acumulada  
-    # --------------------------------- 
+    
     def _generate_profile_points_from_vertices(
         self,
         line_geom: QgsGeometry,
@@ -149,10 +146,10 @@ class ProfileManager:
 
         return features
     
-        #-----------------------------------------------------------------------
+        
         # Recorta una línea usando distancias acumuladas sobre la geometría.
         # Conserva los vértices intermedios para seguir la forma real del perfil.
-        # -------------------------------------------------------------------------
+        
 
     def recortar_linea_por_distancia(self, linea_geom, dist_ini, dist_fin):
 
@@ -211,19 +208,9 @@ class ProfileManager:
 
         return QgsGeometry.fromPolylineXY(puntos_limpios)
 
-    # --------------------------------------------------------------------------------
-    #   Construye las líneas que forman el perfil y su caja:
-    #- linea_perfil : polilínea real del perfil
-    #    - base         : línea horizontal inferior
-    #    - lim_izq      : límite vertical izquierdo
-    #    - lim_der      : límite vertical derecho
-
-    #   Parámetros
-    #   features : list[QgsFeature]
-    #       Lista de features generados por _generate_profile_points_from_vertices().
-    #       Se espera que la geometría de cada feature esté en coordenadas de perfil:
-    #       X = distancia acumulada
-    # --------------------------------------------------------------------------------
+    
+    #   Construye las líneas que forman el perfil y su caja:linea_perfil, base, lim_izq, lim_der
+    #   Se espera que la geometría de cada feature esté en coordenadas de perfil: X = distancia acumulada
     
     def _build_profile_box_lines(self, features,  extra_depth: float = 100.0):
        
@@ -285,11 +272,9 @@ class ProfileManager:
             "base_y": base_y
         }
     
-    #-------------------------------------------
-    # ----------------Línea de estrcutura
-    #-------------------------------------------
-
-
+    
+    # Mapa de líneas de Estrcuturas
+    
     def construir_linea_estructura(
             self,
             dist,
@@ -343,10 +328,10 @@ class ProfileManager:
             QgsPointXY(x_inf, y_inf)
         ])
 
-    # ---------------------------------------------------
+    
     # Obtiene la elevación Y del perfil para una coordenada X dada.
     # En el perfil, X representa la distancia acumulada sobre la sección.
-    # ---------------------------------------------------
+    
 
     def obtener_y_en_x(self, linea_geom, x_objetivo):
         
@@ -372,14 +357,7 @@ class ProfileManager:
 
         return None
     
-    # --------------------------------------------------------------------------------
-    #   Genera una capa temporal de líneas con:     
-    #    linea_perfil
-    #    base
-    #    lim_izq
-    #    lim_der
-    # --------------------------------------------------------------------------------
-
+    #   Genera una capa temporal de líneas con:    linea_perfil, base, lim_izq, lim_der
 
     def build_profile_box_layer(
         self,
@@ -418,18 +396,18 @@ class ProfileManager:
         if line_geom is None or line_geom.isEmpty():
             raise Exception("No se encontró una geometría válida en la capa de sección.")
 
-        # -----------------------------
+
         # DENSIFICAR SEGÚN EL DEM
-        # -----------------------------
+
         pixel_size = self._get_dem_pixel_size(dem_layer)
         print(f"Pixel size DEM: {pixel_size}")
 
         dense_geom = self._densify_line_geometry(line_geom, pixel_size)
         print("Línea densificada correctamente")
 
-        # -----------------------------
+
         # GENERAR PUNTOS DEL PERFIL
-        # -----------------------------
+
         profile_point_features = self._generate_profile_points_from_vertices(
             line_geom=dense_geom,
             dem_layer=dem_layer
@@ -438,9 +416,9 @@ class ProfileManager:
         if not profile_point_features:
             raise Exception("No fue posible generar puntos para el perfil.")
 
-        # -----------------------------
+        
         # CONSTRUIR PERFIL + CAJA
-        # -----------------------------
+        
         box_data = self._build_profile_box_lines(
             features=profile_point_features,
             extra_depth=extra_depth
@@ -492,9 +470,9 @@ class ProfileManager:
                 "geometry": sub_geom
             })
 
-        # -----------------------------------------
+
         # FORZAR CIERRE EXACTO EN EXTREMOS
-        # -----------------------------------------
+
         if segmentos_linea:
 
             vertices_perfil = list(linea_perfil.vertices())
@@ -542,9 +520,9 @@ class ProfileManager:
             Qgis.Info
         )
 
-        # -----------------------------
+        
         # CAPA DE SALIDA
-        # -----------------------------
+        
         crs_authid = section_layer.crs().authid()
         if not crs_authid:
             crs_authid = dem_layer.crs().authid()
@@ -660,7 +638,7 @@ class ProfileManager:
         prov.addFeatures(out_features)
         out_layer.updateExtents()
 
-        # quitar capa previa con el mismo nombre
+        # Quitar capa previa con el mismo nombre
         for lyr in QgsProject.instance().mapLayers().values():
             if lyr.name() == layer_name:
                 QgsProject.instance().removeMapLayer(lyr.id())
@@ -672,12 +650,8 @@ class ProfileManager:
         return out_layer
 
 
-        # """
         # Crea una capa temporal de polígonos para el perfil geológico.
-        # Versión inicial de diagnóstico.
-        # """
-
-
+        
     def build_geological_polygon_layer(self, line_layer, layer_name="perfil_geologico"):
 
         if line_layer is None or not line_layer.isValid():
@@ -856,9 +830,9 @@ class ProfileManager:
         # longitud proporcional de los ticks
         tick_len = max(5, min(40, altura_y * 0.04))
 
-        # --------------------
+
         # EJE X
-        # --------------------
+
 
         y_eje = y_min - offset_y
 
@@ -877,10 +851,9 @@ class ProfileManager:
 
         out_features.append(feat)
 
-        # --------------------
+        
         # TICKS EJE X
-        # --------------------
-
+        
         x_tick = 0
 
         while x_tick <= x_max:
@@ -909,10 +882,9 @@ class ProfileManager:
             )
 
 
-        # --------------------
+        
         # EJE Y
-        # --------------------
-
+        
         x_eje = x_min - offset_x
 
         geom_y = QgsGeometry.fromPolylineXY([
@@ -930,9 +902,9 @@ class ProfileManager:
 
         out_features.append(feat)
 
-        # --------------------
+        
         # TICKS EJE Y
-        # --------------------
+        
 
         y_tick = math.ceil(y_min / paso_y) * paso_y
 

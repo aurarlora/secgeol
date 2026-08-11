@@ -209,30 +209,20 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.gpkg_path = None
 
 
-        # -----------------------------
         # CONFIGURAR CAJA
-        # -----------------------------
+        
         self.doubleSpinBox.setMinimum(0.0)
         self.doubleSpinBox.setMaximum(10000.0)
         self.doubleSpinBox.setSingleStep(10.0)     #Verificar este punto
         self.doubleSpinBox.setSuffix(" m")
         self.doubleSpinBox.setValue(100.0)
 
-
-
-
-        # -----------------------------
         # SPLITTER DE AYUDA / CONTROLES
-        # -----------------------------
+
         self.splitter_main = self.findChild(QSplitter, "splitter")
 
-        # --------  Extraer datos de elevación ---
+        # Extraer datos de elevación ---
         self.profile_manager = ProfileManager()
-
-
-
-
-
 
         if self.splitter_main:
             self.splitter_main.setSizes([300, 100])   #Tamaño de la ventana
@@ -254,9 +244,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             if handle:
                 handle.setEnabled(False)
 
-        # -----------------------------
         # ESTADO INICIAL DE LA AYUDA
-        # -----------------------------
+        
         self.help_tab_uno = """
             <div style="padding:10px; line-height:1.4;">
                 <h3>Herramienta de Secciones Geológicas</h3>
@@ -311,29 +300,21 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             </p>
             </div>
             """
-        # -----------------------------
+
         # CONEXIÓN DE TABS
-        # -----------------------------
         self.tabWidget.currentChanged.connect(self.actualizar_ayuda_tab)
 
-        # -----------------------------
+
         # INICIALIZAR AYUDA
-        # -----------------------------
         self.actualizar_ayuda_tab()
 
-
-
-        # -----------------------------
         # CONFIGURAR FILTROS DE CAPAS
-        # -----------------------------
         self.MapLayerDEM.setFilters(QgsMapLayerProxyModel.RasterLayer)
         self.MapLayerSec.setFilters(QgsMapLayerProxyModel.LineLayer)
         self.MapLayerGeo.setFilters(QgsMapLayerProxyModel.PolygonLayer)
         self.MapLayerEst.setFilters(QgsMapLayerProxyModel.LineLayer)
 
-        # -----------------------------
         # CONFIGURAR SALIDAS
-        # -----------------------------
 
         # Módulo 1
         self.fileWidgetPerfil.setFilter(
@@ -378,11 +359,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             )
 
 
-
-        # -----------------------------
         # EVENT FILTERS PARA AYUDA
-        # -----------------------------
-
+        
         for w in [
             self.MapLayerDEM,
             self.MapLayerSec,
@@ -406,10 +384,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         ]:
             w.installEventFilter(self)
             
-
-        # -----------------------------
         # TOOLTIPS
-        # -----------------------------
+
         self.MapLayerDEM.setToolTip(
             "Seleccione el modelo digital de elevación (DEM)."
         )
@@ -527,7 +503,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             iface.mapCanvas().unsetMapTool(self.draw_tool)
             self.draw_tool = None
 
-#--------- Muestra la sección dibujada como capa temporal visible en el mapa. Reemplaza la anterior si existe.
+# Muestra la sección dibujada como capa temporal visible en el mapa. Reemplaza la anterior si existe.
 
     def mostrar_seccion_dibujada(self, feature):
         print("🟡 Entró a mostrar seccion dibujada")
@@ -587,23 +563,14 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         # forzar refresco visual
         iface.mapCanvas().refresh()
 
-        # opcional: acercar a la línea para comprobar que sí existe
-        # iface.mapCanvas().setExtent(layer.extent())
-        # iface.mapCanvas().refresh()
-
-
-    # ---------------------------------
     # PANEL DE AYUDA
-    # ---------------------------------
     def mostrar_ayuda(self, titulo, texto):
         self.textBrowserHelp.setHtml(f"""
             <h3>{titulo}</h3>
             <p>{texto}</p>
         """)
 
-    # ---------------------------------
     # EVENT FILTER  Mostarr ayuda
-    # ---------------------------------
     def eventFilter(self, obj, event):
         if event.type() == 10:
 
@@ -734,10 +701,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         return super().eventFilter(obj, event)
 
-    # ---------------------------------
     # Conecta la función de la sección      
-    # ---------------------------------
-
+    
     def preparar_seccion_trabajo(self, feat_sec=None, has_drawn=False, invertida=False):
         print("source_feature is None?:", feat_sec is None)
         print("A: entrar a preparar_seccion_trabajo")
@@ -796,12 +761,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         return temp_layer
     
 
-
-      
-    
-    # ---------------------------------
     # Inicializa workspace
-    # ---------------------------------
 
     def inicializar_workspace(self):
         dem_layer = self.MapLayerDEM.currentLayer()
@@ -815,21 +775,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         print(f"GPKG creado: {self.gpkg_path}")
 
 
-    # ---------------------------------
-    # Prueba
-    # ---------------------------------
-
-    def probar_preparacion_seccion(self):
-        self.inicializar_workspace()
-        layer = self.preparar_seccion_trabajo()
-        print("Sección de trabajo preparada:", layer)
-
-
-    # ---------------------------------
     # Entra a secprofile
-    # --------------------------------- 
-
-
+    
     def generar_perfil(self, feat_sec=None, has_drawn=False, invertida=False, segmentos_geo=None, estructuras=None, section_layer=None):
         print("H: entrar a generar_perfil")
         
@@ -889,10 +836,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
 
 
-
-    # ---------------------------------
     # Valor de caja en metros
-    # ---------------------------------   
 
     def obtener_caja_m(self):
         caja_m = self.doubleSpinBox.value()
@@ -900,11 +844,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             caja_m = 100.0
         return caja_m
 
-    # ---------------------------------
     # Información DEM
-    # ---------------------------------  
-
-
     def actualizar_info_dem(self):
         dem_layer = self.MapLayerDEM.currentLayer()
 
@@ -996,9 +936,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 f"<b>DEM:</b> Error al leer propiedades: {e}"
             )
 
-    # ---------------------------------
     # Información DEM
-    # --------------------------------- 
 
     def actualizar_info_seccion(self):
         sec_layer = self.MapLayerSec.currentLayer()
@@ -1100,10 +1038,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             f"<b>Invertida:</b> {'Sí' if invertida else 'No'}"
         )
 
-    # ---------------------------------
     # Existe comentarios de ayuda de la capa Geologia
-    # --------------------------------- 
-
+    
     def actualizar_estado_geologia(self):
         activo = self.checkGeo.isChecked()
 
@@ -1120,11 +1056,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         else:
             self.actualizar_info_geologia()
 
-    # ---------------------------------
     # Si existe Geologia
-    # --------------------------------- 
-
-
+    
     def actualizar_info_geologia(self):
         print(">> actualizar_info_geologia llamado")
 
@@ -1173,11 +1106,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         )
 
 
-    # ---------------------------------
     # Actualizar información de ayuda si es que se selecciona Estructuras
-    # --------------------------------- 
-
-
+    
     def actualizar_estado_estructuras(self):
         activo = self.checkEst.isChecked()
 
@@ -1298,10 +1228,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             )
     
  
-        #       Crea una capa temporal con la sección efectiva usada para generar el perfil.
-        #       Esta capa servirá como guía espacial para reconstrucción 3D.
- 
-    #--------------------------------Tab2
+    #Tab2
 
     def guardar_salida_tab2(
         self,
@@ -1439,7 +1366,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
 
 
-    #--------------------------------Tab 1
+    # Tab 1
     def crear_seccion_guia(self, section_layer, invertida=False, layer_name="Seccion_guia"):
         
 
@@ -1495,7 +1422,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         return guia_layer
 
 
-    ###---------------------------------------------------------- Tab 3
+    # Tab 3
 
     def ejecutar_perfil_3d(self):
         try:
@@ -1697,11 +1624,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 break
 
 
-            # ---------------------------------------------------------
             # GUARDAR PERFIL GEOLÓGICO 3D
-            # ---------------------------------------------------------
-
-
+            
             opciones = QgsVectorFileWriter.SaveVectorOptions()
             opciones.fileEncoding = "UTF-8"
 
@@ -1754,7 +1678,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
             QgsProject.instance().addMapLayer(perfil_3d_guardado)
 
-        #------ quitamos la capa temporal:
+        # Quitamos la capa temporal:
 
             if out_layer.id() in QgsProject.instance().mapLayers():
                 QgsProject.instance().removeMapLayer(out_layer.id())

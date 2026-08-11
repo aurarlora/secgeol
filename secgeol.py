@@ -60,9 +60,8 @@ class SecGeol:
         self.dlg.raise_()
         self.dlg.activateWindow()
 
-    # -----------------------------------
     # DIBUJAR SECCIÓN (placeholder)
-    # -----------------------------------
+
     def draw_section(self):
         self.iface.messageBar().pushInfo(
             self.tr("SecGeol"),
@@ -70,10 +69,9 @@ class SecGeol:
         )
 
 
-    # --------------------------------------------------------------
     # Devuelve una única feature válida de la sección del layer.
     # Si no cumple la regla, muestra ayuda y regresa None.
-    # --------------------------------------------------------------
+
 
     def _set_help(self, texto):
         if self.dlg and hasattr(self.dlg, "textBrowserHelp"):
@@ -83,7 +81,7 @@ class SecGeol:
     def obtener_feature_seccion(self, sec_layer, has_drawn=False):
 
         if has_drawn:
-            return None  # la sección dibujada se resolverá aparte
+            return None  # La sección dibujada se resolverá aparte
 
         if sec_layer is None:
             self._set_help("Seleccione una capa de sección o dibuje una.")
@@ -128,9 +126,9 @@ class SecGeol:
             )
             return None
 
-        # -------------------------
+        
         # Validación geométrica del registro
-        # -------------------------
+        
         geom = feat.geometry()
         if geom is None or geom.isEmpty():
             self._set_help("La geometría de la sección está vacía.")
@@ -153,10 +151,7 @@ class SecGeol:
         return feat
 
 
-    
-    #-------------------------------------------------------------------------
     # Devuelve la geometría base de la sección: dibujada por el usuario, o tomada del layer/selección
-    #-------------------------------------------------------------------------
 
     def obtener_geometria_seccion_base(self, sec_layer, has_drawn=False):
         # Caso 1: sección dibujada
@@ -186,20 +181,8 @@ class SecGeol:
         return geom
 
 
-    # --------------------------------------------------------------
-    # Devuelve la geometría efectiva de la sección. Si checkInvSec está activado, la invierte.
-    # --------------------------------------------------------------
 
-    def obtener_geometria_seccion(self, sec_layer, has_drawn=False):
-        geom = self.obtener_geometria_seccion_base(sec_layer, has_drawn)
-        if geom is None:
-            return None
-
-        return geom
-
-    # --------------------------------------------------------------
     # Guarda el perfil y la sección guía como dos Shapefiles relacionados
-    # --------------------------------------------------------------
 
     def guardar_capas_salida(self, perfil_layer, guia_layer, salida):
         """
@@ -207,7 +190,7 @@ class SecGeol:
             dict: rutas de los archivos guardados.
         """
 
-        # -------------------------------- 1. Validaciones
+        # 1. Validaciones
         
         if not salida:
             raise ValueError(
@@ -359,9 +342,8 @@ class SecGeol:
 
 
 
-        # ---------------------------------------------------------
         # 8. Cargar las capas guardadas al proyecto
-        # ---------------------------------------------------------
+
         perfil_guardado = QgsVectorLayer(
             ruta_perfil,
             nombre_disponible,
@@ -387,18 +369,17 @@ class SecGeol:
         QgsProject.instance().addMapLayer(perfil_guardado)
         QgsProject.instance().addMapLayer(guia_guardada)
 
-        # ---------------------------------------------------------
         # 9. Eliminar las capas temporales
-        # ---------------------------------------------------------
+        
         if perfil_layer.id() in QgsProject.instance().mapLayers():
             QgsProject.instance().removeMapLayer(perfil_layer.id())
 
         if guia_layer.id() in QgsProject.instance().mapLayers():
             QgsProject.instance().removeMapLayer(guia_layer.id())
 
-        # ---------------------------------------------------------
+        
         # 10. Devolver resultados
-        # ---------------------------------------------------------
+        
         return {
             "perfil": ruta_perfil,
             "guia": ruta_guia,
@@ -407,9 +388,8 @@ class SecGeol:
         }
     
 
-    # -----------------------------------
     # EJECUTAR, aceptar Tab_1
-    # -----------------------------------
+    
     def ejecutar(self):
 
 
@@ -445,10 +425,8 @@ class SecGeol:
         # Salida
         salida = self.dlg.fileWidgetPerfil.filePath().strip()
 
-        # -------------------------
         # VALIDACIONES
-        # -------------------------
-
+        
         if not dem_layer:
             self.iface.messageBar().pushWarning(
                 self.tr("SecGeol"),
@@ -463,8 +441,8 @@ class SecGeol:
             )
             return
         
-        #------- Si no es un DEM  con elevación   -----
-
+        # Si no es un DEM  con elevación?? 
+           
         if not dem_layer:
             self.iface.messageBar().pushWarning(
                 self.tr("SecGeol"),
@@ -546,7 +524,7 @@ class SecGeol:
             )
             return
 
-        #---------------------- Términa validación layer
+        # Términa validación layer
 
 
         if sec_layer is None and not has_drawn:
@@ -572,7 +550,7 @@ class SecGeol:
                 return
             
 
-        #--------------------- Validación geología
+        # Validación geología
 
 
         campo_geo = None
@@ -608,10 +586,8 @@ class SecGeol:
                 campo_geo=campo_geo
             )
 
-        # -----------------------------------------
         # ESTRUCTURAS
-        # -----------------------------------------
-
+        
         campo_dip = None
         campo_azimuth = None
 
@@ -686,37 +662,8 @@ class SecGeol:
                 str(e)
             )
 
-#-------------------------------- Estructuras----------------------------
 
-        # segmentos_geo = []
-        # section_work_layer = None
-
-        # if geo_layer is not None:
-
-        #     section_work_layer = self.dlg.preparar_seccion_trabajo(
-        #         feat_sec=feat_sec,
-        #         has_drawn=has_drawn,
-        #         invertida=inv_sec
-        #     )
-
-        #     section_geom = None
-
-        #     for f in section_work_layer.getFeatures():
-        #         section_geom = QgsGeometry(f.geometry())
-        #         break
-
-        #     segmentos_geo = self.dlg.section_manager.intersectar_seccion_con_geologia(
-        #         section_geom=section_geom,
-        #         section_crs=section_work_layer.crs(),
-        #         geo_layer=geo_layer,
-        #         campo_geo=campo_geo
-        #     )
-
-        
-
-        # -------------------------
         # INFORMACIÓN DE PRUEBA
-        # -------------------------
 
         section_source = sec_layer.name() if sec_layer is not None else "Drawn section"
 
@@ -730,12 +677,6 @@ class SecGeol:
             f"Create axes: {crear_ejes}",
             f"Output: {salida}",
         ]
-
-        
         
         for r in resumen:
             print(r)
-
-      
-
-        
