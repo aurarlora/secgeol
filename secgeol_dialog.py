@@ -1,4 +1,4 @@
-import os, re, unicodedata
+﻿import os, re, unicodedata
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, QVariant
@@ -131,7 +131,11 @@ class DrawSectionMapTool(QgsMapTool):
                 self.finished_callback(feat)
 
         except Exception as e:
-            print(f"Error al finalizar dibujo: {e}")
+            QgsMessageLog.logMessage(
+                f"Error al finalizar dibujo: {e}",
+                "SecGeol",
+                Qgis.Critical
+            )
             self.cancel()
 
 
@@ -428,8 +432,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
     def on_section_layer_changed(self, layer):
         if layer is not None:
-            print("📌 Se seleccionó una capa de sección; se limpiará la sección dibujada")
-
             self.clear_drawn_section_feature()
             self._remove_layer_by_name("seccion_dibujada")
 
@@ -449,7 +451,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
 
     def activar_dibujo_seccion(self):
-        print("🖉 Activar dibujo de sección")
+        
 
         dem_layer = self.MapLayerDEM.currentLayer()
         if dem_layer is None:
@@ -474,11 +476,11 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         canvas.setMapTool(self.draw_tool)
 
     def on_section_drawing_finished(self, feature):
-        print("🔥 Entró a on_section_drawing_finished")
+       
         self.set_drawn_section_feature(feature)
         self.mostrar_seccion_dibujada(feature)
 
-        print("🎯 Dibujo terminado con clic derecho")
+        
 
         iface.mapCanvas().unsetMapTool(self.draw_tool)
         self.draw_tool = None
@@ -497,7 +499,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
 
     def on_section_drawing_cancelled(self):
-        print("❌ Dibujo cancelado")
+        
 
         if self.draw_tool is not None:
             iface.mapCanvas().unsetMapTool(self.draw_tool)
@@ -506,25 +508,25 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 # Muestra la sección dibujada como capa temporal visible en el mapa. Reemplaza la anterior si existe.
 
     def mostrar_seccion_dibujada(self, feature):
-        print("🟡 Entró a mostrar seccion dibujada")
+        
 
         if feature is None:
-            print("❌ feature es None")
+           
             return
 
         geom = feature.geometry()
         if geom is None or geom.isEmpty():
-            print("❌ la geometría de la sección dibujada está vacía")
+          
             return
 
-        print(f"✅ geometría válida: {geom.asWkt()[:200]}")
+        
 
         project = QgsProject.instance()
 
         # eliminar capa previa si existe
         for lyr in list(project.mapLayers().values()):
             if lyr.name() == "seccion_dibujada":
-                print("🧹 Eliminando capa previa 'seccion_dibujada'")
+                
                 project.removeMapLayer(lyr.id())
 
         dem_layer = self.MapLayerDEM.currentLayer()
@@ -532,11 +534,11 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             raise Exception("No se ha seleccionado un DEM.")
 
         crs_authid = dem_layer.crs().authid()
-        print(f"📌 CRS de la capa temporal: {crs_authid}")
+       
 
         layer = QgsVectorLayer(f"LineString?crs={crs_authid}", "seccion_dibujada", "memory")
         if not layer.isValid():
-            print("❌ La capa temporal 'seccion_dibujada' no es válida")
+         
             return
 
         provider = layer.dataProvider()
@@ -545,10 +547,10 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         feat.setGeometry(geom)
 
         ok = provider.addFeatures([feat])
-        print(f"➕ addFeatures result: {ok}")
+
 
         layer.updateExtents()
-        print(f"📦 extent capa: {layer.extent().toString()}")
+
 
         # simbología visible
         renderer = layer.renderer()
@@ -558,7 +560,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         layer.triggerRepaint()
 
         project.addMapLayer(layer)
-        print("✅ Capa temporal 'seccion_dibujada' agregada al mapa")
+
 
         # forzar refresco visual
         iface.mapCanvas().refresh()
@@ -704,8 +706,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     # Conecta la función de la sección      
     
     def preparar_seccion_trabajo(self, feat_sec=None, has_drawn=False, invertida=False):
-        print("source_feature is None?:", feat_sec is None)
-        print("A: entrar a preparar_seccion_trabajo")
+        
+        
 
         dem_layer = self.MapLayerDEM.currentLayer()
         if dem_layer is None:
@@ -716,9 +718,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         target_crs = dem_layer.crs()
 
-        print(f"C: feature desde layer disponible = {feat_sec is not None}")
-        print(f"D: feature dibujada disponible = {self.drawn_section_feature is not None}")
-        print(f"E: invertir sección = {invertida}")
+       
+       
+       
 
         # Caso 1: el usuario dibujó una sección
         if has_drawn:
@@ -734,7 +736,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 target_crs=target_crs,
                 invertida=invertida
             )
-            print("F: sección temporal preparada desde feature dibujada")
+           
 
         # Caso 2: el usuario seleccionó una sola sección válida del layer
         elif feat_sec is not None:
@@ -750,7 +752,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 target_crs=target_crs,
                 invertida=invertida
             )
-            print("F: sección temporal preparada desde feature seleccionada")
+         
 
         else:
             raise Exception(self.tr("No se encontró una sección válida para preparar."))
@@ -772,13 +774,13 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.gpkg_path = self.workspace_manager.create_base_geopackage(crs_authid)
         self.section_manager.set_gpkg_path(self.gpkg_path)
 
-        print(f"GPKG creado: {self.gpkg_path}")
+      
 
 
     # Entra a secprofile
     
     def generar_perfil(self, feat_sec=None, has_drawn=False, invertida=False, segmentos_geo=None, estructuras=None, section_layer=None):
-        print("H: entrar a generar_perfil")
+        
         
         if segmentos_geo is None:
             segmentos_geo = []
@@ -797,16 +799,16 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 has_drawn=has_drawn,
                 invertida=invertida
             )
-            print("I: sección temporal preparada")
-        else:
-            print("I: sección temporal recibida desde ejecutar()")
+            
+        
+        
 
 
         if section_layer is None or not section_layer.isValid():
             raise Exception(self.tr("No fue posible preparar la sección de trabajo."))
 
         caja_m = self.obtener_caja_m()
-        print(f"J: caja_m = {caja_m}")
+       
 
         section_geom = self.section_manager.obtener_geometria_seccion_efectiva(section_layer)
 
@@ -818,7 +820,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         break_distances = []
         if section_geom is not None:
             break_distances = self.section_manager.detect_section_break_distances(section_geom)
-            print(f"J.1: quiebres detectados = {break_distances}")
+       
 
         perfil_layer = self.profile_manager.build_profile_box_layer(
             section_layer=section_layer,
@@ -830,7 +832,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             estructuras=estructuras
         )
 
-        print("K: capa de perfil creada")
+        
 
         return perfil_layer
 
@@ -1059,8 +1061,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     # Si existe Geologia
     
     def actualizar_info_geologia(self):
-        print(">> actualizar_info_geologia llamado")
-
         geo_layer = self.MapLayerGeo.currentLayer()
 
         if geo_layer is None:
@@ -1128,18 +1128,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
 
     def actualizar_info_estructuras(self):
-        print(">> actualizar_info_estructuras llamado")
-        print("Tipo FieldDipEst:", type(self.FieldDipEst))
-        print("Tipo FieldAzimuthEst:", type(self.FieldAzimuthEst))
-
-
         est_layer = self.MapLayerEst.currentLayer()
-
-        print("Capa estructuras:", est_layer.name() if est_layer else None)
-        print("Campos estructuras:", [f.name() for f in est_layer.fields()] if est_layer else [])
-
-
-       
 
         if est_layer is None:
             self.FieldDipEst.setLayer(None)

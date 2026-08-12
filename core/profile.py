@@ -117,10 +117,14 @@ class ProfileManager:
 
                 elev = last_valid_elev
 
-                print(
-                    "Elevación no disponible. "
-                    f"Se utilizó el valor anterior en el punto {pt_id}: "
-                    f"{elev:.3f} m"
+                QgsMessageLog.logMessage(
+                    (
+                        "Elevación no disponible. "
+                        f"Se utilizó el valor anterior en el punto {pt_id}: "
+                        f"{elev:.3f} m"
+                    ),
+                    "SecGeol",
+                    Qgis.Warning
                 )
             else:
                 last_valid_elev = elev
@@ -400,10 +404,9 @@ class ProfileManager:
         # DENSIFICAR SEGÚN EL DEM
 
         pixel_size = self._get_dem_pixel_size(dem_layer)
-        print(f"Pixel size DEM: {pixel_size}")
 
         dense_geom = self._densify_line_geometry(line_geom, pixel_size)
-        print("Línea densificada correctamente")
+        
 
 
         # GENERAR PUNTOS DEL PERFIL
@@ -644,9 +647,6 @@ class ProfileManager:
                 QgsProject.instance().removeMapLayer(lyr.id())
 
         QgsProject.instance().addMapLayer(out_layer)
-
-        print(f"Puntos generados para el perfil: {len(profile_point_features)}")
-        print("Segmentos recibidos en profile:", len(segmentos_geo))
         return out_layer
 
 

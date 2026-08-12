@@ -662,21 +662,3 @@ class SecGeol:
                 str(e)
             )
 
-
-        # INFORMACIÓN DE PRUEBA
-
-        section_source = sec_layer.name() if sec_layer is not None else "Drawn section"
-
-        resumen = [
-            f"DEM: {dem_layer.name()}",
-            f"Section: {section_source}",
-            f"Invert section: {inv_sec}",
-            f"Geology: {geo_layer.name() if geo_layer else 'None'}",
-            f"Structures: {est_layer.name() if est_layer else 'None'}",
-            f"Box (m): {caja_m}",
-            f"Create axes: {crear_ejes}",
-            f"Output: {salida}",
-        ]
-        
-        for r in resumen:
-            print(r)
