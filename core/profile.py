@@ -432,32 +432,22 @@ class ProfileManager:
         lineas_estructura = []
 
         vertices_perfil = list(linea_perfil.vertices())
-        max_x_perfil = max(v.x() for v in vertices_perfil)
-
-        
-        
-        
-        
-        
-
-        if segmentos_geo:
-            max_dist_fin = max(seg["dist_fin"] for seg in segmentos_geo)
-            
-                
-                
-                
-            
-
+       
         top_y = max(p.geometry().asPoint().y() for p in profile_point_features)
         break_geoms = self._build_break_lines(break_distances, box_data["base_y"], top_y)
 
 
+        segmentos_geo_ordenados = sorted(
+            segmentos_geo,
+            key=lambda seg: min(seg["dist_ini"], seg["dist_fin"])
+        )
+        
         segmentos_linea = []
 
-        for seg in segmentos_geo:
+        for seg in segmentos_geo_ordenados:
             d_ini = seg["dist_ini"]
             d_fin = seg["dist_fin"]
-
+            
             sub_geom = self.recortar_linea_por_distancia(
                 linea_perfil,
                 d_ini,
