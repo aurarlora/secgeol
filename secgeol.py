@@ -72,7 +72,6 @@ class SecGeol:
     # Devuelve una única feature válida de la sección del layer.
     # Si no cumple la regla, muestra ayuda y regresa None.
 
-
     def _set_help(self, texto):
         if self.dlg and hasattr(self.dlg, "textBrowserHelp"):
             self.dlg.textBrowserHelp.setPlainText(texto)

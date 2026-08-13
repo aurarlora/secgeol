@@ -3,7 +3,6 @@ import os, math
 from qgis.core import (
     QgsFeature,
     Qgis,
-    QgsMessageLog,
     QgsGeometry,
     QgsPointXY,
     QgsProject,
@@ -11,8 +10,7 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform
 )
-from qgis.PyQt.QtWidgets import QMessageBox
-from qgis.PyQt.QtCore import QVariant
+
 
 class SectionManager:
     def __init__(self, gpkg_path=None):
@@ -119,7 +117,6 @@ class SectionManager:
         new_geom.transform(transform)
         return new_geom
 
-    
     #   Copia una feature conservando atributos existentes y agregando internos.
    
     def _prepare_section_feature(
@@ -145,7 +142,6 @@ class SectionManager:
 
         return new_feat
     
-
     #  Prepara una capa de trabajo a partir de una feature dibujada por la herramienta.
    
     def prepare_section_layer_from_feature(
@@ -248,11 +244,10 @@ class SectionManager:
                         
             valor_campo = None
 
-            if campo_geo:
-                try:
-                    valor_campo = feat_geo[campo_geo]
-                except Exception:
-                    valor_campo = None
+            if campo_geo and campo_geo in feat_geo.fields().names():
+                valor_campo = feat_geo[campo_geo]
+            else:
+                valor_campo = None
 
             segmentos.append({
                 "id_lito": id_lito,
@@ -284,11 +279,6 @@ class SectionManager:
         if est_layer is None:
             return estructuras
         
-        QgsMessageLog.logMessage(
-            f"CRS sección: {section_crs.authid()} | CRS estructuras: {est_layer.crs().authid()}",
-            "SecGeol",
-            Qgis.Info
-        )
 
         # Reproyección si es necesario
         
@@ -377,19 +367,12 @@ class SectionManager:
                 "lado": lado
             })
 
-        QgsMessageLog.logMessage(
-            f"Estructuras intersectadas: {estructuras}",
-            "SecGeol",
-            Qgis.Info
-        )
-
         return estructuras
     
     #    Calcula el azimuth local de la sección en la distancia dada.
     #    Azimuth en grados: 0=N, 90=E, 180=S, 270=W.
     
     def calcular_azimuth_local_seccion(self, section_geom, dist_objetivo):
-
 
         vertices = list(section_geom.vertices())
 

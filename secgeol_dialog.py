@@ -6,7 +6,7 @@ from qgis.PyQt.QtWidgets import QDialog, QSplitter
 from qgis.core import (QgsMapLayerProxyModel, QgsProject, Qgis,QgsPoint, QgsPolygon,QgsVectorFileWriter,
                        QgsFeature, QgsGeometry, QgsVectorLayer, QgsField, QgsLineString,
                        QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog)
-from qgis.gui import QgsMapTool, QgsRubberBand, QgsFileWidget
+from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.utils import iface
 from qgis.PyQt.QtGui import QColor
 
@@ -49,11 +49,6 @@ class DrawSectionMapTool(QgsMapTool):
         self.vertex_band = QgsRubberBand(self.canvas, QgsWkbTypes.PointGeometry)
         self.vertex_band.setWidth(6)
         self.vertex_band.setColor(QColor(255, 0, 0))
-
-        # Para guardar Tab3
-        self.fileWidgetPerfilGeo3D.setStorageMode(QgsFileWidget.SaveFile)
-        self.fileWidgetPerfilGeo3D.setFilter("Shapefile (*.shp);;GeoPackage (*.gpkg)")
-
 
 
     def activate(self):
@@ -151,15 +146,11 @@ class DrawSectionMapTool(QgsMapTool):
         self.preview_band.reset(QgsWkbTypes.LineGeometry)
         self.vertex_band.reset(QgsWkbTypes.PointGeometry)
 
-
-
-
 class SecGeolDialog(QDialog, FORM_CLASS):
     def __init__(self, iface, parent=None):
         super().__init__(parent)
         self.iface = iface
         self.setupUi(self)
-
 
         # Estado inicial de controles opcionales
         self.MapLayerGeo.setEnabled(False)
@@ -177,7 +168,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.actualizar_estado_geologia()
         self.actualizar_estado_estructuras()
 
-
         self.drawn_section_feature = None
         self.draw_tool = None
 
@@ -185,7 +175,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.MapLayerSec.layerChanged.connect(self.on_section_layer_changed)
         self.MapLayerGeo.layerChanged.connect(self.actualizar_info_geologia)
         self.MapLayerEst.layerChanged.connect(self.actualizar_info_estructuras)
-
 
         #Campos filtrados
         self.FieldDipEst.setFilters(QgsFieldProxyModel.Numeric)
@@ -196,14 +185,12 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.MapLayerSecGuia.setFilters(QgsMapLayerProxyModel.LineLayer)
 
         #Conectar TAB 2
-
         self.buttonBox_2.accepted.connect(self.ejecutar_lineas_a_poligonos)
         self.buttonBox_2.rejected.connect(self.reject)
 
         #Conectar TAB 3
         self.buttonBox_3.accepted.connect(self.ejecutar_perfil_3d)
         self.buttonBox_3.rejected.connect(self.reject)
-
 
         # Conectar TAB 1
         self.buttonBox.rejected.connect(self.reject)
@@ -214,7 +201,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
 
         # CONFIGURAR CAJA
-        
         self.doubleSpinBox.setMinimum(0.0)
         self.doubleSpinBox.setMaximum(10000.0)
         self.doubleSpinBox.setSingleStep(10.0)     #Verificar este punto
@@ -222,7 +208,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.doubleSpinBox.setValue(100.0)
 
         # SPLITTER DE AYUDA / CONTROLES
-
         self.splitter_main = self.findChild(QSplitter, "splitter")
 
         # Extraer datos de elevación ---
@@ -249,7 +234,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 handle.setEnabled(False)
 
         # ESTADO INICIAL DE LA AYUDA
-        
         self.help_tab_uno = """
             <div style="padding:10px; line-height:1.4;">
                 <h3>Herramienta de Secciones Geológicas</h3>
@@ -307,7 +291,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         # CONEXIÓN DE TABS
         self.tabWidget.currentChanged.connect(self.actualizar_ayuda_tab)
-
 
         # INICIALIZAR AYUDA
         self.actualizar_ayuda_tab()
@@ -451,17 +434,11 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
 
     def activar_dibujo_seccion(self):
-        
-
         dem_layer = self.MapLayerDEM.currentLayer()
         if dem_layer is None:
             raise Exception("No se ha seleccionado un DEM.")
 
-        # limpiar cualquier selección de layer
-        try:
-            self.MapLayerSec.setLayer(None)
-        except Exception:
-            pass
+        self.MapLayerSec.setLayer(None)
 
         # limpiar sección dibujada previa
         self.clear_drawn_section_feature()
@@ -480,16 +457,12 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.set_drawn_section_feature(feature)
         self.mostrar_seccion_dibujada(feature)
 
-        
-
         iface.mapCanvas().unsetMapTool(self.draw_tool)
         self.draw_tool = None
 
     
-
     def actualizar_ayuda_tab(self):
         current_widget = self.tabWidget.currentWidget()
-
         if current_widget == self.uno:
             self.textBrowserHelp.setHtml(self.help_tab_uno)
         elif current_widget == self.dos:
@@ -499,8 +472,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
 
     def on_section_drawing_cancelled(self):
-        
-
         if self.draw_tool is not None:
             iface.mapCanvas().unsetMapTool(self.draw_tool)
             self.draw_tool = None
@@ -508,18 +479,12 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 # Muestra la sección dibujada como capa temporal visible en el mapa. Reemplaza la anterior si existe.
 
     def mostrar_seccion_dibujada(self, feature):
-        
-
         if feature is None:
-           
             return
 
         geom = feature.geometry()
         if geom is None or geom.isEmpty():
-          
             return
-
-        
 
         project = QgsProject.instance()
 
@@ -535,22 +500,16 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         crs_authid = dem_layer.crs().authid()
        
-
         layer = QgsVectorLayer(f"LineString?crs={crs_authid}", "seccion_dibujada", "memory")
         if not layer.isValid():
-         
             return
 
         provider = layer.dataProvider()
-
         feat = QgsFeature()
         feat.setGeometry(geom)
 
-        ok = provider.addFeatures([feat])
-
-
+        provider.addFeatures([feat])
         layer.updateExtents()
-
 
         # simbología visible
         renderer = layer.renderer()
@@ -560,7 +519,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         layer.triggerRepaint()
 
         project.addMapLayer(layer)
-
 
         # forzar refresco visual
         iface.mapCanvas().refresh()
@@ -706,46 +664,33 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     # Conecta la función de la sección      
     
     def preparar_seccion_trabajo(self, feat_sec=None, has_drawn=False, invertida=False):
-        
-        
-
         dem_layer = self.MapLayerDEM.currentLayer()
         if dem_layer is None:
             raise Exception(self.tr(
                 "No se ha seleccionado un modelo digital de elevación (DEM). "
                 "Seleccione una capa raster válida para continuar.")
             )
-
         target_crs = dem_layer.crs()
-
-       
-       
-       
 
         # Caso 1: el usuario dibujó una sección
         if has_drawn:
             if self.drawn_section_feature is None:
                 raise Exception(self.tr("No se encontró la sección dibujada."))
-
             # Ajusta aquí según el CRS real de tu sección dibujada
             source_crs = self.iface.mapCanvas().mapSettings().destinationCrs()
-
             temp_layer = self.section_manager.prepare_section_layer_from_feature(
                 source_feature=self.drawn_section_feature,
                 source_crs=source_crs,
                 target_crs=target_crs,
                 invertida=invertida
-            )
-           
+            )           
 
         # Caso 2: el usuario seleccionó una sola sección válida del layer
         elif feat_sec is not None:
             source_layer = self.MapLayerSec.currentLayer()
             if source_layer is None:
                 raise Exception(self.tr("No se encontró la capa de sección."))
-
             source_crs = source_layer.crs()
-
             temp_layer = self.section_manager.prepare_section_layer_from_feature(
                 source_feature=feat_sec,
                 source_crs=source_crs,
@@ -753,18 +698,14 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 invertida=invertida
             )
          
-
         else:
             raise Exception(self.tr("No se encontró una sección válida para preparar."))
 
         if temp_layer is None or not temp_layer.isValid():
             raise Exception(self.tr("No fue posible preparar la sección de trabajo."))
-
         return temp_layer
     
-
     # Inicializa workspace
-
     def inicializar_workspace(self):
         dem_layer = self.MapLayerDEM.currentLayer()
         if dem_layer is None:
@@ -774,14 +715,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.gpkg_path = self.workspace_manager.create_base_geopackage(crs_authid)
         self.section_manager.set_gpkg_path(self.gpkg_path)
 
-      
-
-
-    # Entra a secprofile
-    
+    # Entra a secprofile    
     def generar_perfil(self, feat_sec=None, has_drawn=False, invertida=False, segmentos_geo=None, estructuras=None, section_layer=None):
-        
-        
         if segmentos_geo is None:
             segmentos_geo = []
 
@@ -799,29 +734,19 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 has_drawn=has_drawn,
                 invertida=invertida
             )
-            
-        
-        
-
 
         if section_layer is None or not section_layer.isValid():
             raise Exception(self.tr("No fue posible preparar la sección de trabajo."))
-
         caja_m = self.obtener_caja_m()
-       
-
         section_geom = self.section_manager.obtener_geometria_seccion_efectiva(section_layer)
-
 
         if section_geom is None:
             raise Exception(self.tr("No fue posible obtener la geometría efectiva de la sección."))
-
 
         break_distances = []
         if section_geom is not None:
             break_distances = self.section_manager.detect_section_break_distances(section_geom)
        
-
         perfil_layer = self.profile_manager.build_profile_box_layer(
             section_layer=section_layer,
             dem_layer=dem_layer,
@@ -832,11 +757,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             estructuras=estructuras
         )
 
-        
-
         return perfil_layer
-
-
 
     # Valor de caja en metros
 
@@ -1172,12 +1093,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 layer_name="perfil_geologico"
             )
 
-            QgsMessageLog.logMessage(
-                f"checkEjes activado: {self.checkEjes.isChecked()}",
-                "SecGeol",
-                Qgis.Info
-            )
-
             ejes_layer = None
 
             if self.checkEjes.isChecked():
@@ -1186,7 +1101,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                     layer_name="ejes"
                 )
 
-            capas_guardadas = self.guardar_salida_tab2(
+            self.guardar_salida_tab2(
                 perfil_poly_layer=perfil_poly_layer,
                 ejes_layer=ejes_layer,
                 salida_perfil_geo=salida_perfil_geo
@@ -1353,8 +1268,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             "ejes_layer": ejes_guardada
         }
 
-
-
     # Tab 1
     def crear_seccion_guia(self, section_layer, invertida=False, layer_name="Seccion_guia"):
         
@@ -1436,11 +1349,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             sec_feat = next(sec_layer.getFeatures())
             sec_geom = sec_feat.geometry()
 
-            QgsMessageLog.logMessage(
-                f"Longitud sección guía: {sec_geom.length()}",
-                "SecGeol",
-                Qgis.Info
-            )
 
             crs_authid = sec_layer.crs().authid()
 
@@ -1523,23 +1431,6 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
             QgsProject.instance().addMapLayer(out_layer)
 
-            QgsMessageLog.logMessage(
-                f"perfil_geologico3D creado con {total_3d} polígonos.",
-                "SecGeol",
-                Qgis.Info
-            )
-
-            QgsMessageLog.logMessage(
-                f"WKB perfil geológico: {geom.wkbType()}",
-                "SecGeol",
-                Qgis.Info
-            )
-
-            QgsMessageLog.logMessage(
-                f"Polígonos: {poly_layer.featureCount()}",
-                "SecGeol",
-                Qgis.Info
-            )
 
             if not multi:
                 raise Exception("No fue posible leer la geometría multipolígono.")
@@ -1567,51 +1458,13 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                         z_perfil
                     )
                 )
-            # ← FUERA DEL FOR
 
-            QgsMessageLog.logMessage(
-                f"Vertices reconstruidos: {len(nuevos_vertices)}",
-                "SecGeol",
-                Qgis.Info
-            )
-
-            if nuevos_vertices:
-
-                QgsMessageLog.logMessage(
-                    f"Primer XYZ: "
-                    f"{nuevos_vertices[0].x()}, "
-                    f"{nuevos_vertices[0].y()}, "
-                    f"{nuevos_vertices[0].z()}",
-                    "SecGeol",
-                    Qgis.Info
-                ) 
 
             if len(nuevos_vertices) < 4:
                 raise Exception(
                     "No hay suficientes vértices para construir un polígono."
                 )
             
-
-            QgsMessageLog.logMessage(
-                f"Anillo válido: {len(nuevos_vertices)} vértices",
-                "SecGeol",
-                Qgis.Info
-            )
-
-           
-
-            for feat in poly_layer.getFeatures():
-
-                geom = feat.geometry()
-
-                QgsMessageLog.logMessage(
-                    f"WKB Type: {geom.wkbType()}",
-                    "SecGeol",
-                    Qgis.Info
-                )
-
-                break
-
 
             # GUARDAR PERFIL GEOLÓGICO 3D
             

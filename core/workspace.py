@@ -10,8 +10,6 @@ from qgis.core import (
     QgsWkbTypes,QgsFields, QgsField
 )
 
-
-
 class WorkspaceManager:
     def __init__(self):
         self.gpkg_path = None
@@ -48,15 +46,12 @@ class WorkspaceManager:
             options
         )
 
-        print(f"Resultado al crear capa {layer_name}: {writer_result}")
-
         result = writer_result[0]
         error_message = writer_result[1] if len(writer_result) > 1 else ""
         
 
         if result != QgsVectorFileWriter.NoError:
             raise Exception(f"Error al crear capa '{layer_name}': {error_message}")
-
 
 
     def create_base_geopackage(self, crs_authid):

@@ -81,7 +81,7 @@ class ProfileManager:
             raise Exception("La geometría de la sección está vacía.")
 
         vertices = list(line_geom.vertices())
-
+        # valida que la línea densificada tenga al menos dos vértices
         if len(vertices) < 2:
             raise Exception(
                 "La línea densificada no tiene suficientes vértices."
@@ -106,7 +106,7 @@ class ProfileManager:
                 pt.x(),
                 pt.y()
             )
-
+            # si el primer punto del perfil no tiene una elevación válida
             if elev is None:
                 if last_valid_elev is None:
                     raise Exception(
@@ -434,19 +434,19 @@ class ProfileManager:
         vertices_perfil = list(linea_perfil.vertices())
         max_x_perfil = max(v.x() for v in vertices_perfil)
 
-        QgsMessageLog.logMessage(
-            f"Distancia máxima X perfil: {max_x_perfil}",
-            "SecGeol",
-            Qgis.Info
-        )
+        
+        
+        
+        
+        
 
         if segmentos_geo:
             max_dist_fin = max(seg["dist_fin"] for seg in segmentos_geo)
-            QgsMessageLog.logMessage(
-                f"Máximo dist_fin geología: {max_dist_fin}",
-                "SecGeol",
-                Qgis.Info
-            )
+            
+                
+                
+                
+            
 
         top_y = max(p.geometry().asPoint().y() for p in profile_point_features)
         break_geoms = self._build_break_lines(break_distances, box_data["base_y"], top_y)
@@ -502,26 +502,6 @@ class ProfileManager:
                 segmentos_linea[-1]["geometry"] = QgsGeometry.fromPolylineXY([
                     QgsPointXY(p.x(), p.y()) for p in pts_fin
                 ])
-
-
-
-        QgsMessageLog.logMessage(
-            f"Segmentos recibidos en profile.py: {len(segmentos_geo)}",
-            "SecGeol",
-            Qgis.Info
-        )
-
-        QgsMessageLog.logMessage(
-            f"Segmentos de perfil generados: {len(segmentos_linea)}",
-            "SecGeol",
-            Qgis.Info
-        )
-
-        QgsMessageLog.logMessage(
-            f"Estructuras recibidas en profile.py: {len(estructuras)}",
-            "SecGeol",
-            Qgis.Info
-        )
 
         
         # CAPA DE SALIDA
@@ -616,12 +596,6 @@ class ProfileManager:
                 "azimuth": est["azimuth"],
                 "lado": lado
             })
-
-            QgsMessageLog.logMessage(
-                f"Línea estructura creada: dist={dist}, lado={lado}",
-                "SecGeol",
-                Qgis.Info
-            )
 
 
         for est in lineas_estructura:
@@ -757,12 +731,6 @@ class ProfileManager:
 
         QgsProject.instance().addMapLayer(out_layer)
 
-        QgsMessageLog.logMessage(
-            f"Capa temporal creada: {layer_name}",
-            "SecGeol",
-            Qgis.Info
-        )
-
         return out_layer
     
     #------ Para agregar los tics -----
@@ -812,12 +780,6 @@ class ProfileManager:
         paso_x = self.nice_number(longitud_x / ticks_deseados_x)
         paso_y = self.nice_number(altura_y / ticks_deseados_y)
 
-        QgsMessageLog.logMessage(
-            f"Ejes: X={longitud_x:.2f}, pasoX={paso_x} | "
-            f"Y={altura_y:.2f}, pasoY={paso_y}",
-            "SecGeol",
-            Qgis.Info
-        )
         
         out_features = []
 
@@ -832,8 +794,6 @@ class ProfileManager:
 
 
         # EJE X
-
-
         y_eje = y_min - offset_y
 
         geom_x = QgsGeometry.fromPolylineXY([
@@ -853,7 +813,6 @@ class ProfileManager:
 
         
         # TICKS EJE X
-        
         x_tick = 0
 
         while x_tick <= x_max:
@@ -875,14 +834,6 @@ class ProfileManager:
 
             x_tick += paso_x
 
-            QgsMessageLog.logMessage(
-                f"Tick X creado en: {x_tick}",
-                "SecGeol",
-                Qgis.Info
-            )
-
-
-        
         # EJE Y
         
         x_eje = x_min - offset_x
@@ -904,8 +855,6 @@ class ProfileManager:
 
         
         # TICKS EJE Y
-        
-
         y_tick = math.ceil(y_min / paso_y) * paso_y
 
         while y_tick <= y_max:
