@@ -1,0 +1,140 @@
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    line-height: 1.6;
+    color: #2f3437;
+    background-color: #f5f6f7;
+    margin: 0;
+}
+
+.page {
+    max-width: 1000px;
+    margin: 35px auto;
+    background: white;
+    padding: 45px 55px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #3f6f73;
+    padding-bottom: 12px;
+    margin-bottom: 35px;
+}
+
+.manual-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #3f6f73;
+    letter-spacing: 0.5px;
+}
+
+.languages a {
+    text-decoration: none;
+    font-size: 22px;
+    margin-left: 8px;
+    opacity: 0.55;
+}
+
+.languages a.active {
+    opacity: 1;
+}
+
+h1 {
+    color: #294f52;
+    font-size: 30px;
+    margin-bottom: 6px;
+}
+
+h2 {
+    color: #3f6f73;
+    margin-top: 35px;
+    border-bottom: 1px solid #d9e2e3;
+    padding-bottom: 6px;
+}
+
+h3 {
+    color: #455a5c;
+    margin-top: 28px;
+}
+
+.case-number {
+    color: #777;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.objective {
+    background: #eef5f5;
+    border-left: 5px solid #3f6f73;
+    padding: 15px 18px;
+    margin: 25px 0;
+}
+
+.workflow {
+    text-align: center;
+    margin: 30px 0;
+    padding: 18px;
+    background: #fafafa;
+    border: 1px solid #e2e2e2;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.arrow {
+    color: #668b8d;
+    padding: 0 8px;
+}
+
+.requirements {
+    background: #fafafa;
+    padding: 15px 22px;
+    border-radius: 5px;
+}
+
+.step {
+    margin: 22px 0;
+    padding-left: 18px;
+    border-left: 3px solid #d8e3e3;
+}
+
+.step-number {
+    font-weight: bold;
+    color: #3f6f73;
+}
+
+.note {
+    background: #fff8e7;
+    border-left: 4px solid #d6a63c;
+    padding: 12px 16px;
+    margin: 20px 0;
+}
+
+.image-placeholder {
+    border: 2px dashed #bac6c7;
+    background: #fafcfc;
+    padding: 50px 20px;
+    text-align: center;
+    color: #7b8889;
+    margin: 22px 0;
+    border-radius: 5px;
+}
+
+.result {
+    background: #f0f7f2;
+    border-left: 5px solid #568064;
+    padding: 15px 18px;
+    margin-top: 25px;
+}
+
+footer {
+    margin-top: 45px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    color: #777;
+    font-size: 13px;
+}

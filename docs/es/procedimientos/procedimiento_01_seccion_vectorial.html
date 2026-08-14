@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="../../assets/css/secgeol-manual.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SecGeol — Manual de usuario</title>
+</head>
+
+<body>
+
+<div class="page">
+
+    <!-- Encabezado -->
+    <div class="topbar">
+
+        <div class="manual-title">
+            SecGeol · Manual de usuario
+        </div>
+
+        <div class="languages">
+            <a href="manual_es.html"
+               class="active"
+               title="Español">🇲🇽</a>
+
+            <a href="manual_en.html"
+               title="English">🇬🇧</a>
+        </div>
+
+    </div>
+
+
+    <div class="case-number">
+        Caso de uso 01
+    </div>
+
+    <h1>
+        Sección desde una capa vectorial
+    </h1>
+
+    <p>
+        <strong>Orientación original · Flujo básico sin información
+        geológica ni estructural</strong>
+    </p>
+
+
+    <div class="objective">
+        <strong>Objetivo.</strong>
+        Generar un perfil topográfico a partir de una línea de sección existente, 
+        conservar su orientación original y continuar el flujo de trabajo hasta 
+        obtener el perfil geológico 2D y su reconstrucción espacial en 3D.
+    </div>
+
+
+    <h2>Flujo del ejercicio</h2>
+
+    <div class="workflow">
+        1. Sección a perfil
+        <span class="arrow">→</span>
+       2. Líneas a polígonos
+        <span class="arrow">→</span>
+        3. Perfil 2D a 3D
+    </div>
+
+
+    <h2>Datos necesarios</h2>
+
+    <div class="requirements">
+        <ul>
+            <li>Modelo digital de elevación (DEM).</li>
+            <li>Capa vectorial de líneas que contenga la sección.</li>
+            <li>CRS proyectado adecuado para trabajar en unidades métricas.</li>
+        </ul>
+    </div>
+
+
+    <div class="note">
+        <strong>Para este procedimiento, deje sin seleccionar las capas de geología y estructuras.</strong>
+    </div>
+
+
+    <h2>Módulo 1 · Generación del perfil topográfico</h2>
+
+
+    <div class="step">
+
+        <p>
+            <span class="step-number">Paso 1.</span>
+            Seleccione el modelo digital de elevación en el campo
+            correspondiente.
+        </p>
+
+    </div>
+
+
+    <div class="step">
+
+        <p>
+            <span class="step-number">Paso 2.</span>
+            Seleccione la capa vectorial que contiene la línea de sección.
+        </p>
+
+        <p>
+            Mantenga desactivada la opción
+            <strong>Invertir sección</strong> para conservar el sentido
+            original de la geometría.
+        </p>
+
+    </div>
+
+
+    <div class="step">
+
+        <p>
+            <span class="step-number">Paso 3.</span>
+            No seleccione capas de geología ni estructuras.
+        </p>
+
+    </div>
+
+
+    <div class="step">
+
+        <p>
+            <span class="step-number">Paso 4.</span>
+            Defina la ubicación del archivo de salida y ejecute
+            la herramienta.
+        </p>
+
+    </div>
+
+
+    <div class="image-placeholder">
+        Captura pendiente · Configuración del Módulo 1
+    </div>
+
+
+    <div class="result">
+        <strong>Resultado </strong>
+        SecGeol genera el perfil topográfico y la sección guía, conservando el sentido original de la línea seleccionada.
+    </div>
+
+
+    <h2>Módulo 2 · Construcción del perfil geológico</h2>
+
+    <p>
+        El perfil generado en el módulo anterior constituye la base
+        geométrica para la interpretación y construcción del perfil
+        geológico.
+    </p>
+
+    <div class="image-placeholder">
+        Captura pendiente · Flujo del Módulo 2
+    </div>
+
+
+    <h2>Módulo 3 · Reconstrucción 3D</h2>
+
+    <p>
+        Finalmente, el perfil geológico y la sección guía se utilizan
+        para reconstruir la geometría en sus coordenadas espaciales
+        originales.
+    </p>
+
+    <div class="image-placeholder">
+        Captura pendiente · Resultado tridimensional
+    </div>
+
+
+    <div class="result">
+        <strong>Resultado final.</strong>
+        El perfil geológico 3D se genera en sus coordenadas espaciales, conservando la posición, longitud y orientación de la sección guía.
+    </div>
+
+
+    <footer>
+        <span>SecGeol · Manual de usuario</span>
+        <span>2</span>
+    </footer>
+
+</div>
+
+</body>
+</html>
