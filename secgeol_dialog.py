@@ -227,7 +227,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                     width: 0px;
                     background: transparent;
                 }
-            """)
+                """)
 
             handle = self.splitter_main.handle(1)
             if handle:
@@ -524,11 +524,13 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         iface.mapCanvas().refresh()
 
     # PANEL DE AYUDA
-    def mostrar_ayuda(self, titulo, texto):
-        self.textBrowserHelp.setHtml(f"""
-            <h3>{titulo}</h3>
-            <p>{texto}</p>
-        """)
+    def mostrar_ayuda(self, titulo, html):
+         self.textBrowserHelp.setHtml(f"""
+                <div style="font-family: 'Segoe UI', Arial, sans-serif;">
+                    <h3 style="margin-bottom: 8px;">{titulo}</h3>
+                    {html}
+                </div>
+            """)
 
     # EVENT FILTER  Mostarr ayuda
     def eventFilter(self, obj, event):
@@ -542,32 +544,70 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
             elif obj == self.btnDrawSec:
                 self.mostrar_ayuda(
-                    "Dibujar sección",
-                    "Permite dibujar una línea de sección directamente sobre el mapa.\n"
-                    "Haz clic para iniciar y clic derecho para finalizar."
+                   "Dibujar sección",
+                    """
+                    <p>
+                        Permite dibujar una <b>línea de sección</b> directamente
+                        sobre el mapa, como alternativa a seleccionar una sección
+                        desde una capa vectorial.
+                    </p>
+
+                    <p>
+                        Haga clic sobre el mapa para definir los vértices de la línea
+                        y utilice <b>clic derecho</b> para finalizar el dibujo.
+                    </p>
+                    """
                 )
 
             elif obj == self.checkInvSec:
                 self.mostrar_ayuda(
                     "Invertir sección",
-                    "Invierte el sentido de la sección (inicio ↔ fin).\n"
-                    "Esto cambia la orientación del perfil."
+                    """
+                    <p>
+                        Invierte el sentido de la línea de sección y, por lo tanto,
+                        la orientación del perfil resultante.
+                    </p>
+
+                    <p>
+                        Active esta opción cuando necesite intercambiar el
+                        <b>inicio y el final</b> de la sección.
+                    </p>
+                    """
                 )
 
             elif obj == self.MapLayerGeo:
                 self.mostrar_ayuda(
-                    "Capa de geología",
-                    "Capa poligonal opcional que se intersecta con la sección\n"
-                    "para mostrar las unidades geológicas en el perfil."
+                   "Capa de geología",
+                    """
+                    <p>
+                        Seleccione una capa vectorial de <b>polígonos</b> que contenga
+                        las unidades geológicas atravesadas por la línea de sección.
+                    </p>
+
+                    <p>
+                        SecGeol intersectará esta capa con la sección para representar
+                        la distribución de las unidades geológicas sobre el perfil
+                        topográfico.
+                    </p>
+
+                    <p>
+                        Esta entrada es <b>opcional</b>.
+                    </p>
+                    """
                 )
 
             elif obj == self.FieldClasGeo:
                 self.mostrar_ayuda(
                     "Campo de clasificación geológica",
-                    "Seleccione el campo de atributos que se utilizará para clasificar y etiquetar los segmentos geológicos del perfil."
                     """
                     <p>
-                    El valor seleccionado se almacenará en el campo <b>valor_geo</b>.
+                        Seleccione el campo de atributos que identifica las
+                        <b>unidades geológicas</b>.
+                    </p>
+
+                    <p>
+                        Los valores de este campo se transferirán al perfil y
+                        se almacenarán en el atributo <b>valor_geo</b>.
                     </p>
                     """
                 )
@@ -575,28 +615,71 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
             elif obj == self.MapLayerEst:
                 self.mostrar_ayuda(
-                    "Capa estructural",
-                    "Capa lineal opcional que se intersecta con la sección\n"
-                    "para representar estructuras geológicas en el perfil."
+                   "Capa estructural",
+                    """
+                    <p>
+                        Seleccione una capa vectorial de líneas que contenga
+                        las estructuras geológicas que intersectan la sección.
+                    </p>
+
+                    <p>
+                        Esta entrada es <b>opcional</b>.
+                    </p>
+                    """
                 )
 
             elif obj == self.doubleSpinBox:
                 self.mostrar_ayuda(
-                    "Tamaño de caja",
-                    "Define el tamaño de la caja en metros para el perfil.\n"
-                    "Se ocuparan 100 m a partir del valor mínimo de la elevación."
+                   "Profundidad de la caja",
+                    """
+                    <p>
+                        Define, en metros, la profundidad adicional que se
+                        representará por debajo de la elevación mínima del
+                        perfil topográfico.
+                    </p>
+
+                    <p>
+                        El valor permitido está entre <b>100 y 10 000 m</b>.
+                        El valor predeterminado es <b>100 m</b>.
+                    </p>
+
+                    <p>
+                        Por ejemplo, un valor de <b>500</b> extiende la caja
+                        <b>500 m</b> por debajo de la elevación mínima del perfil.
+                    </p>
+                    """
                 )
 
             elif obj == self.checkEjes:
                 self.mostrar_ayuda(
                     "Crear ejes",
-                    "Genera los ejes X y Y en el perfil resultante."
+                    """
+                    <p>
+                        Active esta opción para generar los ejes horizontal y
+                        vertical asociados al perfil.
+                    </p>
+
+                    <p>
+                        El eje horizontal representa la <b>distancia sobre la sección</b>
+                        y el eje vertical la <b>elevación</b>.
+                    </p>
+                    """
                 )
 
             elif obj == self.fileWidgetPerfil:
                 self.mostrar_ayuda(
                     "Archivo de salida",
-                    "Selecciona el archivo donde se guardará el perfil generado."
+                    """
+                    <p>
+                        Seleccione la ubicación y el nombre del archivo donde
+                        se guardará el perfil topográfico.
+                    </p>
+
+                    <p>
+                        SecGeol generará también la <b>sección guía</b>, que conserva
+                        la referencia espacial necesaria para la reconstrucción 3D.
+                    </p>
+                    """
                 )
 
             #Estructuras
@@ -604,18 +687,43 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             elif obj == self.FieldDipEst:
                 self.mostrar_ayuda(
                     "Campo de echado",
-                    "Seleccione el campo numérico que contiene el <b>echado</b> de la estructura.<br><br>"
-                    "El valor debe estar en grados, entre <b>0 y 90</b>. "
-                    "Si el valor está fuera de rango, la estructura no se dibujará."
+                    """
+                    <p>
+                        Seleccione el campo numérico que contiene el
+                        <b>echado</b> de cada estructura.
+                    </p>
+
+                    <p>
+                        Los valores deben almacenarse como <b>valores numéricos</b>
+                        entre <b>0 y 90</b> grados, sin incluir el símbolo de grado (°).
+                    </p>
+
+                    <p>
+                        Los registros con valores fuera de este intervalo
+                        no se representarán en el perfil.
+                    </p>
+                    """
                 )
 
             elif obj == self.FieldAzimuthEst:
                 self.mostrar_ayuda(
-                    "Campo de azimuth",
-                    "Seleccione el campo numérico que contiene el <b>azimuth de buzamiento</b> "
-                    "de la estructura.<br><br>"
-                    "El valor debe estar en grados, entre <b>0 y 360</b>. "
-                    "Si el valor es <b>-1</b> o está fuera de rango, la estructura no se dibujará."
+                    "Campo de azimut de buzamiento",
+                        """
+                        <p>
+                            Seleccione el campo numérico que contiene el
+                            <b>azimut de buzamiento</b> de cada estructura.
+                        </p>
+
+                        <p>
+                            Los valores deben almacenarse como <b>valores numéricos</b> entre
+                            <b>0 y 360</b> grados, sin incluir el símbolo de grado (°).
+                        </p>
+
+                        <p>
+                            Los registros con valor <b>-1</b> o fuera de este intervalo
+                            no se representarán en el perfil.
+                        </p>
+                        """
                 )
 
             elif obj == self.MapLayerSecGuia:
@@ -772,14 +880,32 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         dem_layer = self.MapLayerDEM.currentLayer()
 
         if dem_layer is None:
-            self.textBrowserHelp.setHtml(
-                "<b>DEM:</b> No se ha seleccionado un DEM."
+            self.mostrar_ayuda(
+                "Modelo digital de elevación",
+                """
+                <p>
+                    No se ha seleccionado un <b>modelo digital de elevación (DEM)</b>.
+                </p>
+
+                <p>
+                    Seleccione una capa raster válida para continuar.
+                </p>
+                """
             )
             return
 
         if dem_layer.type() != dem_layer.RasterLayer:
-            self.textBrowserHelp.setHtml(
-                "<b>DEM:</b> La capa seleccionada no es raster."
+            self.mostrar_ayuda(
+                "Modelo digital de elevación no válido",
+                """
+                <p>
+                    La capa seleccionada no es una <b>capa raster</b>.
+                </p>
+
+                <p>
+                    Seleccione un modelo digital de elevación en formato raster.
+                </p>
+                """
             )
             return
 
@@ -826,37 +952,69 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             banda_valida = una_banda and (band_type in tipos_validos)
 
             if es_metrico and banda_valida:
-                estado = "<span style='color:green;'><b>Estado:</b> compatible con SecGeol.</span>"
+                estado = (
+                    "<p style='color:green;'>"
+                    "<b>Estado: Compatible con SecGeol.</b>"
+                    "</p>"
+                )
+
             else:
                 detalles = []
+
                 if not dem_crs.isValid():
-                    detalles.append("el CRS no es válido")
+                    detalles.append("El CRS no es válido.")
                 elif not es_metrico:
-                    detalles.append("el CRS no está en metros")
+                    detalles.append("El CRS debe utilizar metros como unidad.")
+
                 if not una_banda:
-                    detalles.append("el raster no es de una sola banda")
+                    detalles.append("El raster debe contener una sola banda.")
                 elif band_type_name not in tipos_validos:
-                    detalles.append(f"el tipo de dato no es adecuado ({band_type_name})")
+                    detalles.append(
+                        f"El tipo de dato no es adecuado ({band_type_name})."
+                    )
+
+                lista_detalles = "".join(
+                    f"<li>{detalle}</li>"
+                    for detalle in detalles
+                )
 
                 estado = (
-                        "<span style='color:red;'><b>Estado:</b> No compatible con SecGeol.<br>"
-                        "Es posible que la capa seleccionada no contenga elevación del terreno.<br>"
-                        "SecGeol requiere un modelo digital de elevación (DEM) con valores numéricos de altura.</span>"
-                    )
+                    "<div style='color:red;'>"
+                    "<p><b>Estado: No compatible con SecGeol.</b></p>"
+                    "<p>Revise las siguientes características:</p>"
+                    f"<ul>{lista_detalles}</ul>"
+                    "</div>"
+                )
                 
 
-            self.textBrowserHelp.setHtml(
-                f"<b>DEM seleccionado:</b> {dem_layer.name()}<br>"
-                f"<b>CRS:</b> {crs_info}<br>"
-                f"<b>Tamaño de pixel:</b> {pixel_x:.3f} x {pixel_y:.3f}<br>"
-                f"<b>Bandas:</b> {dem_layer.bandCount()}<br>"
-                f"<b>Tipo de dato:</b> {band_type_name}<br>"
-                f"{estado}"
+            self.mostrar_ayuda(
+                "Modelo digital de elevación",
+                f"""
+                <p>
+                    <b>DEM seleccionado:</b> {dem_layer.name()}<br>
+                    <b>CRS:</b> {crs_info}<br>
+                    <b>Tamaño de píxel:</b> {pixel_x:.3f} × {pixel_y:.3f}<br>
+                    <b>Bandas:</b> {dem_layer.bandCount()}<br>
+                    <b>Tipo de dato:</b> {band_type_name}
+                </p>
+
+                {estado}
+                """
             )
 
         except Exception as e:
-            self.textBrowserHelp.setHtml(
-                f"<b>DEM:</b> Error al leer propiedades: {e}"
+            self.mostrar_ayuda(
+                "Error al leer el DEM",
+                f"""
+                <p>
+                    No fue posible leer correctamente las propiedades
+                    de la capa seleccionada.
+                </p>
+
+                <p>
+                    <b>Detalle:</b> {e}
+                </p>
+                """
             )
 
     # Información DEM
@@ -939,26 +1097,47 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
             if not partes:
                 self.mostrar_ayuda(
-                    "Sección",
-                    "No fue posible interpretar la geometría de la sección."
+                    "Sección no válida",
+                    """
+                    <p>
+                        No fue posible interpretar la geometría de la sección seleccionada.
+                    </p>
+
+                    <p>
+                        Seleccione una <b>geometría lineal válida</b> para continuar.
+                    </p>
+                    """
                 )
                 return
 
             if len(partes) > 1:
                 self.mostrar_ayuda(
-                    "Sección",
-                    "La sección contiene múltiples líneas dentro de un mismo registro. "
-                    "SecGeol solo acepta una sola línea por sección."
+                    "Sección no válida",
+                    """
+                    <p>
+                        El registro seleccionado contiene <b>más de una línea independiente</b>.
+                    </p>
+
+                    <p>
+                        SecGeol requiere <b>una sola línea por registro</b>.
+                        La línea puede contener múltiples vértices y cambios de dirección.
+                    </p>
+                    """
                 )
                 return
 
         
 
         longitud = geom.length()
-        self.textBrowserHelp.setHtml(
-            f"<b>Sección activa:</b> {sec_layer.name()}<br>"
-            f"<b>Longitud:</b> {longitud:.2f}<br>"
-            f"<b>Invertida:</b> {'Sí' if invertida else 'No'}"
+        self.mostrar_ayuda(
+            "Sección activa",
+            f"""
+            <p>
+                <b>Capa:</b> {sec_layer.name()}<br>
+                <b>Longitud:</b> {longitud:.2f} m<br>
+                <b>Orientación invertida:</b> {'Sí' if invertida else 'No'}
+            </p>
+            """
         )
 
     # Existe comentarios de ayuda de la capa Geologia
@@ -973,8 +1152,18 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             self.MapLayerGeo.setLayer(None)
             self.FieldClasGeo.setLayer(None)
             self.mostrar_ayuda(
-                "Geología desactivada",
-                "Active esta opción si desea intersectar una capa geológica con la sección."
+                "Sin geología",
+                """
+                <p>
+                    La incorporación de información geológica es <b>opcional</b>.
+                </p>
+
+                <p>
+                    Active esta opción para seleccionar una capa poligonal
+                    y representar las unidades geológicas que intersectan
+                    la línea de sección.
+                </p>
+                """
             )
         else:
             self.actualizar_info_geologia()
@@ -988,7 +1177,21 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             self.FieldClasGeo.setLayer(None)
             self.mostrar_ayuda(
                 "Capa de geología",
-                "Seleccione una capa geológica para cargar sus campos."
+                """
+                <p>
+                    La opción de geología está <b>activada</b>.
+                </p>
+
+                <p>
+                    Seleccione una capa vectorial de <b>polígonos</b>
+                    que contenga las unidades geológicas.
+                </p>
+
+                <p>
+                    Al seleccionar la capa, SecGeol habilitará sus campos
+                    de atributos para elegir el campo de clasificación geológica.
+                </p>
+                """
             )
             return
 
@@ -1008,22 +1211,37 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         crs_info = f"{crs_authid} - {crs_name}" if crs_authid else crs_name
 
         if total_campos == 0:
-            mensaje_campo = (
-                "La capa geológica no contiene campos de atributos.<br>"
-                "SecGeol continuará usando únicamente <b>id_lito</b>."
-            )
+            mensaje_campo = """
+                <p>
+                    La capa geológica no contiene campos de atributos.
+                    SecGeol continuará utilizando únicamente <b>id_lito</b>
+                    como identificador de las unidades.
+                </p>
+            """
         else:
-            mensaje_campo = (
-                "Seleccione el campo que se utilizará para clasificar los segmentos de la sección.<br>"
-                "SecGeol generará además el campo <b>id_lito</b> como identificador interno."
-            )
+            mensaje_campo = """
+                <p>
+                    Seleccione el campo de atributos que identifica las
+                    <b>unidades geológicas</b>.
+                </p>
+
+                <p>
+                    SecGeol generará además el campo <b>id_lito</b>
+                    como identificador interno.
+                </p>
+            """
 
         self.mostrar_ayuda(
             "Capa de geología",
-            f"Capa seleccionada: {geo_layer.name()}<br>"
-            f"CRS: {crs_info}<br>"
-            f"Campos disponibles: {total_campos}<br>"
-            f"{mensaje_campo}"
+            f"""
+            <p>
+                <b>Capa seleccionada:</b> {geo_layer.name()}<br>
+                <b>CRS:</b> {crs_info}<br>
+                <b>Campos disponibles:</b> {total_campos}
+            </p>
+
+            {mensaje_campo}
+            """
         )
 
 
@@ -1041,8 +1259,18 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             self.FieldDipEst.setLayer(None)
             self.FieldAzimuthEst.setLayer(None)
             self.mostrar_ayuda(
-                "Estructuras desactivadas",
-                "Active esta opción si desea proyectar estructuras sobre el perfil."
+                "Sin estructuras",
+                """
+                <p>
+                    La incorporación de información estructural es <b>opcional</b>.
+                </p>
+
+                <p>
+                    Active esta opción para seleccionar una capa lineal
+                    y representar las estructuras geológicas que intersectan
+                    la línea de sección.
+                </p>
+                """
             )
         else:
             self.actualizar_info_estructuras()
@@ -1056,7 +1284,22 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             self.FieldAzimuthEst.setLayer(None)
             self.mostrar_ayuda(
                 "Capa de estructuras",
-                "Seleccione una capa lineal de estructuras para cargar sus campos numéricos."
+                """
+                <p>
+                    La opción de estructuras está <b>activada</b>.
+                </p>
+
+                <p>
+                    Seleccione una capa vectorial de <b>líneas</b>
+                    que contenga las estructuras geológicas.
+                </p>
+
+                <p>
+                    Al seleccionar la capa, SecGeol habilitará los campos
+                    numéricos disponibles para definir el <b>echado</b>
+                    y el <b>azimut de buzamiento</b>.
+                </p>
+                """
             )
             return
 
@@ -1072,11 +1315,23 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         self.mostrar_ayuda(
             "Capa de estructuras",
-            f"Capa seleccionada: {est_layer.name()}<br>"
-            f"CRS: {crs_info}<br>"
-            f"Campos disponibles: {total_campos}<br><br>"
-            "Seleccione los campos numéricos de <b>echado</b> y <b>azimuth</b> "
-            "que se utilizarán para proyectar las estructuras sobre el perfil."
+            f"""
+            <p>
+                <b>Capa seleccionada:</b> {est_layer.name()}<br>
+                <b>CRS:</b> {crs_info}<br>
+            </p>
+
+            <p>
+                SecGeol muestra únicamente los <b>campos numéricos</b>
+                disponibles para seleccionar el <b>echado</b> y el
+                <b>azimut de buzamiento</b>.
+            </p>
+
+            <p>
+                Estos valores se utilizarán para representar las estructuras
+                que intersectan la línea de sección sobre el perfil.
+            </p>
+            """
         )
 
     #---------------------Tab 2---------------------------------------    
