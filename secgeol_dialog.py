@@ -153,6 +153,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
 
         # Estado inicial de controles opcionales
+        self.FieldElevCurvas.setEnabled(False)   
         self.MapLayerGeo.setEnabled(False)
         self.MapLayerEst.setEnabled(False)
 
@@ -171,6 +172,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.drawn_section_feature = None
         self.draw_tool = None
 
+        # para cambiar entre dem y contour
+        self.MapLayerCurvas.layerChanged.connect(self.al_cambiar_curvas)
+        self.MapLayerDEM.layerChanged.connect(self.al_cambiar_dem)
         self.btnDrawSec.clicked.connect(self.activar_dibujo_seccion)
         self.MapLayerSec.layerChanged.connect(self.on_section_layer_changed)
         self.MapLayerGeo.layerChanged.connect(self.actualizar_info_geologia)
@@ -183,6 +187,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.MapLayerSecLin.setFilters(QgsMapLayerProxyModel.LineLayer)
         self.MapLayerPerGeo.setFilters(QgsMapLayerProxyModel.PolygonLayer)
         self.MapLayerSecGuia.setFilters(QgsMapLayerProxyModel.LineLayer)
+        self.MapLayerCurvas.setFilters(QgsMapLayerProxyModel.LineLayer)
+        self.FieldElevCurvas.setFilters(QgsFieldProxyModel.Numeric)
 
         #Conectar TAB 2
         self.buttonBox_2.accepted.connect(self.ejecutar_lineas_a_poligonos)
@@ -435,8 +441,16 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
     def activar_dibujo_seccion(self):
         dem_layer = self.MapLayerDEM.currentLayer()
-        if dem_layer is None:
-            raise Exception("No se ha seleccionado un DEM.")
+        curvas_layer = self.MapLayerCurvas.currentLayer()
+
+        if dem_layer is None and curvas_layer is None:
+            raise Exception(
+                self.tr(
+                    "Seleccione una fuente de elevación: "
+                    "un modelo digital de elevación (DEM) "
+                    "o una capa de curvas de nivel."
+                )
+            )
 
         self.MapLayerSec.setLayer(None)
 
@@ -494,11 +508,25 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 
                 project.removeMapLayer(lyr.id())
 
-        dem_layer = self.MapLayerDEM.currentLayer()
-        if dem_layer is None:
-            raise Exception("No se ha seleccionado un DEM.")
+        #Verifica que haya proyección en DEM o en curvas
 
-        crs_authid = dem_layer.crs().authid()
+        dem_layer = self.MapLayerDEM.currentLayer()
+        curvas_layer = self.MapLayerCurvas.currentLayer()
+
+        if dem_layer is not None:
+            crs_authid = dem_layer.crs().authid()
+
+        elif curvas_layer is not None:
+            crs_authid = curvas_layer.crs().authid()
+
+        else:
+            raise Exception(
+                self.tr(
+                    "Seleccione una fuente de elevación: "
+                    "un modelo digital de elevación (DEM) "
+                    "o una capa de curvas de nivel."
+                )
+            )
        
         layer = QgsVectorLayer(f"LineString?crs={crs_authid}", "seccion_dibujada", "memory")
         if not layer.isValid():
@@ -769,16 +797,43 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         return super().eventFilter(obj, event)
 
+    #Selección de DEM o curvas de nivel
+    def al_cambiar_curvas(self, layer):
+        if layer is not None:
+            self.MapLayerDEM.setLayer(None)
+            self.FieldElevCurvas.setLayer(layer)
+            self.FieldElevCurvas.setEnabled(True)
+        else:
+            self.FieldElevCurvas.setLayer(None)
+            self.FieldElevCurvas.setEnabled(False)
+
+
+    def al_cambiar_dem(self, layer):
+        if layer is not None:
+            self.MapLayerCurvas.setLayer(None)
+            self.FieldElevCurvas.setLayer(None)
+            self.FieldElevCurvas.setEnabled(False)
+
     # Conecta la función de la sección      
     
     def preparar_seccion_trabajo(self, feat_sec=None, has_drawn=False, invertida=False):
         dem_layer = self.MapLayerDEM.currentLayer()
-        if dem_layer is None:
-            raise Exception(self.tr(
-                "No se ha seleccionado un modelo digital de elevación (DEM). "
-                "Seleccione una capa raster válida para continuar.")
+        curvas_layer = self.MapLayerCurvas.currentLayer()
+
+        if dem_layer is not None:
+            target_crs = dem_layer.crs()
+
+        elif curvas_layer is not None:
+            target_crs = curvas_layer.crs()
+
+        else:
+            raise Exception(
+                self.tr(
+                    "Seleccione una fuente de elevación: "
+                    "un modelo digital de elevación (DEM) "
+                    "o una capa de curvas de nivel."
+                )
             )
-        target_crs = dem_layer.crs()
 
         # Caso 1: el usuario dibujó una sección
         if has_drawn:
@@ -816,10 +871,23 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     # Inicializa workspace
     def inicializar_workspace(self):
         dem_layer = self.MapLayerDEM.currentLayer()
-        if dem_layer is None:
-            raise Exception("No se ha seleccionado un DEM.")
+        curvas_layer = self.MapLayerCurvas.currentLayer()
 
-        crs_authid = dem_layer.crs().authid()
+        if dem_layer is not None:
+            crs_authid = dem_layer.crs().authid()
+
+        elif curvas_layer is not None:
+            crs_authid = curvas_layer.crs().authid()
+
+        else:
+            raise Exception(
+                self.tr(
+                    "Seleccione una fuente de elevación: "
+                    "un modelo digital de elevación (DEM) "
+                    "o una capa de curvas de nivel."
+                )
+            )
+
         self.gpkg_path = self.workspace_manager.create_base_geopackage(crs_authid)
         self.section_manager.set_gpkg_path(self.gpkg_path)
 
@@ -832,9 +900,16 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             estructuras = []
 
         dem_layer = self.MapLayerDEM.currentLayer()
+        curvas_layer = self.MapLayerCurvas.currentLayer()
 
-        if dem_layer is None:
-            raise Exception(self.tr("No se ha seleccionado un DEM."))
+        if dem_layer is None and curvas_layer is None:
+            raise Exception(
+                self.tr(
+                    "Seleccione una fuente de elevación: "
+                    "un modelo digital de elevación (DEM) "
+                    "o una capa de curvas de nivel."
+                )
+            )
 
         if section_layer is None:
             section_layer = self.preparar_seccion_trabajo(
@@ -850,6 +925,33 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         if section_geom is None:
             raise Exception(self.tr("No fue posible obtener la geometría efectiva de la sección."))
+
+        # PRUEBA TEMPORAL: perfil desde curvas de nivel
+
+        if curvas_layer is not None:
+            campo_elev = self.FieldElevCurvas.currentField()
+
+            profile_point_features, dist_inicio, dist_fin = (
+                self.profile_manager.build_profile_points_from_contours(
+                    section_geom=section_geom,
+                    contour_layer=curvas_layer,
+                    elevation_field=campo_elev
+                )
+            )
+
+            QgsMessageLog.logMessage(
+                (
+                    f"Curvas: puntos={len(profile_point_features)} | "
+                    f"dist_inicio={dist_inicio:.3f} | "
+                    f"dist_fin={dist_fin:.3f} | "
+                    f"x_inicial="
+                    f"{profile_point_features[0].geometry().asPoint().x():.3f}"
+                ),
+                "SecGeol-Debug",
+                Qgis.Info
+            )
+            return None
+
 
         break_distances = []
         if section_geom is not None:

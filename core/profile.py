@@ -153,6 +153,93 @@ class ProfileManager:
         
         # Recorta una línea usando distancias acumuladas sobre la geometría.
         # Conserva los vértices intermedios para seguir la forma real del perfil.
+
+    def build_profile_points_from_contours(
+        self,
+        section_geom,
+        contour_layer,
+        elevation_field
+    ):
+        if section_geom is None or section_geom.isEmpty():
+            raise Exception("La geometría de la sección está vacía.")
+
+        if contour_layer is None or not contour_layer.isValid():
+            raise Exception("La capa de curvas de nivel no es válida.")
+
+        if not elevation_field:
+            raise Exception("No se ha seleccionado el campo de elevación.")
+
+        resultados = []
+
+        for feat in contour_layer.getFeatures():
+            geom_curva = feat.geometry()
+
+            if geom_curva is None or geom_curva.isEmpty():
+                continue
+
+            inter = section_geom.intersection(geom_curva)
+
+            if inter.isEmpty():
+                continue
+
+            # La misma curva puede intersectar la sección más de una vez
+            if inter.isMultipart():
+                puntos = inter.asMultiPoint()
+            else:
+                punto = inter.asPoint()
+                puntos = [punto] if punto else []
+
+            for pt in puntos:
+                distancia = section_geom.lineLocatePoint(
+                    QgsGeometry.fromPointXY(QgsPointXY(pt))
+                )
+
+                if distancia < 0:
+                    continue
+
+                try:
+                    elevacion = float(feat[elevation_field])
+                except (TypeError, ValueError):
+                    continue
+
+                resultados.append({
+                    "distancia": distancia,
+                    "elevacion": elevacion,
+                    "x": pt.x(),
+                    "y": pt.y()
+                })
+
+        if len(resultados) < 2:
+            raise Exception(
+                "Se requieren al menos dos intersecciones entre "
+                "la sección y las curvas de nivel."
+            )
+
+        # Ordenar las intersecciones según el sentido de la sección
+        resultados.sort(key=lambda r: r["distancia"])
+
+        dist_inicio = resultados[0]["distancia"]
+        dist_fin = resultados[-1]["distancia"]
+
+        profile_point_features = []
+
+        for r in resultados:
+            # La primera intersección define X = 0 en el perfil 2D
+            x_local = r["distancia"] - dist_inicio
+
+            feat = QgsFeature()
+            feat.setGeometry(
+                QgsGeometry.fromPointXY(
+                    QgsPointXY(
+                        x_local,
+                        r["elevacion"]
+                    )
+                )
+            )
+
+            profile_point_features.append(feat)
+
+        return profile_point_features, dist_inicio, dist_fin
         
 
     def recortar_linea_por_distancia(self, linea_geom, dist_ini, dist_fin):
