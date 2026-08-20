@@ -453,7 +453,8 @@ class ProfileManager:
     def build_profile_box_layer(
         self,
         section_layer,
-        dem_layer,
+        dem_layer=None,
+        profile_point_features=None,
         extra_depth: float = 100.0,
         layer_name: str = "Perfil_topografico",
         break_distances=None,
@@ -470,8 +471,22 @@ class ProfileManager:
         if section_layer is None or not section_layer.isValid():
             raise Exception("La capa de sección no es válida.")
 
-        if dem_layer is None or not dem_layer.isValid():
-            raise Exception("La capa DEM no es válida.")
+
+        if profile_point_features is None:
+            if dem_layer is None or not dem_layer.isValid():
+                raise Exception("La capa DEM no es válida.")
+
+            pixel_size = self._get_dem_pixel_size(dem_layer)
+
+            dense_geom = self._densify_line_geometry(
+                line_geom,
+                pixel_size
+            )
+
+            profile_point_features = self._generate_profile_points_from_vertices(
+                line_geom=dense_geom,
+                dem_layer=dem_layer
+            )
 
         if extra_depth <= 0:
             extra_depth = 100.0
@@ -490,19 +505,21 @@ class ProfileManager:
 
         # DENSIFICAR SEGÚN EL DEM
 
-        pixel_size = self._get_dem_pixel_size(dem_layer)
+       # pixel_size = self._get_dem_pixel_size(dem_layer)
 
-        dense_geom = self._densify_line_geometry(line_geom, pixel_size)
+      # dense_geom = self._densify_line_geometry(line_geom, pixel_size)
         
 
 
         # GENERAR PUNTOS DEL PERFIL
 
-        profile_point_features = self._generate_profile_points_from_vertices(
-            line_geom=dense_geom,
-            dem_layer=dem_layer
-        )
+        #profile_point_features = self._generate_profile_points_from_vertices(
+        #    line_geom=dense_geom,
+        #    dem_layer=dem_layer
+        #)
 
+        # Solo si NO llegaron puntos desde curvas, usar DEM
+        
         if not profile_point_features:
             raise Exception("No fue posible generar puntos para el perfil.")
 

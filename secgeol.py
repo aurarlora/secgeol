@@ -9,7 +9,7 @@ from qgis.PyQt.QtWidgets import QAction
 from qgis.core import ( 
                         QgsWkbTypes,QgsVectorLayer,
                         QgsProject,QgsVectorFileWriter,
-                        Qgis, QgsGeometry
+                        Qgis, QgsGeometry,  QgsMessageLog,
                        )
 
 class SecGeol:
@@ -611,6 +611,19 @@ class SecGeol:
             )
 
         try:
+            QgsMessageLog.logMessage(
+                            (
+                                f"SECCION DEBUG | "
+                                f"total={sec_layer.featureCount() if sec_layer else 'None'} | "
+                                f"seleccionadas={sec_layer.selectedFeatureCount() if sec_layer else 'None'} | "
+                                f"feat_sec={'SI' if feat_sec is not None else 'NO'} | "
+                                f"fid={feat_sec.id() if feat_sec is not None else 'None'} | "
+                                f"section_work_layer={'SI' if section_work_layer is not None else 'NO'}"
+                            ),
+                            "SecGeol-Debug",
+                            Qgis.Info
+                        )
+            
             perfil_layer = self.dlg.generar_perfil(
                 feat_sec=feat_sec,
                 has_drawn=has_drawn,
@@ -620,6 +633,7 @@ class SecGeol:
                 section_layer=section_work_layer
                 
             )
+            
 
             if section_work_layer is None:
                 section_work_layer = self.dlg.preparar_seccion_trabajo(
@@ -634,7 +648,7 @@ class SecGeol:
                 layer_name="Seccion_guia"
             )
 
-            rutas_guardadas = self.guardar_capas_salida(
+            rutas_guardadas = self.guardar_capas_salida(                              ##Verificar
                 perfil_layer=perfil_layer,
                 guia_layer=guia_layer,
                 salida=salida

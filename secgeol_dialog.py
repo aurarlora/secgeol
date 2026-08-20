@@ -667,7 +667,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                     </p>
 
                     <p>
-                        El valor permitido está entre <b>100 y 10 000 m</b>.
+                        El valor permitido está entre <b>1 y 10 000 m</b>.
                         El valor predeterminado es <b>100 m</b>.
                     </p>
 
@@ -926,7 +926,10 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         if section_geom is None:
             raise Exception(self.tr("No fue posible obtener la geometría efectiva de la sección."))
 
-        # PRUEBA TEMPORAL: perfil desde curvas de nivel
+        # Variables para la fuente de elevación
+        profile_point_features = None
+        dist_inicio = None
+        dist_fin = None
 
         if curvas_layer is not None:
             campo_elev = self.FieldElevCurvas.currentField()
@@ -950,16 +953,29 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 "SecGeol-Debug",
                 Qgis.Info
             )
-            return None
+            #return None
 
 
         break_distances = []
         if section_geom is not None:
             break_distances = self.section_manager.detect_section_break_distances(section_geom)
-       
+
+        QgsMessageLog.logMessage(
+            (
+                f"ANTES DE BOX | "
+                f"curvas={'SI' if curvas_layer is not None else 'NO'} | "
+                f"dem={'SI' if dem_layer is not None else 'NO'} | "
+                f"profile_points="
+                f"{len(profile_point_features) if profile_point_features is not None else 'None'}"
+            ),
+            "SecGeol-Debug",
+            Qgis.Info
+        )
+
         perfil_layer = self.profile_manager.build_profile_box_layer(
             section_layer=section_layer,
             dem_layer=dem_layer,
+            profile_point_features=profile_point_features,
             extra_depth=caja_m,
             layer_name="Perfil_topografico",
             break_distances=break_distances,
@@ -1129,45 +1145,91 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         if has_drawn:
             geom = self.drawn_section_feature.geometry() if self.drawn_section_feature else None
             if geom is None or geom.isEmpty():
-                self.textBrowserHelp.setHtml(
-                    "<b>Sección:</b> La sección dibujada no es válida."
+                self.mostrar_ayuda(
+                    "Sección no válida",
+                    """
+                    <p>
+                        <span style="color:red; font-size:18px;">⚠</span>
+                        <b> La sección dibujada no contiene una geometría válida.</b>
+                    </p>
+
+                    <p>
+                        Dibuje nuevamente la línea de sección para continuar.
+                    </p>
+                    """
                 )
                 return
 
             longitud = geom.length()
-            self.textBrowserHelp.setHtml(
-                f"<b>Sección activa:</b> dibujada por el usuario<br>"
-                f"<b>Longitud:</b> {longitud:.2f}<br>"
-                f"<b>Invertida:</b> {'Sí' if invertida else 'No'}"
-            )
+            self.mostrar_ayuda(
+                    "Sección activa",
+                    f"""
+                    <p>
+                        <b>Origen:</b> dibujada por el usuario<br>
+                        <b>Longitud:</b> {longitud:.2f} m<br>
+                        <b>Orientación invertida:</b> {'Sí' if invertida else 'No'}
+                    </p>
+                    """
+                )
             return
 
         if sec_layer is None:
-            self.textBrowserHelp.setHtml(
-                "<b>Sección:</b> Seleccione una capa de sección o dibuje una."
+            self.mostrar_ayuda(
+                "Sección",
+                """
+                <p>
+                    Seleccione una <b>capa de sección</b> o dibuje una línea
+                    directamente sobre el mapa.
+                </p>
+                """
             )
             return
 
         if QgsWkbTypes.geometryType(sec_layer.wkbType()) != QgsWkbTypes.LineGeometry:
-            self.textBrowserHelp.setHtml(
-                "<b>Sección:</b> La capa debe ser de tipo línea."
-            )
+            self.mostrar_ayuda(
+                    "Sección no válida",
+                    """
+                    <p>
+                        <span style="color:red; font-size:18px;">⚠</span>
+                        <b> La capa seleccionada no es de tipo línea.</b>
+                    </p>
+
+                    <p>
+                        Seleccione una capa vectorial lineal para continuar.
+                    </p>
+                    """
+                )
             return
 
         total = sec_layer.featureCount()
         seleccionadas = sec_layer.selectedFeatureCount()
 
         if total == 0:
-            self.textBrowserHelp.setHtml(
-                "<b>Sección:</b> La capa no contiene registros."
-            )
+            self.mostrar_ayuda(
+                    "Sección no válida",
+                    """
+                    <p>
+                        <span style="color:red; font-size:18px;">⚠</span>
+                        <b> La capa seleccionada no contiene registros.</b>
+                    </p>
+                    """
+                )
             return
 
         if seleccionadas > 1:
-            self.textBrowserHelp.setHtml(
-                "<b>Sección:</b> Hay más de una línea seleccionada. "
-                "Debe dejar una sola."
-            )
+            self.mostrar_ayuda(
+                    "Sección requerida",
+                    """
+                    <p>
+                        <span style="color:red; font-size:18px;">⚠</span>
+                        <b> Hay más de una sección seleccionada.</b>
+                    </p>
+
+                    <p>
+                        Deje seleccionada <b>una sola línea</b> para continuar.
+                    </p>
+                    """
+                )
             return
 
         if seleccionadas == 1:
@@ -1175,22 +1237,43 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         elif total == 1:
             feat = next(sec_layer.getFeatures(), None)
         else:
-            self.textBrowserHelp.setHtml(
-                "<b>Sección:</b> La capa contiene varias líneas. "
-                "Seleccione una sola para continuar."
+            self.mostrar_ayuda(
+                "Sección requerida",
+                """
+                <p style="color:#b00020;">
+                    <span style="color:red; font-size:18px;">⚠</span>
+                    <b> La capa contiene más de una sección.</b>
+                </p>
+
+                <p>
+                    Seleccione <b>una sola línea</b> para continuar.
+                </p>
+                """
             )
             return
 
         if feat is None:
-            self.textBrowserHelp.setHtml(
-                "<b>Sección:</b> No fue posible recuperar la línea."
-            )
-            return
+           self.mostrar_ayuda(
+                "Sección no válida",
+                """
+                <p>
+                    <span style="color:red; font-size:18px;">⚠</span>
+                    <b> No fue posible recuperar la sección seleccionada.</b>
+                </p>
+                """
+           )
+           return
 
         geom = feat.geometry()
         if geom is None or geom.isEmpty():
-            self.textBrowserHelp.setHtml(
-                "<b>Sección:</b> La geometría está vacía."
+            self.mostrar_ayuda(
+                "Sección no válida",
+                """
+                <p>
+                    <span style="color:red; font-size:18px;">⚠</span>
+                    <b> La geometría de la sección está vacía.</b>
+                </p>
+                """
             )
             return
         
