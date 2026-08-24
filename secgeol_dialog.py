@@ -5,7 +5,7 @@ from qgis.PyQt.QtCore import Qt, QVariant
 from qgis.PyQt.QtWidgets import QDialog, QSplitter
 from qgis.core import (QgsMapLayerProxyModel, QgsProject, Qgis,QgsPoint, QgsPolygon,QgsVectorFileWriter,
                        QgsFeature, QgsGeometry, QgsVectorLayer, QgsField, QgsLineString,
-                       QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog)
+                       QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog,  QgsPointXY,)
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.utils import iface
 from qgis.PyQt.QtGui import QColor
@@ -171,6 +171,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         self.drawn_section_feature = None
         self.draw_tool = None
+        self.section_geom_recortada = None
+
 
         # para cambiar entre dem y contour
         self.MapLayerCurvas.layerChanged.connect(self.al_cambiar_curvas)
@@ -931,6 +933,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         dist_inicio = None
         dist_fin = None
 
+        self.section_geom_recortada = None
+
         if curvas_layer is not None:
             campo_elev = self.FieldElevCurvas.currentField()
 
@@ -942,35 +946,19 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 )
             )
 
-            QgsMessageLog.logMessage(
-                (
-                    f"Curvas: puntos={len(profile_point_features)} | "
-                    f"dist_inicio={dist_inicio:.3f} | "
-                    f"dist_fin={dist_fin:.3f} | "
-                    f"x_inicial="
-                    f"{profile_point_features[0].geometry().asPoint().x():.3f}"
-                ),
-                "SecGeol-Debug",
-                Qgis.Info
+            # Recortar la sección al intervalo cubierto por las curvas de nivel
+            seccion_recortada = self.section_manager.recortar_seccion_por_distancia(
+                section_geom,
+                dist_inicio,
+                dist_fin
             )
-            #return None
 
+            self.section_geom_recortada = seccion_recortada
+            
 
         break_distances = []
         if section_geom is not None:
             break_distances = self.section_manager.detect_section_break_distances(section_geom)
-
-        QgsMessageLog.logMessage(
-            (
-                f"ANTES DE BOX | "
-                f"curvas={'SI' if curvas_layer is not None else 'NO'} | "
-                f"dem={'SI' if dem_layer is not None else 'NO'} | "
-                f"profile_points="
-                f"{len(profile_point_features) if profile_point_features is not None else 'None'}"
-            ),
-            "SecGeol-Debug",
-            Qgis.Info
-        )
 
         perfil_layer = self.profile_manager.build_profile_box_layer(
             section_layer=section_layer,
@@ -1709,7 +1697,13 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         }
 
     # Tab 1
-    def crear_seccion_guia(self, section_layer, invertida=False, layer_name="Seccion_guia"):
+    def crear_seccion_guia(
+        self,
+        section_layer,
+        invertida=False,
+        layer_name="Seccion_guia",
+        geom_override=None
+    ):
         
 
         if section_layer is None or not section_layer.isValid():
@@ -1738,7 +1732,16 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         out_features = []
 
         for f in section_layer.getFeatures():
-            geom = QgsGeometry(f.geometry())
+            long_override = (
+                f"{geom_override.length():.3f}"
+                if geom_override is not None
+                else "None"
+            )
+
+            if geom_override is not None:
+                geom = QgsGeometry(geom_override)
+            else:
+                geom = QgsGeometry(f.geometry())
 
             feat = QgsFeature(guia_layer.fields())
             feat.setGeometry(geom)
@@ -1830,13 +1833,23 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                         x_perfil = pt.x()
                         z_perfil = pt.y()
 
-                        punto_real = sec_geom.interpolate(x_perfil)
+                        long_guia = sec_geom.length()
+                        tolerancia = 1e-6
 
-                        if punto_real is None or punto_real.isEmpty():
-                            continue
+                        # Tratar explícitamente el extremo final de la sección guía
+                        if abs(x_perfil - long_guia) <= tolerancia:
+                            vertices_guia = list(sec_geom.vertices())
+                            ultimo = vertices_guia[-1]
+                            xy = QgsPointXY(ultimo.x(), ultimo.y())
 
-                        xy = punto_real.asPoint()
+                        else:
+                            punto_real = sec_geom.interpolate(x_perfil)
 
+                            if punto_real is None or punto_real.isEmpty():
+                                continue
+                            xy = punto_real.asPoint()
+
+                        
                         nuevos_vertices.append(
                             QgsPoint(
                                 xy.x(),

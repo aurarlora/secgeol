@@ -595,6 +595,13 @@ class SecGeol:
                     has_drawn=has_drawn,
                     invertida=inv_sec
                 )
+            
+            #guia_layer = self.dlg.crear_seccion_guia(
+            #    section_layer=section_work_layer,
+            #    invertida=inv_sec,
+            #    layer_name="Seccion_guia",
+            #    geom_override=self.dlg.section_geom_recortada
+            #)
 
             section_geom = None
 
@@ -611,18 +618,6 @@ class SecGeol:
             )
 
         try:
-            QgsMessageLog.logMessage(
-                            (
-                                f"SECCION DEBUG | "
-                                f"total={sec_layer.featureCount() if sec_layer else 'None'} | "
-                                f"seleccionadas={sec_layer.selectedFeatureCount() if sec_layer else 'None'} | "
-                                f"feat_sec={'SI' if feat_sec is not None else 'NO'} | "
-                                f"fid={feat_sec.id() if feat_sec is not None else 'None'} | "
-                                f"section_work_layer={'SI' if section_work_layer is not None else 'NO'}"
-                            ),
-                            "SecGeol-Debug",
-                            Qgis.Info
-                        )
             
             perfil_layer = self.dlg.generar_perfil(
                 feat_sec=feat_sec,
@@ -645,7 +640,8 @@ class SecGeol:
             guia_layer = self.dlg.crear_seccion_guia(
                 section_layer=section_work_layer,
                 invertida=inv_sec,
-                layer_name="Seccion_guia"
+                layer_name="Seccion_guia",
+                geom_override=self.dlg.section_geom_recortada
             )
 
             rutas_guardadas = self.guardar_capas_salida(                              ##Verificar

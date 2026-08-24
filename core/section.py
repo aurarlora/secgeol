@@ -63,6 +63,98 @@ class SectionManager:
 
         return break_distances
 
+    
+    def recortar_seccion_por_distancia(self, geom, dist_inicio, dist_fin):
+        if geom is None or geom.isEmpty():
+            raise Exception("La geometría de la sección está vacía.")
+
+        if dist_inicio > dist_fin:
+            dist_inicio, dist_fin = dist_fin, dist_inicio
+
+        longitud_total = geom.length()
+
+        if dist_inicio < 0 or dist_fin > longitud_total:
+            raise Exception(
+                "Las distancias de recorte están fuera de la longitud de la sección."
+            )
+
+        vertices = list(geom.vertices())
+
+        if len(vertices) < 2:
+            raise Exception(
+                "La sección debe contener al menos dos vértices."
+            )
+
+        puntos_salida = []
+        acumulada = 0.0
+
+        for i in range(len(vertices) - 1):
+            p1 = QgsPointXY(vertices[i])
+            p2 = QgsPointXY(vertices[i + 1])
+
+            longitud_segmento = p1.distance(p2)
+
+            if longitud_segmento == 0:
+                continue
+
+            inicio_segmento = acumulada
+            fin_segmento = acumulada + longitud_segmento
+
+            # El segmento queda completamente antes del intervalo útil
+            if fin_segmento < dist_inicio:
+                acumulada = fin_segmento
+                continue
+
+            # Ya rebasamos el final del intervalo
+            if inicio_segmento > dist_fin:
+                break
+
+            # Punto exacto de inicio del recorte
+            if inicio_segmento <= dist_inicio <= fin_segmento:
+                ratio = (
+                    (dist_inicio - inicio_segmento)
+                    / longitud_segmento
+                )
+
+                x = p1.x() + ratio * (p2.x() - p1.x())
+                y = p1.y() + ratio * (p2.y() - p1.y())
+
+                punto_inicio = QgsPointXY(x, y)
+
+                if not puntos_salida or puntos_salida[-1] != punto_inicio:
+                    puntos_salida.append(punto_inicio)
+
+            # Añadir el vértice final del segmento si cae dentro del intervalo
+            if dist_inicio <= fin_segmento <= dist_fin:
+                if not puntos_salida or puntos_salida[-1] != p2:
+                    puntos_salida.append(p2)
+
+            # Punto exacto de fin del recorte
+            if inicio_segmento <= dist_fin <= fin_segmento:
+                ratio = (
+                    (dist_fin - inicio_segmento)
+                    / longitud_segmento
+                )
+
+                x = p1.x() + ratio * (p2.x() - p1.x())
+                y = p1.y() + ratio * (p2.y() - p1.y())
+
+                punto_fin = QgsPointXY(x, y)
+
+                if not puntos_salida or puntos_salida[-1] != punto_fin:
+                    puntos_salida.append(punto_fin)
+
+                break
+
+            acumulada = fin_segmento
+
+        if len(puntos_salida) < 2:
+            raise Exception(
+                "No fue posible recortar la sección entre las distancias indicadas."
+            )
+
+        return QgsGeometry.fromPolylineXY(puntos_salida)
+
     #  Invierte el sentido de una geometría de línea simple.  Verificar que las partes tambien se cambien
 
     def _reverse_linestring_geometry(self, geom: QgsGeometry) -> QgsGeometry:
