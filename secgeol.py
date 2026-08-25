@@ -88,7 +88,9 @@ class SecGeol:
     def draw_section(self):
         self.iface.messageBar().pushInfo(
             self.tr("SecGeol"),
-            self.tr("Dibuja la sección sobre el mapa: haz clic para iniciar y clic derecho para finalizar.")
+            self.tr(
+                "Draw the section on the map: click to start and right-click to finish."
+            )
         )
 
 
@@ -106,24 +108,32 @@ class SecGeol:
             return None  # La sección dibujada se resolverá aparte
 
         if sec_layer is None:
-            self._set_help("Seleccione una capa de sección o dibuje una.")
+            self._set_help(
+                self.tr("Select a section layer or draw one.")
+            )
             return None
 
         if QgsWkbTypes.geometryType(sec_layer.wkbType()) != QgsWkbTypes.LineGeometry:
-            self._set_help("La capa de sección debe ser de tipo línea.")
+            self._set_help(
+                self.tr("The section layer must be a line layer.")
+            )
             return None
 
         total = sec_layer.featureCount()
         seleccionadas = sec_layer.selectedFeatureCount()
 
         if total == 0:
-            self._set_help("La capa de sección no contiene registros.")
+            self._set_help(
+                self.tr("The section layer contains no features.")
+            )
             return None
 
         if seleccionadas > 1:
             self._set_help(
-                "Hay más de una sección seleccionada. "
-                "Deje seleccionada solo una línea."
+                self.tr(
+                    "More than one section is selected. "
+                    "Leave only one line selected."
+                )
             )
             return None
 
@@ -132,20 +142,26 @@ class SecGeol:
         if seleccionadas == 1:
             feat = next(sec_layer.getSelectedFeatures(), None)
             if feat is None:
-                self._set_help("No fue posible recuperar la sección seleccionada.")
+                self._set_help(
+                    self.tr("Could not retrieve the selected section.")
+                )
                 return None
 
         elif total == 1:
             feat = next(sec_layer.getFeatures(), None)
             if feat is None:
-                self._set_help("No fue posible recuperar la sección.")
+                self._set_help(
+                    self.tr("Could not retrieve the section.")
+                )
                 return None
 
         else:
             self._set_help(
-                "La capa contiene más de una sección. "
-                "Seleccione una sola línea para continuar."
-            )
+                    self.tr(
+                        "The layer contains more than one section. "
+                        "Select a single line to continue."
+                    )
+                )
             return None
 
         
@@ -153,20 +169,26 @@ class SecGeol:
         
         geom = feat.geometry()
         if geom is None or geom.isEmpty():
-            self._set_help("La geometría de la sección está vacía.")
+            self._set_help(
+                self.tr("The section geometry is empty.")
+            )
             return None
 
         if geom.isMultipart():
             partes = geom.asMultiPolyline()
 
             if not partes:
-                self._set_help("No fue posible interpretar la geometría de la sección.")
+                self._set_help(
+                    self.tr("Could not interpret the section geometry.")
+                )
                 return None
 
             if len(partes) > 1:
                 self._set_help(
-                    "La sección contiene líneas separadas dentro de un mismo registro. "
-                    "SecGeol solo acepta una sola línea por sección."
+                    self.tr(
+                        "The section contains separate lines within the same feature. "
+                        "SecGeol accepts only one line per section."
+                    )
                 )
                 return None
 
@@ -180,12 +202,16 @@ class SecGeol:
         if has_drawn:
             feat = self.dlg.drawn_section_feature
             if feat is None:
-                self._set_help("No fue posible recuperar la sección dibujada.")
+                self._set_help(
+                    self.tr("Could not retrieve the drawn section.")
+                )
                 return None
 
             geom = feat.geometry()
             if geom is None or geom.isEmpty():
-                self._set_help("La sección dibujada no contiene una geometría válida.")
+                self._set_help(
+                    self.tr("The drawn section does not contain a valid geometry.")
+                )
                 return None
 
             return geom
@@ -197,7 +223,9 @@ class SecGeol:
 
         geom = feat.geometry()
         if geom is None or geom.isEmpty():
-            self._set_help("No fue posible recuperar la geometría de la sección.")
+            self._set_help(
+                self.tr("Could not retrieve the section geometry.")
+            )
             return None
 
         return geom
@@ -454,8 +482,8 @@ class SecGeol:
             self.iface.messageBar().pushWarning(
                 self.tr("SecGeol"),
                 self.tr(
-                    "Seleccione una fuente de elevación: "
-                    "un DEM o una capa de curvas de nivel."
+                    "Select an elevation source: "
+                    "a DEM or a contour line layer."
                 )
             )
             return
@@ -467,7 +495,7 @@ class SecGeol:
             if dem_layer.type() != dem_layer.RasterLayer:
                 self.iface.messageBar().pushWarning(
                     self.tr("SecGeol"),
-                    self.tr("La capa DEM seleccionada no es raster.")
+                    self.tr("The selected DEM layer is not a raster layer.")
                 )
                 return
 
@@ -476,34 +504,44 @@ class SecGeol:
             if not dem_crs.isValid():
                 self.iface.messageBar().pushWarning(
                     self.tr("SecGeol"),
-                    self.tr("El CRS del DEM no es válido.")
+                    self.tr("The DEM CRS is not valid.")
                 )
+
                 self._set_help(
-                    "El sistema de referencia del DEM no es válido."
+                    self.tr("The DEM coordinate reference system is not valid.")
                 )
+
                 return
 
             if dem_crs.mapUnits() != Qgis.DistanceUnit.Meters:
                 self.iface.messageBar().pushWarning(
                     self.tr("SecGeol"),
-                    self.tr("El DEM debe utilizar unidades métricas.")
+                    self.tr("The DEM must use metric units.")
                 )
+
                 self._set_help(
-                    "El modelo digital de elevación debe estar en un sistema "
-                    "de referencia proyectado con unidades en metros."
+                    self.tr(
+                        "The digital elevation model must use a projected "
+                        "coordinate reference system with units in meters."
+                    )
                 )
+
                 return
 
             if dem_layer.bandCount() != 1:
                 self.iface.messageBar().pushWarning(
                     self.tr("SecGeol"),
-                    self.tr("El DEM debe contener una sola banda.")
+                    self.tr("The DEM must contain a single band.")
                 )
+
                 self._set_help(
-                    "El raster seleccionado no parece corresponder a un modelo "
-                    "digital de elevación. Es posible que la capa sea una imagen "
-                    "y no contenga elevación del terreno."
+                    self.tr(
+                        "The selected raster does not appear to be a digital "
+                        "elevation model. The layer may be an image and may "
+                        "not contain terrain elevation data."
+                    )
                 )
+
                 return
 
             provider = dem_layer.dataProvider()
@@ -534,10 +572,15 @@ class SecGeol:
                     self.tr("SecGeol"),
                     self.tr("The DEM raster type is not valid.")
                 )
+
                 self._set_help(
-                    f"El raster seleccionado no parece corresponder a un modelo digital de elevación. "
-                    f"Tipo de dato detectado: {band_type_name}."
+                    self.tr(
+                        "The selected raster does not appear to be a digital elevation model. "
+                        "Detected data type: "
+                    )
+                    + f"{band_type_name}."
                 )
+
                 return
 
                 # Términa validación layer  ***revisar desde aquí
@@ -619,12 +662,6 @@ class SecGeol:
                     invertida=inv_sec
                 )
             
-            #guia_layer = self.dlg.crear_seccion_guia(
-            #    section_layer=section_work_layer,
-            #    invertida=inv_sec,
-            #    layer_name="Seccion_guia",
-            #    geom_override=self.dlg.section_geom_recortada
-            #)
 
             section_geom = None
 

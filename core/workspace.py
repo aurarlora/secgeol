@@ -1,7 +1,7 @@
 import os
 import tempfile
 from datetime import datetime
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant, QCoreApplication
 
 from qgis.core import (
     QgsVectorFileWriter,
@@ -51,7 +51,13 @@ class WorkspaceManager:
         
 
         if result != QgsVectorFileWriter.NoError:
-            raise Exception(f"Error al crear capa '{layer_name}': {error_message}")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "Error creating layer: "
+                )
+                + f"'{layer_name}': {error_message}"
+            )
 
 
     def create_base_geopackage(self, crs_authid):

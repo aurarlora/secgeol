@@ -1,7 +1,7 @@
 ﻿import os, re, unicodedata
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import Qt, QVariant
+from qgis.PyQt.QtCore import Qt, QVariant, QCoreApplication
 from qgis.PyQt.QtWidgets import QDialog, QSplitter
 from qgis.core import (QgsMapLayerProxyModel, QgsProject, Qgis,QgsPoint, QgsPolygon,QgsVectorFileWriter,
                        QgsFeature, QgsGeometry, QgsVectorLayer, QgsField, QgsLineString,
@@ -127,7 +127,11 @@ class DrawSectionMapTool(QgsMapTool):
 
         except Exception as e:
             QgsMessageLog.logMessage(
-                f"Error al finalizar dibujo: {e}",
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "Error finishing drawing: "
+                )
+                + f"{e}",
                 "SecGeol",
                 Qgis.Critical
             )
@@ -242,60 +246,93 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 handle.setEnabled(False)
 
         # ESTADO INICIAL DE LA AYUDA
-        self.help_tab_uno = """
+        self.help_tab_uno = self.tr(
+            """
             <div style="padding:10px; line-height:1.4;">
-                <h3>Herramienta de Secciones Geológicas</h3>
+                <h3>Geological Section Tool</h3>
 
                 <p>
-                    Esta herramienta genera un perfil topográfico a partir de un Modelo Digital de Elevación (DEM)
-                    a lo largo de una línea de sección definida por el usuario. El perfil resultante puede utilizarse
-                    como base para la interpretación geológica y la construcción de secciones.
+                    This module generates a topographic profile along a user-defined
+                    section line using one of two elevation sources:
+                    a <b>Digital Elevation Model (DEM)</b> or a
+                    <b>contour line layer</b>.
                 </p>
 
                 <p>
-                    <b>Requisitos:</b><br>
-                    - Cargar todas las capas de entrada en el proyecto actual de QGIS.<br>
-                    - Utilizar un sistema de referencia proyectado (recomendado: UTM).<br>
-                    - Asegurar que las capas compartan el mismo sistema de referencia.
+                    The resulting profile can be used as the basis for geological
+                    interpretation and the construction of geological sections.
                 </p>
 
                 <p>
-                    <b>Tip:</b> Los campos marcados con un asterisco (*) son obligatorios.<br>
-                    Haz clic en cada control para ver una breve descripción.
+                    <b>Requirements:</b><br>
+                    - Load all input layers into the current QGIS project.<br>
+                    - Use a projected coordinate reference system with metric units
+                    (UTM is recommended).<br>
+                    - Ensure that the input layers use compatible coordinate reference systems.
+                </p>
+
+                <p>
+                    When contour lines are used as the elevation source, the profile
+                    is limited to the segment between the first and last intersections.
+                    The first intersection is assigned <b>X = 0</b>.
+                </p>
+
+                <p>
+                    <b>Tip:</b> Fields marked with an asterisk (*) are required.<br>
+                    Hover over each control to display additional information.
                 </p>
             </div>
             """
-        self.help_tab_dos = """
+        )
+        self.help_tab_dos = self.tr(
+            """
             <div style="padding:10px; line-height:1.4; font-size:12px;">
-                <h3>Opciones de Interpretación</h3>
+                <h3>Lines to Polygons</h3>
+
                 <p>
-                    En esta pestaña se integrarán opciones adicionales relacionadas con la interpretación geológica
-                    y la generación de resultados derivados a partir del perfil.
+                    This module converts the interpreted profile lines generated from
+                    the topographic profile into closed polygon geometries.
                 </p>
+
                 <p>
-                    Haz clic en cada control para ver una breve descripción.
+                    The resulting polygons represent the geological interpretation
+                    of the section in local profile coordinates and can be used as
+                    input for the 3D reconstruction module.
+                </p>
+
+                <p>
+                    Before running this step, adjust the profile lines according to
+                    the geological interpretation and verify that the geometries
+                    required to form the polygons are properly connected.
                 </p>
             </div>
             """
+        )
 
-        self.help_tab_tres = """
+        self.help_tab_tres = self.tr(
+            """
             <div style="padding:10px; line-height:1.4; font-size:12px;">
-            <h3>Reconstrucción Geológica 3D</h3>
-            <p>
-                Seleccione el perfil geológico interpretado generado en el módulo 2 y la sección guía creada en el módulo 1.
+                <h3>3D Geological Reconstruction</h3>
 
+                <p>
+                    Select the interpreted geological profile generated in
+                    <b>2. Lines to polygons</b> and the <b>guide section</b>
+                    generated in <b>1. Section to profile</b>.
+                </p>
 
-            </p>
-            <p>
-                La sección guía conserva la referencia espacial utilizada para generar el perfil topográfico y permite reconstruir la geometría en coordenadas reales para su visualización en entornos 3D.
-            </p>
-            <p>
-            Salida:
-                Perfil_geologico3D
+                <p>
+                    The guide section preserves the spatial reference used to generate
+                    the topographic profile and allows the 2D geological interpretation
+                    to be reconstructed in real-world coordinates.
+                </p>
 
-            </p>
+                <p>
+                    The resulting output is a <b>3D geological profile</b> that can be
+                    visualized and analyzed in three-dimensional environments.
+                </p>
             </div>
             """
+        )
 
         # CONEXIÓN DE TABS
         self.tabWidget.currentChanged.connect(self.actualizar_ayuda_tab)
@@ -385,80 +422,90 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         # TOOLTIPS
 
         self.MapLayerDEM.setToolTip(
-            "Seleccione el modelo digital de elevación (DEM)."
+            self.tr("Select a digital elevation model (DEM).")
         )
 
         self.MapLayerCurvas.setToolTip(
-            "Seleccione una capa de curvas de nivel como fuente de elevación."
+            self.tr("Select a contour line layer as the elevation source.")
         )
 
         self.FieldElevCurvas.setToolTip(
-            "Seleccione el campo numérico que contiene la elevación de las curvas de nivel."
+            self.tr("Select the numeric field containing contour elevations.")
         )
 
         self.checkGeo.setToolTip(
-            "Incorporar información geológica al perfil."
+            self.tr("Include geological information in the profile.")
         )
 
         self.checkEst.setToolTip(
-            "Incorporar estructuras geológicas al perfil."
+            self.tr("Include geological structures in the profile.")
         )
 
         self.MapLayerSec.setToolTip(
-            "Seleccione la capa que contiene la línea de sección."
+            self.tr("Select the layer containing the section line.")
         )
 
         self.btnDrawSec.setToolTip(
-            "Dibuje una línea de sección directamente sobre el mapa."
+            self.tr("Draw a section line directly on the map.")
         )
 
         self.checkInvSec.setToolTip(
-            "Invertir el sentido de la sección (inicio ↔ fin)."
+            self.tr("Reverse the section direction (start ↔ end).")
         )
 
         self.MapLayerGeo.setToolTip(
-            "Capa de geología (opcional) para intersectar la sección."
+            self.tr("Select an optional geology layer to intersect the section.")
         )
 
         self.FieldClasGeo.setToolTip(
-            "Campo utilizado para clasificar los segmentos geológicos del perfil."
+            self.tr("Select the field used to classify geological profile segments.")
         )
 
         self.MapLayerEst.setToolTip(
-            "Capa estructural (opcional) para intersectar la sección."
+            self.tr("Select an optional structural layer to intersect the section.")
         )
 
         self.doubleSpinBox.setToolTip(
-             "Profundidad de la caja del perfil en metros. El valor predeterminado es 100 m."
+            self.tr(
+                "Set the profile box depth in meters. "
+                "The default value is 100 m."
+            )
         )
 
         self.checkEjes.setToolTip(
-            "Crear ejes X y Y en el perfil generado."
+            self.tr("Create X and Y axes for the generated profile.")
         )
 
         self.fileWidgetPerfil.setToolTip(
-            "Seleccione el archivo de salida para guardar el perfil."
+            self.tr("Select the output file for the topographic profile.")
         )
 
-        #Tab3
         self.MapLayerSecLin.setToolTip(
-            "Seleccione el perfil topográfico que será convertido en polígonos."
+            self.tr("Select the topographic profile to be converted into polygons.")
         )
 
         self.fileWidgetPerfilGeo.setToolTip(
-            "Seleccione el archivo de salida para guardar el perfil geológico 2D."
+            self.tr("Select the output file for the 2D geological profile.")
         )
 
         self.MapLayerPerGeo.setToolTip(
-            "Seleccione el perfil geológico poligonal 2D que será reconstruido en 3D."
+            self.tr("Select the polygonal 2D geological profile to reconstruct in 3D.")
         )
 
         self.MapLayerSecGuia.setToolTip(
-            "Seleccione la sección guía que proporciona la referencia espacial del perfil."
+            self.tr("Select the guide section that provides the profile spatial reference.")
         )
 
         self.fileWidgetPerfilGeo3D.setToolTip(
-            "Seleccione el archivo de salida para guardar el perfil geológico 3D."
+            self.tr("Select the output file for the 3D geological profile.")
+        )
+
+        self.FieldDipEst.setToolTip(
+            self.tr("Select the numeric field containing the dip of each structure.")
+        )
+
+        self.FieldAzimuthEst.setToolTip(
+            self.tr("Select the numeric field containing the dip azimuth of each structure.")
         )
 
     def on_section_layer_changed(self, layer):
@@ -486,11 +533,11 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         curvas_layer = self.MapLayerCurvas.currentLayer()
 
         if dem_layer is None and curvas_layer is None:
-            raise Exception(
+           raise Exception(
                 self.tr(
-                    "Seleccione una fuente de elevación: "
-                    "un modelo digital de elevación (DEM) "
-                    "o una capa de curvas de nivel."
+                    "Select an elevation source: "
+                    "a digital elevation model (DEM) "
+                    "or a contour line layer."
                 )
             )
 
@@ -564,9 +611,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         else:
             raise Exception(
                 self.tr(
-                    "Seleccione una fuente de elevación: "
-                    "un modelo digital de elevación (DEM) "
-                    "o una capa de curvas de nivel."
+                    "Select an elevation source: "
+                    "a digital elevation model (DEM) "
+                    "or a contour line layer."
                 )
             )
        
@@ -613,375 +660,422 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 self.actualizar_info_seccion()
 
 
-            elif obj == self.MapLayerCurvas:  
+            elif obj == self.MapLayerCurvas:
                 self.mostrar_ayuda(
-                    "Curvas de nivel",
-                    """
-                    <p>
-                        Seleccione una capa vectorial de <b>líneas</b> que contenga
-                        las curvas de nivel utilizadas como fuente de elevación.
-                    </p>
+                    self.tr("Contour lines"),
+                    self.tr(
+                        """
+                        <p>
+                            Select a vector <b>line layer</b> containing the contour
+                            lines to be used as the elevation source.
+                        </p>
 
-                    <p>
-                        SecGeol calculará las intersecciones entre la línea de sección
-                        y las curvas de nivel para construir el perfil topográfico.
-                    </p>
+                        <p>
+                            SecGeol will calculate the intersections between the section
+                            line and the contour lines to construct the topographic profile.
+                        </p>
 
-                    <p>
-                        <b>Importante:</b> el perfil se limitará desde la primera
-                        hasta la última curva de nivel intersectada. La primera
-                        intersección se establecerá como <b>X = 0</b>.
-                    </p>
-                    """
-                )
+                        <p>
+                            <b>Important:</b> the profile will be limited from the first
+                            to the last intersected contour line. The first intersection
+                            will be set to <b>X = 0</b>.
+                        </p>
+                        """
+                    )
+                )  
+                
 
             elif obj == self.FieldElevCurvas:
                 self.mostrar_ayuda(
-                    "Campo de elevación",
+                self.tr("Elevation field"),
+                self.tr(
                     """
                     <p>
-                        Seleccione el campo numérico que contiene la
-                        <b>cota o elevación</b> de cada curva de nivel.
+                        Select the numeric field containing the
+                        <b>elevation</b> of each contour line.
                     </p>
 
                     <p>
-                        SecGeol muestra únicamente los <b>campos numéricos</b>
-                        disponibles en la capa seleccionada.
+                        SecGeol displays only the <b>numeric fields</b>
+                        available in the selected layer.
                     </p>
 
                     <p>
-                        Los valores deben almacenarse como números, sin unidades,
-                        símbolos ni texto adicional.
+                        Values must be stored as numbers, without units,
+                        symbols, or additional text.
                     </p>
                     """
                 )
+            )
 
             elif obj == self.btnDrawSec:
                 self.mostrar_ayuda(
-                   "Dibujar sección",
+                self.tr("Draw section"),
+                self.tr(
                     """
                     <p>
-                        Permite dibujar una <b>línea de sección</b> directamente
-                        sobre el mapa, como alternativa a seleccionar una sección
-                        desde una capa vectorial.
+                        Draw a <b>section line</b> directly on the map
+                        as an alternative to selecting a section from
+                        a vector layer.
                     </p>
 
                     <p>
-                        Haga clic sobre el mapa para definir los vértices de la línea
-                        y utilice <b>clic derecho</b> para finalizar el dibujo.
+                        Click on the map to define the line vertices
+                        and use <b>right-click</b> to finish drawing.
                     </p>
                     """
                 )
+            )
 
             elif obj == self.checkInvSec:
                 self.mostrar_ayuda(
-                    "Invertir sección",
+                self.tr("Reverse section"),
+                self.tr(
                     """
                     <p>
-                        Invierte el sentido de la línea de sección y, por lo tanto,
-                        la orientación del perfil resultante.
+                        Reverses the direction of the section line and,
+                        therefore, the orientation of the resulting profile.
                     </p>
 
                     <p>
-                        Active esta opción cuando necesite intercambiar el
-                        <b>inicio y el final</b> de la sección.
+                        Enable this option when you need to swap the
+                        <b>start and end</b> of the section.
                     </p>
                     """
                 )
+            )
 
             elif obj == self.checkGeo:
                 self.mostrar_ayuda(
-                    "Incorporar geología",
+                self.tr("Include geology"),
+                self.tr(
                     """
                     <p>
-                        Active esta opción para incorporar una capa geológica
-                        poligonal al perfil.
+                        Enable this option to include a polygonal
+                        geological layer in the profile.
                     </p>
 
                     <p>
-                        SecGeol intersectará las unidades geológicas con la línea
-                        de sección y las representará sobre el perfil topográfico.
+                        SecGeol will intersect the geological units with
+                        the section line and represent them on the
+                        topographic profile.
                     </p>
 
                     <p>
-                        Esta opción es <b>opcional</b>.
+                        This option is <b>optional</b>.
                     </p>
                     """
                 )
+            )
 
             elif obj == self.checkEst:
                 self.mostrar_ayuda(
-                    "Incorporar estructuras",
+                self.tr("Include structures"),
+                self.tr(
                     """
                     <p>
-                        Active esta opción para incorporar estructuras geológicas
-                        representadas mediante una capa vectorial de líneas.
+                        Enable this option to include geological structures
+                        represented by a vector line layer.
                     </p>
 
                     <p>
-                        SecGeol utilizará los campos de <b>echado</b> y
-                        <b>azimut de buzamiento</b> para representar las estructuras
-                        que intersectan la sección.
+                        SecGeol will use the <b>dip</b> and
+                        <b>dip azimuth</b> fields to represent structures
+                        that intersect the section.
                     </p>
 
                     <p>
-                        Esta opción es <b>opcional</b>.
+                        This option is <b>optional</b>.
                     </p>
                     """
                 )
+            )
 
             elif obj == self.MapLayerGeo:
                 self.mostrar_ayuda(
-                   "Capa de geología",
+                self.tr("Geology layer"),
+                self.tr(
                     """
                     <p>
-                        Seleccione una capa vectorial de <b>polígonos</b> que contenga
-                        las unidades geológicas atravesadas por la línea de sección.
+                        Select a vector <b>polygon layer</b> containing
+                        the geological units crossed by the section line.
                     </p>
 
                     <p>
-                        SecGeol intersectará esta capa con la sección para representar
-                        la distribución de las unidades geológicas sobre el perfil
-                        topográfico.
+                        SecGeol will intersect this layer with the section
+                        to represent the distribution of geological units
+                        on the topographic profile.
                     </p>
 
                     <p>
-                        Esta entrada es <b>opcional</b>.
+                        This input is <b>optional</b>.
                     </p>
                     """
                 )
+            )
 
             elif obj == self.FieldClasGeo:
                 self.mostrar_ayuda(
-                    "Campo de clasificación geológica",
+                self.tr("Geological classification field"),
+                self.tr(
                     """
                     <p>
-                        Seleccione el campo de atributos que identifica las
-                        <b>unidades geológicas</b>.
+                        Select the attribute field that identifies the
+                        <b>geological units</b>.
                     </p>
 
                     <p>
-                        Los valores de este campo se transferirán al perfil y
-                        se almacenarán en el atributo <b>valor_geo</b>.
+                        Values from this field will be transferred to the
+                        profile and stored in the <b>valor_geo</b> attribute.
                     </p>
                     """
                 )
+            )
             
 
             elif obj == self.MapLayerEst:
                 self.mostrar_ayuda(
-                   "Capa estructural",
+                self.tr("Structural layer"),
+                self.tr(
                     """
                     <p>
-                        Seleccione una capa vectorial de líneas que contenga
-                        las estructuras geológicas que intersectan la sección.
+                        Select a vector line layer containing the geological
+                        structures that intersect the section.
                     </p>
 
                     <p>
-                        Esta entrada es <b>opcional</b>.
+                        This input is <b>optional</b>.
                     </p>
                     """
                 )
+            )
 
             elif obj == self.doubleSpinBox:
                 self.mostrar_ayuda(
-                   "Profundidad de la caja",
+                self.tr("Profile box depth"),
+                self.tr(
                     """
                     <p>
-                        Define, en metros, la profundidad adicional que se
-                        representará por debajo de la elevación mínima del
-                        perfil topográfico.
+                        Defines, in meters, the additional depth represented
+                        below the minimum elevation of the topographic profile.
                     </p>
 
                     <p>
-                        El valor permitido está entre <b>1 y 10 000 m</b>.
-                        El valor predeterminado es <b>100 m</b>.
+                        Allowed values range from <b>1 to 10,000 m</b>.
+                        The default value is <b>100 m</b>.
                     </p>
 
                     <p>
-                        Por ejemplo, un valor de <b>500</b> extiende la caja
-                        <b>500 m</b> por debajo de la elevación mínima del perfil.
+                        For example, a value of <b>500</b> extends the profile
+                        box <b>500 m</b> below the minimum profile elevation.
                     </p>
                     """
                 )
+            )
 
             elif obj == self.checkEjes:
                 self.mostrar_ayuda(
-                    "Crear ejes",
+                self.tr("Create axes"),
+                self.tr(
                     """
                     <p>
-                        Active esta opción para generar los ejes horizontal y
-                        vertical asociados al perfil.
+                        Enable this option to generate the horizontal and
+                        vertical axes associated with the profile.
                     </p>
 
                     <p>
-                        El eje horizontal representa la <b>distancia sobre la sección</b>
-                        y el eje vertical la <b>elevación</b>.
+                        The horizontal axis represents the
+                        <b>distance along the section</b>, and the vertical
+                        axis represents <b>elevation</b>.
                     </p>
                     """
                 )
+            )
+
 
             elif obj == self.fileWidgetPerfil:
                 self.mostrar_ayuda(
-                    "Archivo de salida",
+                self.tr("Output file"),
+                self.tr(
                     """
                     <p>
-                        Seleccione la ubicación y el nombre del archivo donde
-                        se guardará el perfil topográfico.
+                        Select the location and file name where the
+                        topographic profile will be saved.
                     </p>
 
                     <p>
-                        SecGeol generará también la <b>sección guía</b>, que conserva
-                        la referencia espacial necesaria para la reconstrucción 3D.
+                        SecGeol will also generate the <b>guide section</b>,
+                        which preserves the spatial reference required for
+                        the 3D reconstruction.
                     </p>
                     """
                 )
+            )
 
             #Estructuras
 
             elif obj == self.FieldDipEst:
                 self.mostrar_ayuda(
-                    "Campo de echado",
+                self.tr("Dip field"),
+                self.tr(
                     """
                     <p>
-                        Seleccione el campo numérico que contiene el
-                        <b>echado</b> de cada estructura.
+                        Select the numeric field containing the
+                        <b>dip</b> of each structure.
                     </p>
 
                     <p>
-                        Los valores deben almacenarse como <b>valores numéricos</b>
-                        entre <b>0 y 90</b> grados, sin incluir el símbolo de grado (°).
+                        Values must be stored as <b>numeric values</b>
+                        between <b>0 and 90</b> degrees, without including
+                        the degree symbol (°).
                     </p>
 
                     <p>
-                        Los registros con valores fuera de este intervalo
-                        no se representarán en el perfil.
+                        Records with values outside this range will not be
+                        represented in the profile.
                     </p>
                     """
                 )
+            )
 
             elif obj == self.FieldAzimuthEst:
                 self.mostrar_ayuda(
-                    "Campo de azimut de buzamiento",
-                        """
-                        <p>
-                            Seleccione el campo numérico que contiene el
-                            <b>azimut de buzamiento</b> de cada estructura.
-                        </p>
+                self.tr("Dip azimuth field"),
+                self.tr(
+                    """
+                    <p>
+                        Select the numeric field containing the
+                        <b>dip azimuth</b> of each structure.
+                    </p>
 
-                        <p>
-                            Los valores deben almacenarse como <b>valores numéricos</b> entre
-                            <b>0 y 360</b> grados, sin incluir el símbolo de grado (°).
-                        </p>
+                    <p>
+                        Values must be stored as <b>numeric values</b>
+                        between <b>0 and 360</b> degrees, without including
+                        the degree symbol (°).
+                    </p>
 
-                        <p>
-                            Los registros con valor <b>-1</b> o fuera de este intervalo
-                            no se representarán en el perfil.
-                        </p>
-                        """
+                    <p>
+                        Records with a value of <b>-1</b> or outside this
+                        range will not be represented in the profile.
+                    </p>
+                    """
                 )
+            )
 
             elif obj == self.MapLayerSecGuia:
                 self.mostrar_ayuda(
-                    "Sección guía",
+                self.tr("Guide section"),
+                self.tr(
                     """
                     <p>
-                        Seleccione la <b>sección guía</b> generada en el módulo
-                        <b>1. Sección a perfil</b>.
+                        Select the <b>guide section</b> generated in
+                        <b>1. Section to profile</b>.
                     </p>
 
                     <p>
-                        Esta capa conserva la referencia espacial utilizada para
-                        generar el perfil y permite reconstruir la interpretación
-                        geológica en sus coordenadas reales.
+                        This layer preserves the spatial reference used to
+                        generate the profile and allows the geological
+                        interpretation to be reconstructed in its
+                        real-world coordinates.
                     </p>
 
                     <p>
-                        Cuando el perfil se genera a partir de curvas de nivel,
-                        la sección guía corresponde únicamente al tramo comprendido
-                        entre la primera y la última intersección.
+                        When the profile is generated from contour lines,
+                        the guide section corresponds only to the segment
+                        between the first and last intersections.
                     </p>
                     """
                 )
+            )
 
             elif obj == self.MapLayerPerGeo:
                 self.mostrar_ayuda(
-                    "Perfil geológico 2D",
+                self.tr("2D geological profile"),
+                self.tr(
                     """
                     <p>
-                        Seleccione la capa poligonal generada en el módulo
-                        <b>2. Líneas a polígonos</b>.
+                        Select the polygon layer generated in
+                        <b>2. Lines to polygons</b>.
                     </p>
 
                     <p>
-                        Esta capa contiene la interpretación geológica del perfil
-                        en coordenadas locales, donde el eje X representa la
-                        distancia a lo largo de la sección.
+                        This layer contains the geological interpretation
+                        of the profile in local coordinates, where the
+                        X-axis represents the distance along the section.
                     </p>
 
                     <p>
-                        SecGeol utilizará esta geometría junto con la sección guía
-                        para reconstruir el perfil en coordenadas espaciales reales.
+                        SecGeol will use this geometry together with the
+                        guide section to reconstruct the profile in
+                        real-world coordinates.
                     </p>
                     """
                 )
+            )
            
 
             elif obj == self.fileWidgetPerfilGeo:
                 self.mostrar_ayuda(
-                    "Salida del perfil geológico",
+                self.tr("Geological profile output"),
+                self.tr(
                     """
                     <p>
-                        Seleccione la ubicación y el nombre del archivo donde se
-                        guardará el <b>perfil geológico poligonal 2D</b>.
+                        Select the location and file name where the
+                        <b>2D polygonal geological profile</b> will be saved.
                     </p>
 
                     <p>
-                        Esta capa podrá utilizarse posteriormente en el módulo
-                        <b>3. Perfil 2D a 3D</b>.
+                        This layer can later be used in
+                        <b>3. 2D profile to 3D</b>.
                     </p>
                     """
                 )
+            )
 
             elif obj == self.fileWidgetPerfilGeo3D:
                 self.mostrar_ayuda(
-                    "Salida del perfil geológico 3D",
+                self.tr("3D geological profile output"),
+                self.tr(
                     """
                     <p>
-                        Seleccione la ubicación y el nombre del archivo donde se
-                        guardará el perfil geológico reconstruido en
-                        <b>coordenadas espaciales reales</b>.
+                        Select the location and file name where the
+                        geological profile reconstructed in
+                        <b>real-world coordinates</b> will be saved.
                     </p>
 
                     <p>
-                        La salida conserva la geometría tridimensional necesaria
-                        para su visualización y análisis en entornos 3D.
+                        The output preserves the three-dimensional geometry
+                        required for visualization and analysis in 3D
+                        environments.
                     </p>
                     """
                 )
+            )
 
             elif obj == self.MapLayerSecLin:
                 self.mostrar_ayuda(
-                    "Perfil topográfico",
+                self.tr("Topographic profile"),
+                self.tr(
                     """
                     <p>
-                        Seleccione la capa <b>Perfil_topografico</b> generada en el
-                        módulo <b>1. Sección a perfil</b>.
+                        Select the <b>Perfil_topografico</b> layer generated
+                        in <b>1. Section to profile</b>.
                     </p>
 
                     <p>
-                        Esta capa contiene la línea del terreno y los elementos
-                        asociados al perfil. Puede ser ajustada durante la
-                        interpretación geológica antes de convertir las líneas
-                        en polígonos.
+                        This layer contains the terrain line and the elements
+                        associated with the profile. It can be edited during
+                        geological interpretation before the lines are
+                        converted into polygons.
                     </p>
 
                     <p>
-                        El módulo <b>2. Líneas a polígonos</b> utilizará estas
-                        geometrías para construir el perfil geológico poligonal.
+                        <b>2. Lines to polygons</b> will use these geometries
+                        to construct the polygonal geological profile.
                     </p>
                     """
                 )
+            )
 
 
         elif event.type() == 11:  # Leave
@@ -1021,16 +1115,18 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         else:
             raise Exception(
                 self.tr(
-                    "Seleccione una fuente de elevación: "
-                    "un modelo digital de elevación (DEM) "
-                    "o una capa de curvas de nivel."
+                    "Select an elevation source: "
+                    "a digital elevation model (DEM) "
+                    "or a contour line layer."
                 )
             )
 
         # Caso 1: el usuario dibujó una sección
         if has_drawn:
             if self.drawn_section_feature is None:
-                raise Exception(self.tr("No se encontró la sección dibujada."))
+                raise Exception(
+                    self.tr("The drawn section was not found.")
+                )
             # Ajusta aquí según el CRS real de tu sección dibujada
             source_crs = self.iface.mapCanvas().mapSettings().destinationCrs()
             temp_layer = self.section_manager.prepare_section_layer_from_feature(
@@ -1044,7 +1140,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         elif feat_sec is not None:
             source_layer = self.MapLayerSec.currentLayer()
             if source_layer is None:
-                raise Exception(self.tr("No se encontró la capa de sección."))
+                raise Exception(
+                    self.tr("The section layer was not found.")
+                )
             source_crs = source_layer.crs()
             temp_layer = self.section_manager.prepare_section_layer_from_feature(
                 source_feature=feat_sec,
@@ -1054,10 +1152,14 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             )
          
         else:
-            raise Exception(self.tr("No se encontró una sección válida para preparar."))
+            raise Exception(
+                    self.tr("No valid section was found to prepare.")
+                )
 
         if temp_layer is None or not temp_layer.isValid():
-            raise Exception(self.tr("No fue posible preparar la sección de trabajo."))
+            raise Exception(
+                self.tr("Could not prepare the working section.")
+            )
         return temp_layer
     
     # Inicializa workspace
@@ -1074,9 +1176,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         else:
             raise Exception(
                 self.tr(
-                    "Seleccione una fuente de elevación: "
-                    "un modelo digital de elevación (DEM) "
-                    "o una capa de curvas de nivel."
+                    "Select an elevation source: "
+                    "a digital elevation model (DEM) "
+                    "or a contour line layer."
                 )
             )
 
@@ -1097,9 +1199,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         if dem_layer is None and curvas_layer is None:
             raise Exception(
                 self.tr(
-                    "Seleccione una fuente de elevación: "
-                    "un modelo digital de elevación (DEM) "
-                    "o una capa de curvas de nivel."
+                    "Select an elevation source: "
+                    "a digital elevation model (DEM) "
+                    "or a contour line layer."
                 )
             )
 
@@ -1111,13 +1213,16 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             )
 
         if section_layer is None or not section_layer.isValid():
-            raise Exception(self.tr("No fue posible preparar la sección de trabajo."))
+            raise Exception(
+                self.tr("Could not prepare the working section.")
+            )
         caja_m = self.obtener_caja_m()
         section_geom = self.section_manager.obtener_geometria_seccion_efectiva(section_layer)
 
         if section_geom is None:
-            raise Exception(self.tr("No fue posible obtener la geometría efectiva de la sección."))
-
+            raise Exception(
+                self.tr("Could not obtain the effective section geometry.")
+            )
         # Variables para la fuente de elevación
         profile_point_features = None
         dist_inicio = None
@@ -1177,32 +1282,36 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         if dem_layer is None:
             self.mostrar_ayuda(
-                "Modelo digital de elevación",
+            self.tr("Digital elevation model"),
+            self.tr(
                 """
                 <p>
-                    No se ha seleccionado un <b>modelo digital de elevación (DEM)</b>.
+                    No <b>digital elevation model (DEM)</b> has been selected.
                 </p>
 
                 <p>
-                    Seleccione una capa raster válida para continuar.
+                    Select a valid raster layer to continue.
                 </p>
                 """
             )
+        )
             return
 
         if dem_layer.type() != dem_layer.RasterLayer:
             self.mostrar_ayuda(
-                "Modelo digital de elevación no válido",
+            self.tr("Invalid digital elevation model"),
+            self.tr(
                 """
                 <p>
-                    La capa seleccionada no es una <b>capa raster</b>.
+                    The selected layer is not a <b>raster layer</b>.
                 </p>
 
                 <p>
-                    Seleccione un modelo digital de elevación en formato raster.
+                    Select a digital elevation model in raster format.
                 </p>
                 """
             )
+        )
             return
 
         try:
@@ -1250,23 +1359,30 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             if es_metrico and banda_valida:
                 estado = (
                     "<p style='color:green;'>"
-                    "<b>Estado: Compatible con SecGeol.</b>"
-                    "</p>"
+                    + self.tr("<b>Status: Compatible with SecGeol.</b>")
+                    + "</p>"
                 )
 
             else:
                 detalles = []
 
                 if not dem_crs.isValid():
-                    detalles.append("El CRS no es válido.")
+                    detalles.append(
+                        self.tr("The CRS is not valid.")
+                    )
                 elif not es_metrico:
-                    detalles.append("El CRS debe utilizar metros como unidad.")
+                    detalles.append(
+                        self.tr("The CRS must use meters as its unit.")
+                    )
 
                 if not una_banda:
-                    detalles.append("El raster debe contener una sola banda.")
+                    detalles.append(
+                        self.tr("The raster must contain a single band.")
+                    )
                 elif band_type_name not in tipos_validos:
                     detalles.append(
-                        f"El tipo de dato no es adecuado ({band_type_name})."
+                        self.tr("The data type is not suitable")
+                        + f" ({band_type_name})."
                     )
 
                 lista_detalles = "".join(
@@ -1276,39 +1392,41 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
                 estado = (
                     "<div style='color:red;'>"
-                    "<p><b>Estado: No compatible con SecGeol.</b></p>"
-                    "<p>Revise las siguientes características:</p>"
-                    f"<ul>{lista_detalles}</ul>"
-                    "</div>"
+                    + self.tr("<p><b>Status: Not compatible with SecGeol.</b></p>")
+                    + self.tr("<p>Check the following characteristics:</p>")
+                    + f"<ul>{lista_detalles}</ul>"
+                    + "</div>"
                 )
                 
 
             self.mostrar_ayuda(
-                "Modelo digital de elevación",
-                f"""
-                <p>
-                    <b>DEM seleccionado:</b> {dem_layer.name()}<br>
-                    <b>CRS:</b> {crs_info}<br>
-                    <b>Tamaño de píxel:</b> {pixel_x:.3f} × {pixel_y:.3f}<br>
-                    <b>Bandas:</b> {dem_layer.bandCount()}<br>
-                    <b>Tipo de dato:</b> {band_type_name}
-                </p>
+            self.tr("Digital elevation model"),
+            f"""
+            <p>
+                <b>{self.tr("Selected DEM:")}</b> {dem_layer.name()}<br>
+                <b>CRS:</b> {crs_info}<br>
+                <b>{self.tr("Pixel size:")}</b> {pixel_x:.3f} × {pixel_y:.3f}<br>
+                <b>{self.tr("Bands:")}</b> {dem_layer.bandCount()}<br>
+                <b>{self.tr("Data type:")}</b> {band_type_name}
+            </p>
 
-                {estado}
-                """
-            )
+            {estado}
+            """
+        )
 
         except Exception as e:
             self.mostrar_ayuda(
-                "Error al leer el DEM",
+                self.tr("Error reading DEM"),
                 f"""
                 <p>
-                    No fue posible leer correctamente las propiedades
-                    de la capa seleccionada.
+                    {self.tr(
+                        "Could not correctly read the properties "
+                        "of the selected layer."
+                    )}
                 </p>
 
                 <p>
-                    <b>Detalle:</b> {e}
+                    <b>{self.tr("Details:")}</b> {e}
                 </p>
                 """
             )
@@ -1322,61 +1440,71 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         if has_drawn:
             geom = self.drawn_section_feature.geometry() if self.drawn_section_feature else None
+
             if geom is None or geom.isEmpty():
                 self.mostrar_ayuda(
-                    "Sección no válida",
-                    """
-                    <p>
-                        <span style="color:red; font-size:18px;">⚠</span>
-                        <b> La sección dibujada no contiene una geometría válida.</b>
-                    </p>
+                    self.tr("Invalid section"),
+                    self.tr(
+                        """
+                        <p>
+                            <span style="color:red; font-size:18px;">⚠</span>
+                            <b>The drawn section does not contain a valid geometry.</b>
+                        </p>
 
-                    <p>
-                        Dibuje nuevamente la línea de sección para continuar.
-                    </p>
-                    """
+                        <p>
+                            Draw the section line again to continue.
+                        </p>
+                        """
+                    )
                 )
                 return
 
             longitud = geom.length()
-            self.mostrar_ayuda(
-                    "Sección activa",
-                    f"""
-                    <p>
-                        <b>Origen:</b> dibujada por el usuario<br>
-                        <b>Longitud:</b> {longitud:.2f} m<br>
-                        <b>Orientación invertida:</b> {'Sí' if invertida else 'No'}
-                    </p>
-                    """
-                )
-            return
 
-        if sec_layer is None:
+            estado_invertida = self.tr("Yes") if invertida else self.tr("No")
+
             self.mostrar_ayuda(
-                "Sección",
-                """
+                self.tr("Active section"),
+                f"""
                 <p>
-                    Seleccione una <b>capa de sección</b> o dibuje una línea
-                    directamente sobre el mapa.
+                    <b>{self.tr("Source:")}</b> {self.tr("Drawn by the user")}<br>
+                    <b>{self.tr("Length:")}</b> {longitud:.2f} m<br>
+                    <b>{self.tr("Reversed orientation:")}</b> {estado_invertida}
                 </p>
                 """
             )
             return
 
-        if QgsWkbTypes.geometryType(sec_layer.wkbType()) != QgsWkbTypes.LineGeometry:
+        if sec_layer is None:
             self.mostrar_ayuda(
-                    "Sección no válida",
+                self.tr("Section"),
+                self.tr(
                     """
                     <p>
-                        <span style="color:red; font-size:18px;">⚠</span>
-                        <b> La capa seleccionada no es de tipo línea.</b>
-                    </p>
-
-                    <p>
-                        Seleccione una capa vectorial lineal para continuar.
+                        Select a <b>section layer</b> or draw a line
+                        directly on the map.
                     </p>
                     """
                 )
+            )
+            return
+
+        if QgsWkbTypes.geometryType(sec_layer.wkbType()) != QgsWkbTypes.LineGeometry:
+            self.mostrar_ayuda(
+                self.tr("Invalid section"),
+                self.tr(
+                    """
+                    <p>
+                        <span style="color:red; font-size:18px;">⚠</span>
+                        <b>The selected layer is not a line layer.</b>
+                    </p>
+
+                    <p>
+                        Select a vector line layer to continue.
+                    </p>
+                    """
+                )
+            )
             return
 
         total = sec_layer.featureCount()
@@ -1384,30 +1512,34 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         if total == 0:
             self.mostrar_ayuda(
-                    "Sección no válida",
+                self.tr("Invalid section"),
+                self.tr(
                     """
                     <p>
                         <span style="color:red; font-size:18px;">⚠</span>
-                        <b> La capa seleccionada no contiene registros.</b>
+                        <b>The selected layer contains no features.</b>
                     </p>
                     """
                 )
+            )
             return
 
         if seleccionadas > 1:
             self.mostrar_ayuda(
-                    "Sección requerida",
+                self.tr("Section required"),
+                self.tr(
                     """
                     <p>
                         <span style="color:red; font-size:18px;">⚠</span>
-                        <b> Hay más de una sección seleccionada.</b>
+                        <b>More than one section is selected.</b>
                     </p>
 
                     <p>
-                        Deje seleccionada <b>una sola línea</b> para continuar.
+                        Leave <b>only one line</b> selected to continue.
                     </p>
                     """
                 )
+            )
             return
 
         if seleccionadas == 1:
@@ -1416,17 +1548,19 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             feat = next(sec_layer.getFeatures(), None)
         else:
             self.mostrar_ayuda(
-                "Sección requerida",
-                """
-                <p style="color:#b00020;">
-                    <span style="color:red; font-size:18px;">⚠</span>
-                    <b> La capa contiene más de una sección.</b>
-                </p>
+                self.tr("Section required"),
+                self.tr(
+                    """
+                    <p style="color:#b00020;">
+                        <span style="color:red; font-size:18px;">⚠</span>
+                        <b>The layer contains more than one section.</b>
+                    </p>
 
-                <p>
-                    Seleccione <b>una sola línea</b> para continuar.
-                </p>
-                """
+                    <p>
+                        Select <b>only one line</b> to continue.
+                    </p>
+                    """
+                )
             )
             return
 
@@ -1445,13 +1579,15 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         geom = feat.geometry()
         if geom is None or geom.isEmpty():
             self.mostrar_ayuda(
-                "Sección no válida",
-                """
-                <p>
-                    <span style="color:red; font-size:18px;">⚠</span>
-                    <b> La geometría de la sección está vacía.</b>
-                </p>
-                """
+                self.tr("Invalid section"),
+                self.tr(
+                    """
+                    <p>
+                        <span style="color:red; font-size:18px;">⚠</span>
+                        <b>The section geometry is empty.</b>
+                    </p>
+                    """
+                )
             )
             return
         
@@ -1460,45 +1596,50 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
             if not partes:
                 self.mostrar_ayuda(
-                    "Sección no válida",
-                    """
-                    <p>
-                        No fue posible interpretar la geometría de la sección seleccionada.
-                    </p>
+                    self.tr("Invalid section"),
+                    self.tr(
+                        """
+                        <p>
+                            Could not interpret the geometry of the selected section.
+                        </p>
 
-                    <p>
-                        Seleccione una <b>geometría lineal válida</b> para continuar.
-                    </p>
-                    """
+                        <p>
+                            Select a <b>valid line geometry</b> to continue.
+                        </p>
+                        """
+                    )
                 )
                 return
 
             if len(partes) > 1:
                 self.mostrar_ayuda(
-                    "Sección no válida",
-                    """
-                    <p>
-                        El registro seleccionado contiene <b>más de una línea independiente</b>.
-                    </p>
+                    self.tr("Invalid section"),
+                    self.tr(
+                        """
+                        <p>
+                            The selected feature contains <b>more than one independent line</b>.
+                        </p>
 
-                    <p>
-                        SecGeol requiere <b>una sola línea por registro</b>.
-                        La línea puede contener múltiples vértices y cambios de dirección.
-                    </p>
-                    """
+                        <p>
+                            SecGeol requires <b>only one line per feature</b>.
+                            The line may contain multiple vertices and changes in direction.
+                        </p>
+                        """
+                    )
                 )
                 return
 
         
 
         longitud = geom.length()
+        estado_invertida = self.tr("Yes") if invertida else self.tr("No")
         self.mostrar_ayuda(
-            "Sección activa",
+            self.tr("Active section"),
             f"""
             <p>
-                <b>Capa:</b> {sec_layer.name()}<br>
-                <b>Longitud:</b> {longitud:.2f} m<br>
-                <b>Orientación invertida:</b> {'Sí' if invertida else 'No'}
+                <b>{self.tr("Layer:")}</b> {sec_layer.name()}<br>
+                <b>{self.tr("Length:")}</b> {longitud:.2f} m<br>
+                <b>{self.tr("Reversed orientation:")}</b> {estado_invertida}
             </p>
             """
         )
@@ -1515,18 +1656,20 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             self.MapLayerGeo.setLayer(None)
             self.FieldClasGeo.setLayer(None)
             self.mostrar_ayuda(
-                "Sin geología",
-                """
-                <p>
-                    La incorporación de información geológica es <b>opcional</b>.
-                </p>
+                self.tr("No geology"),
+                self.tr(
+                    """
+                    <p>
+                        Including geological information is <b>optional</b>.
+                    </p>
 
-                <p>
-                    Active esta opción para seleccionar una capa poligonal
-                    y representar las unidades geológicas que intersectan
-                    la línea de sección.
-                </p>
-                """
+                    <p>
+                        Enable this option to select a polygon layer
+                        and represent the geological units that intersect
+                        the section line.
+                    </p>
+                    """
+                )
             )
         else:
             self.actualizar_info_geologia()
@@ -1539,22 +1682,25 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         if geo_layer is None:
             self.FieldClasGeo.setLayer(None)
             self.mostrar_ayuda(
-                "Capa de geología",
-                """
-                <p>
-                    La opción de geología está <b>activada</b>.
-                </p>
+                self.tr("Geology layer"),
+                self.tr(
+                    """
+                    <p>
+                        The geology option is <b>enabled</b>.
+                    </p>
 
-                <p>
-                    Seleccione una capa vectorial de <b>polígonos</b>
-                    que contenga las unidades geológicas.
-                </p>
+                    <p>
+                        Select a <b>polygon vector layer</b>
+                        containing the geological units.
+                    </p>
 
-                <p>
-                    Al seleccionar la capa, SecGeol habilitará sus campos
-                    de atributos para elegir el campo de clasificación geológica.
-                </p>
-                """
+                    <p>
+                        After selecting the layer, SecGeol will enable its
+                        attribute fields so you can select the geological
+                        classification field.
+                    </p>
+                    """
+                )
             )
             return
 
@@ -1574,33 +1720,37 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         crs_info = f"{crs_authid} - {crs_name}" if crs_authid else crs_name
 
         if total_campos == 0:
-            mensaje_campo = """
+            mensaje_campo = self.tr(
+                """
                 <p>
-                    La capa geológica no contiene campos de atributos.
-                    SecGeol continuará utilizando únicamente <b>id_lito</b>
-                    como identificador de las unidades.
+                    The geology layer does not contain attribute fields.
+                    SecGeol will continue using only <b>id_lito</b>
+                    as the identifier for the geological units.
                 </p>
-            """
+                """
+            )
         else:
-            mensaje_campo = """
+            mensaje_campo = self.tr(
+                """
                 <p>
-                    Seleccione el campo de atributos que identifica las
-                    <b>unidades geológicas</b>.
+                    Select the attribute field that identifies the
+                    <b>geological units</b>.
                 </p>
 
                 <p>
-                    SecGeol generará además el campo <b>id_lito</b>
-                    como identificador interno.
+                    SecGeol will also generate the <b>id_lito</b>
+                    field as an internal identifier.
                 </p>
-            """
+                """
+            )
 
         self.mostrar_ayuda(
-            "Capa de geología",
+            self.tr("Geology layer"),
             f"""
             <p>
-                <b>Capa seleccionada:</b> {geo_layer.name()}<br>
+                <b>{self.tr("Selected layer:")}</b> {geo_layer.name()}<br>
                 <b>CRS:</b> {crs_info}<br>
-                <b>Campos disponibles:</b> {total_campos}
+                <b>{self.tr("Available fields:")}</b> {total_campos}
             </p>
 
             {mensaje_campo}
@@ -1622,18 +1772,20 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             self.FieldDipEst.setLayer(None)
             self.FieldAzimuthEst.setLayer(None)
             self.mostrar_ayuda(
-                "Sin estructuras",
-                """
-                <p>
-                    La incorporación de información estructural es <b>opcional</b>.
-                </p>
+                self.tr("No structures"),
+                self.tr(
+                    """
+                    <p>
+                        Including structural information is <b>optional</b>.
+                    </p>
 
-                <p>
-                    Active esta opción para seleccionar una capa lineal
-                    y representar las estructuras geológicas que intersectan
-                    la línea de sección.
-                </p>
-                """
+                    <p>
+                        Enable this option to select a line layer
+                        and represent the geological structures that intersect
+                        the section line.
+                    </p>
+                    """
+                )
             )
         else:
             self.actualizar_info_estructuras()
@@ -1646,23 +1798,25 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             self.FieldDipEst.setLayer(None)
             self.FieldAzimuthEst.setLayer(None)
             self.mostrar_ayuda(
-                "Capa de estructuras",
-                """
-                <p>
-                    La opción de estructuras está <b>activada</b>.
-                </p>
+                self.tr("Structural layer"),
+                self.tr(
+                    """
+                    <p>
+                        The structural option is <b>enabled</b>.
+                    </p>
 
-                <p>
-                    Seleccione una capa vectorial de <b>líneas</b>
-                    que contenga las estructuras geológicas.
-                </p>
+                    <p>
+                        Select a <b>line vector layer</b>
+                        containing the geological structures.
+                    </p>
 
-                <p>
-                    Al seleccionar la capa, SecGeol habilitará los campos
-                    numéricos disponibles para definir el <b>echado</b>
-                    y el <b>azimut de buzamiento</b>.
-                </p>
-                """
+                    <p>
+                        After selecting the layer, SecGeol will enable the
+                        available numeric fields to define the <b>dip</b>
+                        and <b>dip azimuth</b>.
+                    </p>
+                    """
+                )
             )
             return
 
@@ -1677,22 +1831,25 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         total_campos = len(est_layer.fields())
 
         self.mostrar_ayuda(
-            "Capa de estructuras",
+            self.tr("Structural layer"),
             f"""
             <p>
-                <b>Capa seleccionada:</b> {est_layer.name()}<br>
+                <b>{self.tr("Selected layer:")}</b> {est_layer.name()}<br>
                 <b>CRS:</b> {crs_info}<br>
             </p>
 
             <p>
-                SecGeol muestra únicamente los <b>campos numéricos</b>
-                disponibles para seleccionar el <b>echado</b> y el
-                <b>azimut de buzamiento</b>.
+                {self.tr(
+                    "SecGeol displays only the available <b>numeric fields</b> "
+                    "for selecting the <b>dip</b> and <b>dip azimuth</b>."
+                )}
             </p>
 
             <p>
-                Estos valores se utilizarán para representar las estructuras
-                que intersectan la línea de sección sobre el perfil.
+                {self.tr(
+                    "These values will be used to represent the structures "
+                    "that intersect the section line on the profile."
+                )}
             </p>
             """
         )
@@ -1704,7 +1861,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             salida_perfil_geo = self.fileWidgetPerfilGeo.filePath().strip()
 
             if line_layer is None:
-                raise Exception("Seleccione una capa de líneas del perfil.")
+                raise Exception(
+                    self.tr("Select a profile line layer.")
+                )
 
             perfil_poly_layer = self.profile_manager.build_geological_polygon_layer(
                 line_layer=line_layer,
@@ -1726,12 +1885,14 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             )
 
             self.mostrar_ayuda(
-                "Líneas a polígonos",
-                "Se generó la capa temporal <b>perfil_geologico</b>."
+                self.tr("Lines to polygons"),
+                self.tr(
+                    "The temporary <b>perfil_geologico</b> layer was generated."
+                )
                 + (
-                    " y la capa <b>ejes</b>."
+                    self.tr(" The <b>ejes</b> layer was also generated.")
                     if ejes_layer is not None
-                    else "."
+                    else ""
                 )
             )
             
@@ -1739,13 +1900,17 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         except Exception as e:
             QgsMessageLog.logMessage(
-            f"Error en líneas a polígonos/ejes: {e}",
-            "SecGeol",
-            Qgis.Critical
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "Error generating polygons/axes: "
+                )
+                + str(e),
+                "SecGeol",
+                Qgis.Critical
             )
 
             self.mostrar_ayuda(
-                "Error",
+                self.tr("Error"),
                 str(e)
             )
     
@@ -1760,10 +1925,14 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     ):
        
         if perfil_poly_layer is None:
-            raise Exception("No se generó la capa del perfil geológico.")
+            raise Exception(
+                self.tr("The geological profile layer was not generated.")
+            )
 
         if not salida_perfil_geo:
-            raise Exception("Seleccione una ruta de salida.")
+            raise Exception(
+                self.tr("Select an output path.")
+            )
 
         carpeta = os.path.dirname(salida_perfil_geo)
         nombre_archivo = os.path.basename(salida_perfil_geo)
@@ -1828,8 +1997,10 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         if resultado_perfil[0] != QgsVectorFileWriter.NoError:
             raise Exception(
-                f"No fue posible guardar el perfil geológico: "
-                f"{resultado_perfil[1]}"
+                self.tr(
+                    "Could not save the geological profile: "
+                )
+                + f"{resultado_perfil[1]}"
             )
 
         perfil_guardado = QgsVectorLayer(
@@ -1840,7 +2011,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         if not perfil_guardado.isValid():
             raise Exception(
-                "El perfil geológico se guardó, pero no pudo cargarse."
+                self.tr(
+                    "The geological profile was saved, but could not be loaded."
+                )
             )
 
         QgsProject.instance().addMapLayer(perfil_guardado)
@@ -1857,8 +2030,10 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
             if resultado_ejes[0] != QgsVectorFileWriter.NoError:
                 raise Exception(
-                    f"No fue posible guardar la capa de ejes: "
-                    f"{resultado_ejes[1]}"
+                    self.tr(
+                        "Could not save the axes layer: "
+                    )
+                    + f"{resultado_ejes[1]}"
                 )
 
             ejes_guardada = QgsVectorLayer(
@@ -1869,7 +2044,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
             if not ejes_guardada.isValid():
                 raise Exception(
-                    "La capa de ejes se guardó, pero no pudo cargarse."
+                    self.tr(
+                        "The axes layer was saved, but could not be loaded."
+                    )
                 )
 
             QgsProject.instance().addMapLayer(ejes_guardada)
@@ -1897,7 +2074,11 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         
 
         if section_layer is None or not section_layer.isValid():
-            raise Exception("No hay sección de trabajo válida para crear la sección guía.")
+            raise Exception(
+                self.tr(
+                    "There is no valid working section available to create the guide section."
+                )
+            )
 
         crs_authid = section_layer.crs().authid()
 
@@ -1964,20 +2145,24 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             poly_layer = self.MapLayerPerGeo.currentLayer()
 
             if poly_layer is None:
-                raise Exception("Seleccione una capa poligonal del perfil geológico.")
+                raise Exception(
+                    self.tr("Select a polygon layer for the geological profile.")
+                )
 
             sec_layer = self.MapLayerSecGuia.currentLayer()
 
             if sec_layer is None:
                 raise Exception(
-                    "Seleccione la capa Seccion_guia."
-            )
+                    self.tr("Select the guide section layer.")
+                )
 
 
             salida_perfil_3d  = self.fileWidgetPerfilGeo3D.filePath()
 
-            if not salida_perfil_3d :
-                raise Exception("Seleccione una ruta de salida para el perfil 3D.")
+            if not salida_perfil_3d:
+                raise Exception(
+                    self.tr("Select an output path for the 3D geological profile.")
+                )
             
             sec_feat = next(sec_layer.getFeatures())
             sec_geom = sec_feat.geometry()
@@ -2076,7 +2261,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
 
             if not multi:
-                raise Exception("No fue posible leer la geometría multipolígono.")
+                raise Exception(
+                    self.tr("Could not read the multipolygon geometry.")
+                )
 
             primer_anillo = multi[0][0]
 
@@ -2105,7 +2292,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
             if len(nuevos_vertices) < 4:
                 raise Exception(
-                    "No hay suficientes vértices para construir un polígono."
+                    self.tr(
+                        "There are not enough vertices to construct a polygon."
+                    )
                 )
             
 
@@ -2127,7 +2316,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
             else:
                 raise Exception(
-                    "La salida debe tener extensión .shp o .gpkg."
+                    self.tr(
+                        "The output file must have a .shp or .gpkg extension."
+                    )
                 )
 
             resultado = QgsVectorFileWriter.writeAsVectorFormatV3(
@@ -2139,9 +2330,12 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
             if resultado[0] != QgsVectorFileWriter.NoError:
                 raise Exception(
-                    f"No fue posible guardar el perfil geológico 3D.\n"
-                    f"Error: {resultado[1]}"
-                )        
+                    self.tr(
+                        "Could not save the 3D geological profile.\n"
+                        "Error: "
+                    )
+                    + f"{resultado[1]}"
+                )     
 
 
             # Después cargamos la capa guardada:
@@ -2158,7 +2352,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
             if not perfil_3d_guardado.isValid():
                 raise Exception(
-                    "El archivo fue generado, pero no pudo cargarse en QGIS."
+                    self.tr(
+                        "The file was generated, but could not be loaded into QGIS."
+                    )
                 )
 
             QgsProject.instance().addMapLayer(perfil_3d_guardado)
@@ -2170,10 +2366,12 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
 
             self.mostrar_ayuda(
-                "Perfil geológico 3D",
-                f"Perfil geológico 3D generado correctamente.<br>"
-                f"Polígonos creados: <b>{total_3d}</b><br>"
-                f"Salida: <b>{salida_perfil_3d}</b>"
+                self.tr("3D geological profile"),
+                f"""
+                {self.tr("3D geological profile generated successfully.")}<br>
+                {self.tr("Polygons created:")} <b>{total_3d}</b><br>
+                {self.tr("Output:")} <b>{salida_perfil_3d}</b>
+                """
             )
 
             self.accept()

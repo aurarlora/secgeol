@@ -1,5 +1,5 @@
 import os, math
-
+from qgis.PyQt.QtCore import QCoreApplication
 from qgis.core import (
     QgsFeature,
     Qgis,
@@ -66,7 +66,12 @@ class SectionManager:
     
     def recortar_seccion_por_distancia(self, geom, dist_inicio, dist_fin):
         if geom is None or geom.isEmpty():
-            raise Exception("La geometría de la sección está vacía.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The section geometry is empty."
+                )
+            )
 
         if dist_inicio > dist_fin:
             dist_inicio, dist_fin = dist_fin, dist_inicio
@@ -75,14 +80,20 @@ class SectionManager:
 
         if dist_inicio < 0 or dist_fin > longitud_total:
             raise Exception(
-                "Las distancias de recorte están fuera de la longitud de la sección."
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The clipping distances are outside the section length."
+                )
             )
 
         vertices = list(geom.vertices())
 
         if len(vertices) < 2:
-            raise Exception(
-                "La sección debe contener al menos dos vértices."
+           raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The section must contain at least two vertices."
+                )
             )
 
         puntos_salida = []
@@ -150,7 +161,10 @@ class SectionManager:
 
         if len(puntos_salida) < 2:
             raise Exception(
-                "No fue posible recortar la sección entre las distancias indicadas."
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "Could not clip the section between the specified distances."
+                )
             )
 
         return QgsGeometry.fromPolylineXY(puntos_salida)
@@ -192,10 +206,20 @@ class SectionManager:
             return geom
 
         if not source_crs.isValid():
-            raise Exception(self.tr("El CRS de origen no es válido."))
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The source CRS is not valid."
+                )
+            )
 
         if not target_crs.isValid():
-            raise Exception(self.tr("El CRS de destino no es válido."))
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The destination CRS is not valid."
+                )
+            )
 
         if source_crs == target_crs:
             return QgsGeometry(geom)
@@ -245,10 +269,20 @@ class SectionManager:
     ) -> QgsVectorLayer:
 
         if source_feature is None:
-            raise Exception(self.tr("No se proporcionó una sección válida."))
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "No valid section was provided."
+                )
+            )
 
         if target_crs is None or not target_crs.isValid():
-            raise Exception(self.tr("El CRS de destino no es válido."))
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The destination CRS is not valid."
+                )
+            )
 
         crs_authid = target_crs.authid()
 

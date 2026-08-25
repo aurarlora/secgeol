@@ -12,7 +12,7 @@ from qgis.core import (
 
 )
 
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant, QCoreApplication
 
 class ProfileManager:
     #Lee un valor del DEM
@@ -50,7 +50,12 @@ class ProfileManager:
         height = dem_layer.height()
 
         if width == 0 or height == 0:
-            raise Exception("El DEM no tiene dimensiones válidas.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The DEM has invalid dimensions."
+                )
+            )
 
         pixel_size_x = extent.width() / width
         pixel_size_y = extent.height() / height
@@ -62,10 +67,20 @@ class ProfileManager:
     
     def _densify_line_geometry(self, line_geom: QgsGeometry, distance: float) -> QgsGeometry:
         if line_geom is None or line_geom.isEmpty():
-            raise Exception("La geometría de la sección está vacía.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The section geometry is empty."
+                )
+            )
 
         if distance <= 0:
-            raise Exception("La distancia de densificación debe ser mayor que cero.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The densification distance must be greater than zero."
+                )
+            )
 
         return line_geom.densifyByDistance(distance)
      
@@ -78,13 +93,21 @@ class ProfileManager:
         dem_layer: QgsRasterLayer
         ):
         if line_geom is None or line_geom.isEmpty():
-            raise Exception("La geometría de la sección está vacía.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The section geometry is empty."
+                )
+            )
 
         vertices = list(line_geom.vertices())
         # valida que la línea densificada tenga al menos dos vértices
         if len(vertices) < 2:
             raise Exception(
-                "La línea densificada no tiene suficientes vértices."
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The densified line does not have enough vertices."
+                )
             )
 
         features = []
@@ -110,18 +133,23 @@ class ProfileManager:
             if elev is None:
                 if last_valid_elev is None:
                     raise Exception(
-                        "No fue posible obtener una elevación válida "
-                        f"para el primer punto del perfil: "
-                        f"X={pt.x():.3f}, Y={pt.y():.3f}."
+                        QCoreApplication.translate(
+                            "SecGeol",
+                            "Could not obtain a valid elevation for the first profile point: "
+                        )
+                        + f"X={pt.x():.3f}, Y={pt.y():.3f}."
                     )
 
                 elev = last_valid_elev
 
                 QgsMessageLog.logMessage(
                     (
-                        "Elevación no disponible. "
-                        f"Se utilizó el valor anterior en el punto {pt_id}: "
-                        f"{elev:.3f} m"
+                        QCoreApplication.translate(
+                            "SecGeol",
+                            "Elevation is not available. "
+                            "The previous value was used at point "
+                        )
+                        + f"{pt_id}: {elev:.3f} m"
                     ),
                     "SecGeol",
                     Qgis.Warning
@@ -161,13 +189,28 @@ class ProfileManager:
         elevation_field
     ):
         if section_geom is None or section_geom.isEmpty():
-            raise Exception("La geometría de la sección está vacía.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The section geometry is empty."
+                )
+            )
 
         if contour_layer is None or not contour_layer.isValid():
-            raise Exception("La capa de curvas de nivel no es válida.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The contour line layer is not valid."
+                )
+            )
 
         if not elevation_field:
-            raise Exception("No se ha seleccionado el campo de elevación.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "No elevation field has been selected."
+                )
+            )
 
         resultados = []
 
@@ -211,8 +254,11 @@ class ProfileManager:
 
         if len(resultados) < 2:
             raise Exception(
-                "Se requieren al menos dos intersecciones entre "
-                "la sección y las curvas de nivel."
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "At least two intersections between the section "
+                    "and the contour lines are required."
+                )
             )
 
         # Ordenar las intersecciones según el sentido de la sección
@@ -306,7 +352,12 @@ class ProfileManager:
     def _build_profile_box_lines(self, features,  extra_depth: float = 100.0):
        
         if not features:
-            raise Exception("No hay puntos de perfil para construir la caja.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "There are no profile points available to construct the profile box."
+                )
+            )
 
         pts = []
         for feat in features:
@@ -318,7 +369,12 @@ class ProfileManager:
             pts.append(QgsPointXY(pt.x(), pt.y()))
 
         if len(pts) < 2:
-            raise Exception("Se requieren al menos dos puntos válidos para construir la caja del perfil.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "At least two valid points are required to construct the profile box."
+                )
+            )
 
         pt_ini = pts[0]
         pt_fin = pts[-1]
@@ -469,12 +525,22 @@ class ProfileManager:
             segmentos_geo = []
 
         if section_layer is None or not section_layer.isValid():
-            raise Exception("La capa de sección no es válida.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The section layer is not valid."
+                )
+            )
 
 
         if profile_point_features is None:
             if dem_layer is None or not dem_layer.isValid():
-                raise Exception("La capa DEM no es válida.")
+                raise Exception(
+                    QCoreApplication.translate(
+                        "SecGeol",
+                        "The DEM layer is not valid."
+                    )
+                )
 
             pixel_size = self._get_dem_pixel_size(dem_layer)
 
@@ -500,28 +566,23 @@ class ProfileManager:
                 break
 
         if line_geom is None or line_geom.isEmpty():
-            raise Exception("No se encontró una geometría válida en la capa de sección.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "No valid geometry was found in the section layer."
+                )
+            )
 
-
-        # DENSIFICAR SEGÚN EL DEM
-
-       # pixel_size = self._get_dem_pixel_size(dem_layer)
-
-      # dense_geom = self._densify_line_geometry(line_geom, pixel_size)
-        
-
-
-        # GENERAR PUNTOS DEL PERFIL
-
-        #profile_point_features = self._generate_profile_points_from_vertices(
-        #    line_geom=dense_geom,
-        #    dem_layer=dem_layer
-        #)
 
         # Solo si NO llegaron puntos desde curvas, usar DEM
         
         if not profile_point_features:
-            raise Exception("No fue posible generar puntos para el perfil.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "Could not generate profile points."
+                )
+            )
 
         
         # CONSTRUIR PERFIL + CAJA
@@ -723,7 +784,12 @@ class ProfileManager:
     def build_geological_polygon_layer(self, line_layer, layer_name="perfil_geologico"):
 
         if line_layer is None or not line_layer.isValid():
-            raise Exception("La capa de líneas del perfil no es válida.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The profile line layer is not valid."
+                )
+            )
 
         crs_authid = line_layer.crs().authid()
         if not crs_authid:
@@ -776,12 +842,16 @@ class ProfileManager:
 
 
         if polygon_geoms is None or polygon_geoms.isEmpty():
-
             QgsMessageLog.logMessage(
-                "Polygonize no generó polígonos.",
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "Polygonize did not generate any polygons."
+                ),
                 "SecGeol",
                 Qgis.Warning
             )
+
+            
 
             QgsProject.instance().addMapLayer(out_layer)
 
@@ -835,7 +905,12 @@ class ProfileManager:
         ):
 
         if line_layer is None or not line_layer.isValid():
-            raise Exception("La capa de líneas no es válida.")
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "The line layer is not valid."
+                )
+            )   
 
         crs_authid = line_layer.crs().authid()
 
