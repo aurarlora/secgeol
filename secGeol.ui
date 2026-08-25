@@ -36,19 +36,19 @@
     </property>
     <widget class="QWidget" name="uno">
      <attribute name="title">
-      <string>1. Sección a perfil</string>
+      <string> 1. Section to profile</string>
      </attribute>
      <widget class="QLabel" name="label_4">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>340</y>
-        <width>121</width>
+        <width>221</width>
         <height>20</height>
        </rect>
       </property>
       <property name="text">
-       <string>* Perfil de salida (*.shp)</string>
+       <string>* Save topographic profile (*.shp)</string>
       </property>
      </widget>
      <widget class="QFrame" name="frame">
@@ -76,7 +76,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Dibuja</string>
+        <string>Draw</string>
        </property>
       </widget>
       <widget class="QCheckBox" name="checkInvSec">
@@ -89,7 +89,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Invertir el sentidode la sección</string>
+        <string>Reverse section direction</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_2">
@@ -102,7 +102,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>* Sección</string>
+        <string>Section</string>
        </property>
       </widget>
       <widget class="QgsMapLayerComboBox" name="MapLayerSec">
@@ -137,14 +137,14 @@
       <widget class="QLabel" name="label_7">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>240</x>
          <y>40</y>
-         <width>81</width>
+         <width>41</width>
          <height>31</height>
         </rect>
        </property>
        <property name="text">
-        <string>Profundidad</string>
+        <string>Depth</string>
        </property>
       </widget>
      </widget>
@@ -196,7 +196,7 @@
       <widget class="QgsFieldComboBox" name="FieldAzimuthEst">
        <property name="geometry">
         <rect>
-         <x>270</x>
+         <x>110</x>
          <y>90</y>
          <width>101</width>
          <height>21</height>
@@ -206,37 +206,25 @@
       <widget class="QgsFieldComboBox" name="FieldDipEst">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>280</x>
          <y>90</y>
          <width>91</width>
          <height>21</height>
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="label_8">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>90</y>
-         <width>49</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Echado</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="FieldAzimuthEst_2">
        <property name="geometry">
         <rect>
-         <x>220</x>
-         <y>90</y>
+         <x>30</x>
+         <y>80</y>
          <width>51</width>
-         <height>20</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="text">
-        <string>Azimuth</string>
+        <string>Dip 
+azimuth</string>
        </property>
       </widget>
       <widget class="QCheckBox" name="checkGeo">
@@ -249,7 +237,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Geología</string>
+        <string>Geology</string>
        </property>
       </widget>
       <widget class="QCheckBox" name="checkEst">
@@ -262,7 +250,20 @@
         </rect>
        </property>
        <property name="text">
-        <string>Estructural</string>
+        <string>Structures</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_8">
+       <property name="geometry">
+        <rect>
+         <x>240</x>
+         <y>90</y>
+         <width>31</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Dip</string>
        </property>
       </widget>
      </widget>
@@ -318,7 +319,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Curvas de nivel</string>
+       <string>Contour lines</string>
       </property>
      </widget>
      <widget class="QgsMapLayerComboBox" name="MapLayerCurvas">
@@ -366,8 +367,8 @@
         </rect>
        </property>
        <property name="text">
-        <string>* Modelo Digital 
- de Elevación</string>
+        <string>* Digital Elevation 
+  Model</string>
        </property>
       </widget>
      </widget>
@@ -383,7 +384,7 @@
     </widget>
     <widget class="QWidget" name="dos">
      <attribute name="title">
-      <string>2. Lineas a poligonos</string>
+      <string>2. Lines to polygons</string>
      </attribute>
      <widget class="QCheckBox" name="checkEjes">
       <property name="geometry">
@@ -395,7 +396,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Crear ejes X, Y</string>
+       <string>Create X, Y axes</string>
       </property>
      </widget>
      <widget class="QgsFileWidget" name="fileWidgetPerfilGeo">
@@ -447,7 +448,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>* Perfil topográfico</string>
+       <string>Topographic profile</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_6">
@@ -455,18 +456,18 @@
        <rect>
         <x>10</x>
         <y>260</y>
-        <width>211</width>
+        <width>251</width>
         <height>20</height>
        </rect>
       </property>
       <property name="text">
-       <string>* Perfil geológico de salida (*.shp)</string>
+       <string>* Save polygonal geological profile (*.shp)</string>
       </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tres">
      <attribute name="title">
-      <string>3. Perfil 2D a 3D</string>
+      <string>3. 2D profile to 3D</string>
      </attribute>
      <widget class="QgsMapLayerComboBox" name="MapLayerPerGeo">
       <property name="geometry">
@@ -488,7 +489,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>* Perfil geológico de polígonos (fase 2)</string>
+       <string>* Polygonal geological profile (step 2)</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_10">
@@ -496,12 +497,12 @@
        <rect>
         <x>20</x>
         <y>190</y>
-        <width>171</width>
+        <width>241</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>* Perfil geológico 3D (*.shp)</string>
+       <string>* Save 3D geological profile (*.shp)</string>
       </property>
      </widget>
      <widget class="QgsFileWidget" name="fileWidgetPerfilGeo3D">
@@ -543,7 +544,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>* Sección guía (fase 1)</string>
+       <string>* Guide section (step 1)</string>
       </property>
      </widget>
      <widget class="QgsMapLayerComboBox" name="MapLayerSecGuia">

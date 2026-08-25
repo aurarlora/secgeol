@@ -1,15 +1,12 @@
 import os, re, unicodedata
-import tempfile
-from datetime import datetime
 from .secgeol_dialog import SecGeolDialog
-
-from qgis.PyQt.QtCore import QCoreApplication
+from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTranslator
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import ( 
                         QgsWkbTypes,QgsVectorLayer,
                         QgsProject,QgsVectorFileWriter,
-                        Qgis, QgsGeometry,  QgsMessageLog,
+                        Qgis, QgsGeometry,
                        )
 
 class SecGeol:
@@ -17,8 +14,34 @@ class SecGeol:
         self.iface = iface
         self.plugin_dir = os.path.dirname(__file__)
         self.action = None
-        self.menu = self.tr("SecGeol")
         self.dlg = None
+
+        # Traducción
+        self.translator = None
+
+        locale = QSettings().value(
+            "locale/userLocale",
+            ""
+        )
+
+        locale = locale[0:2] if locale else ""
+
+        locale_path = os.path.join(
+            self.plugin_dir,
+            "i18n",
+            f"secgeol_{locale}.qm"
+        )
+
+        if os.path.exists(locale_path):
+            self.translator = QTranslator()
+
+            if self.translator.load(locale_path):
+                QCoreApplication.installTranslator(
+                    self.translator
+                )
+
+        self.menu = self.tr("SecGeol")
+
 
     def tr(self, message):
         return QCoreApplication.translate("SecGeol", message)
