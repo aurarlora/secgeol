@@ -358,11 +358,13 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         
         for w in [
             self.MapLayerDEM,
+            self.MapLayerCurvas,
             self.MapLayerSec,
             self.btnDrawSec,
             self.checkInvSec,
             self.MapLayerGeo,
             self.FieldClasGeo,
+            self.FieldElevCurvas,
             self.MapLayerEst,
             self.doubleSpinBox,
             self.checkEjes,
@@ -370,7 +372,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             self.FieldDipEst,
             self.FieldAzimuthEst,
             self.MapLayerSecLin,
-            self.checkEjes,
+            self.checkGeo,
+            self.checkEst,
             self.MapLayerPerGeo,
             self.MapLayerSecGuia,
             self.fileWidgetPerfilGeo3D,
@@ -384,6 +387,23 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.MapLayerDEM.setToolTip(
             "Seleccione el modelo digital de elevación (DEM)."
         )
+
+        self.MapLayerCurvas.setToolTip(
+            "Seleccione una capa de curvas de nivel como fuente de elevación."
+        )
+
+        self.FieldElevCurvas.setToolTip(
+            "Seleccione el campo numérico que contiene la elevación de las curvas de nivel."
+        )
+
+        self.checkGeo.setToolTip(
+            "Incorporar información geológica al perfil."
+        )
+
+        self.checkEst.setToolTip(
+            "Incorporar estructuras geológicas al perfil."
+        )
+
         self.MapLayerSec.setToolTip(
             "Seleccione la capa que contiene la línea de sección."
         )
@@ -409,7 +429,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         )
 
         self.doubleSpinBox.setToolTip(
-            "Tamaño de la caja en metros (opcional). Use 0 para no generarla."
+             "Profundidad de la caja del perfil en metros. El valor predeterminado es 100 m."
         )
 
         self.checkEjes.setToolTip(
@@ -420,6 +440,26 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             "Seleccione el archivo de salida para guardar el perfil."
         )
 
+        #Tab3
+        self.MapLayerSecLin.setToolTip(
+            "Seleccione el perfil topográfico que será convertido en polígonos."
+        )
+
+        self.fileWidgetPerfilGeo.setToolTip(
+            "Seleccione el archivo de salida para guardar el perfil geológico 2D."
+        )
+
+        self.MapLayerPerGeo.setToolTip(
+            "Seleccione el perfil geológico poligonal 2D que será reconstruido en 3D."
+        )
+
+        self.MapLayerSecGuia.setToolTip(
+            "Seleccione la sección guía que proporciona la referencia espacial del perfil."
+        )
+
+        self.fileWidgetPerfilGeo3D.setToolTip(
+            "Seleccione el archivo de salida para guardar el perfil geológico 3D."
+        )
 
     def on_section_layer_changed(self, layer):
         if layer is not None:
@@ -572,6 +612,50 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             elif obj == self.MapLayerSec:
                 self.actualizar_info_seccion()
 
+
+            elif obj == self.MapLayerCurvas:  
+                self.mostrar_ayuda(
+                    "Curvas de nivel",
+                    """
+                    <p>
+                        Seleccione una capa vectorial de <b>líneas</b> que contenga
+                        las curvas de nivel utilizadas como fuente de elevación.
+                    </p>
+
+                    <p>
+                        SecGeol calculará las intersecciones entre la línea de sección
+                        y las curvas de nivel para construir el perfil topográfico.
+                    </p>
+
+                    <p>
+                        <b>Importante:</b> el perfil se limitará desde la primera
+                        hasta la última curva de nivel intersectada. La primera
+                        intersección se establecerá como <b>X = 0</b>.
+                    </p>
+                    """
+                )
+
+            elif obj == self.FieldElevCurvas:
+                self.mostrar_ayuda(
+                    "Campo de elevación",
+                    """
+                    <p>
+                        Seleccione el campo numérico que contiene la
+                        <b>cota o elevación</b> de cada curva de nivel.
+                    </p>
+
+                    <p>
+                        SecGeol muestra únicamente los <b>campos numéricos</b>
+                        disponibles en la capa seleccionada.
+                    </p>
+
+                    <p>
+                        Los valores deben almacenarse como números, sin unidades,
+                        símbolos ni texto adicional.
+                    </p>
+                    """
+                )
+
             elif obj == self.btnDrawSec:
                 self.mostrar_ayuda(
                    "Dibujar sección",
@@ -601,6 +685,47 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                     <p>
                         Active esta opción cuando necesite intercambiar el
                         <b>inicio y el final</b> de la sección.
+                    </p>
+                    """
+                )
+
+            elif obj == self.checkGeo:
+                self.mostrar_ayuda(
+                    "Incorporar geología",
+                    """
+                    <p>
+                        Active esta opción para incorporar una capa geológica
+                        poligonal al perfil.
+                    </p>
+
+                    <p>
+                        SecGeol intersectará las unidades geológicas con la línea
+                        de sección y las representará sobre el perfil topográfico.
+                    </p>
+
+                    <p>
+                        Esta opción es <b>opcional</b>.
+                    </p>
+                    """
+                )
+
+            elif obj == self.checkEst:
+                self.mostrar_ayuda(
+                    "Incorporar estructuras",
+                    """
+                    <p>
+                        Active esta opción para incorporar estructuras geológicas
+                        representadas mediante una capa vectorial de líneas.
+                    </p>
+
+                    <p>
+                        SecGeol utilizará los campos de <b>echado</b> y
+                        <b>azimut de buzamiento</b> para representar las estructuras
+                        que intersectan la sección.
+                    </p>
+
+                    <p>
+                        Esta opción es <b>opcional</b>.
                     </p>
                     """
                 )
@@ -759,38 +884,103 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             elif obj == self.MapLayerSecGuia:
                 self.mostrar_ayuda(
                     "Sección guía",
-                    "Seleccione el perfil geológico interpretado y la sección guía generada en el módulo 1.<br><br>"
-                    "La sección guía contiene la referencia espacial necesaria para reconstruir el perfil en coordenadas reales."
+                    """
+                    <p>
+                        Seleccione la <b>sección guía</b> generada en el módulo
+                        <b>1. Sección a perfil</b>.
+                    </p>
+
+                    <p>
+                        Esta capa conserva la referencia espacial utilizada para
+                        generar el perfil y permite reconstruir la interpretación
+                        geológica en sus coordenadas reales.
+                    </p>
+
+                    <p>
+                        Cuando el perfil se genera a partir de curvas de nivel,
+                        la sección guía corresponde únicamente al tramo comprendido
+                        entre la primera y la última intersección.
+                    </p>
+                    """
                 )
 
             elif obj == self.MapLayerPerGeo:
                 self.mostrar_ayuda(
-                    "Perfil geológico",
-                    "Seleccione la capa poligonal generada en el módulo 2. "
-                    "Esta capa contiene la interpretación geológica que será reconstruida en 3D."
+                    "Perfil geológico 2D",
+                    """
+                    <p>
+                        Seleccione la capa poligonal generada en el módulo
+                        <b>2. Líneas a polígonos</b>.
+                    </p>
+
+                    <p>
+                        Esta capa contiene la interpretación geológica del perfil
+                        en coordenadas locales, donde el eje X representa la
+                        distancia a lo largo de la sección.
+                    </p>
+
+                    <p>
+                        SecGeol utilizará esta geometría junto con la sección guía
+                        para reconstruir el perfil en coordenadas espaciales reales.
+                    </p>
+                    """
                 )
            
 
             elif obj == self.fileWidgetPerfilGeo:
                 self.mostrar_ayuda(
-                    "Salida perfil geológico",
-                    "Seleccione la ubicación donde se guardará la capa poligonal del perfil geológico. "
-                    "Esta capa contendrá la interpretación geológica y podrá utilizarse posteriormente "
-                    "en el módulo de reconstrucción 3D."
+                    "Salida del perfil geológico",
+                    """
+                    <p>
+                        Seleccione la ubicación y el nombre del archivo donde se
+                        guardará el <b>perfil geológico poligonal 2D</b>.
+                    </p>
+
+                    <p>
+                        Esta capa podrá utilizarse posteriormente en el módulo
+                        <b>3. Perfil 2D a 3D</b>.
+                    </p>
+                    """
                 )
 
             elif obj == self.fileWidgetPerfilGeo3D:
                 self.mostrar_ayuda(
-                    "Salida perfil geológico 3D",
-                    "Seleccione la ubicación donde se guardará el perfil geológico reconstruido "
-                    "en coordenadas espaciales reales para su visualización y análisis tridimensional."
+                    "Salida del perfil geológico 3D",
+                    """
+                    <p>
+                        Seleccione la ubicación y el nombre del archivo donde se
+                        guardará el perfil geológico reconstruido en
+                        <b>coordenadas espaciales reales</b>.
+                    </p>
+
+                    <p>
+                        La salida conserva la geometría tridimensional necesaria
+                        para su visualización y análisis en entornos 3D.
+                    </p>
+                    """
                 )
 
             elif obj == self.MapLayerSecLin:
                 self.mostrar_ayuda(
                     "Perfil topográfico",
-                    "Seleccione la capa Perfil_topografico generada en el módulo 1 y ajustada de acuerdo con la interpretación geológica. "
-                    "Las líneas se convertirán en polígonos para construir el perfil geológico final, asignar simbología litológica y generar salidas cartográficas con escalas reales."
+                    """
+                    <p>
+                        Seleccione la capa <b>Perfil_topografico</b> generada en el
+                        módulo <b>1. Sección a perfil</b>.
+                    </p>
+
+                    <p>
+                        Esta capa contiene la línea del terreno y los elementos
+                        asociados al perfil. Puede ser ajustada durante la
+                        interpretación geológica antes de convertir las líneas
+                        en polígonos.
+                    </p>
+
+                    <p>
+                        El módulo <b>2. Líneas a polígonos</b> utilizará estas
+                        geometrías para construir el perfil geológico poligonal.
+                    </p>
+                    """
                 )
 
 
