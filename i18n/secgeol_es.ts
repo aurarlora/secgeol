@@ -1,129 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1">
+<TS version="2.1" language="es_MX" sourcelanguage="en_US">
 <context>
     <name>Dialog</name>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>SecGeol</source>
-        <translation type="unfinished" />
+        <translation>SecGeol</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source> 1. Section to profile</source>
-        <translation type="unfinished" />
+        <translation> 1. Sección a perfil</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>* Save topographic profile (*.shp)</source>
-        <translation type="unfinished" />
+        <translation>* Guardar perfil topográfico (*.shp)</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>Draw</source>
-        <translation type="unfinished" />
+        <translation>Dibujar</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>Reverse section direction</source>
-        <translation type="unfinished" />
+        <translation>Invertir dirección de la sección</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>Section</source>
-        <translation type="unfinished" />
+        <translation>Sección</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>Depth</source>
-        <translation type="unfinished" />
+        <translation>Profundidad</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>Dip 
 azimuth</source>
-        <translation type="unfinished" />
+        <translation>Azimut de
+buzamiento</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>Geology</source>
-        <translation type="unfinished" />
+        <translation>Geología</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>Structures</source>
-        <translation type="unfinished" />
+        <translation>Estructuras</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>Dip</source>
-        <translation type="unfinished" />
+        <translation>Echado</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
-        <source>Guardar perfil topográfico</source>
-        <translation type="unfinished" />
+        <source>Save topographic profile</source>
+        <translation>Guardar perfil topográfico</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>Contour lines</source>
-        <translation type="unfinished" />
+        <translation>Curvas de nivel</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>* Digital Elevation 
   Model</source>
-        <translation type="unfinished" />
+        <translation>* Modelo digital de 
+  elevación</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>2. Lines to polygons</source>
-        <translation type="unfinished" />
+        <translation>2. Líneas a polígonos</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>Create X, Y axes</source>
-        <translation type="unfinished" />
+        <translation>Crear ejes X, Y</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
-        <source>Guardar perfil geológico de polígonos</source>
-        <translation type="unfinished" />
+        <source>Save polygonal geological profile</source>
+        <translation>Guardar perfil geológico de polígonos</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>Topographic profile</source>
-        <translation type="unfinished" />
+        <translation>Perfil topográfico</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>* Save polygonal geological profile (*.shp)</source>
-        <translation type="unfinished" />
+        <translation>* Guardar perfil geológico poligonal (*.shp)</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>3. 2D profile to 3D</source>
-        <translation type="unfinished" />
+        <translation>3. Perfil 2D a 3D</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>* Polygonal geological profile (step 2)</source>
-        <translation type="unfinished" />
+        <translation>* Perfil geológico poligonal (paso 2)</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>* Save 3D geological profile (*.shp)</source>
-        <translation type="unfinished" />
+        <translation>* Guardar perfil geológico 3D (*.shp)</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
-        <source>Guardar perfil geológico 3D</source>
-        <translation type="unfinished" />
+        <source>Save 3D geological profile</source>
+        <translation>Guardar perfil geológico 3D</translation>
     </message>
     <message>
         <location filename="..\secGeol.ui" line="0" />
         <source>* Guide section (step 1)</source>
-        <translation type="unfinished" />
+        <translation>* Sección guía (paso 1)</translation>
+    </message>
+    <message>
+        <source>Guardar perfil geológico 3D</source>
+        <translation type="vanished">Guardar perfil geológico 3D</translation>
+    </message>
+    <message>
+        <source>Guardar perfil geológico de polígonos</source>
+        <translation type="vanished">Guardar perfil geológico de polígonos</translation>
+    </message>
+    <message>
+        <source>Guardar perfil topográfico</source>
+        <translation type="vanished">Guardar perfil topográfico</translation>
     </message>
 </context><context>
     <name>SecGeol</name>
@@ -142,49 +156,49 @@ azimuth</source>
         <location filename="..\secgeol.py" line="54" />
         <location filename="..\secgeol.py" line="43" />
         <source>SecGeol</source>
-        <translation type="unfinished" />
+        <translation>SecGeol</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="91" />
         <source>Draw the section on the map: click to start and right-click to finish.</source>
-        <translation type="unfinished" />
+        <translation>Dibuje la sección en el mapa: haga clic para iniciar y clic derecho para finalizar.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="592" />
         <location filename="..\secgeol.py" line="112" />
         <source>Select a section layer or draw one.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione una capa de sección o dibuje una.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="601" />
         <location filename="..\secgeol.py" line="118" />
         <source>The section layer must be a line layer.</source>
-        <translation type="unfinished" />
+        <translation>La capa de sección debe ser una capa de líneas.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="127" />
         <source>The section layer contains no features.</source>
-        <translation type="unfinished" />
+        <translation>La capa de sección no contiene registros.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="133" />
         <source>More than one section is selected. Leave only one line selected.</source>
-        <translation type="unfinished" />
+        <translation>Hay más de una sección seleccionada. Deje seleccionada una sola línea.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="146" />
         <source>Could not retrieve the selected section.</source>
-        <translation type="unfinished" />
+        <translation>No fue posible obtener la sección seleccionada.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="154" />
         <source>Could not retrieve the section.</source>
-        <translation type="unfinished" />
+        <translation>No fue posible obtener la sección.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="160" />
         <source>The layer contains more than one section. Select a single line to continue.</source>
-        <translation type="unfinished" />
+        <translation>La capa contiene más de una sección. Seleccione una sola línea para continuar.</translation>
     </message>
     <message>
         <location filename="..\core\section.py" line="70" />
@@ -193,258 +207,258 @@ azimuth</source>
         <location filename="..\core\profile.py" line="71" />
         <location filename="..\secgeol.py" line="173" />
         <source>The section geometry is empty.</source>
-        <translation type="unfinished" />
+        <translation>La geometría de la sección está vacía.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="182" />
         <source>Could not interpret the section geometry.</source>
-        <translation type="unfinished" />
+        <translation>No fue posible interpretar la geometría de la sección.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="188" />
         <source>The section contains separate lines within the same feature. SecGeol accepts only one line per section.</source>
-        <translation type="unfinished" />
+        <translation>La sección contiene líneas independientes dentro del mismo registro. SecGeol acepta una sola línea por sección.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="206" />
         <source>Could not retrieve the drawn section.</source>
-        <translation type="unfinished" />
+        <translation>No fue posible obtener la sección dibujada.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="213" />
         <source>The drawn section does not contain a valid geometry.</source>
-        <translation type="unfinished" />
+        <translation>La sección dibujada no contiene una geometría válida.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="227" />
         <source>Could not retrieve the section geometry.</source>
-        <translation type="unfinished" />
+        <translation>No fue posible obtener la geometría de la sección.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="247" />
         <source>You must specify an output file.</source>
-        <translation type="unfinished" />
+        <translation>Debe especificar un archivo de salida.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="252" />
         <source>The profile layer is not valid.</source>
-        <translation type="unfinished" />
+        <translation>La capa del perfil no es válida.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="257" />
         <source>The guide section layer is not valid.</source>
-        <translation type="unfinished" />
+        <translation>La capa de sección guía no es válida.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="267" />
         <source>The output folder is not valid.</source>
-        <translation type="unfinished" />
+        <translation>La carpeta de salida no es válida.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="370" />
         <source>The profile could not be saved: </source>
-        <translation type="unfinished" />
+        <translation>No fue posible guardar el perfil: </translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="389" />
         <source>The guide section could not be saved: </source>
-        <translation type="unfinished" />
+        <translation>No fue posible guardar la sección guía: </translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="411" />
         <source>The saved profile layer could not be loaded.</source>
-        <translation type="unfinished" />
+        <translation>La capa de perfil guardada no pudo cargarse.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="416" />
         <source>The saved guide section layer could not be loaded.</source>
-        <translation type="unfinished" />
+        <translation>La capa de sección guía guardada no pudo cargarse.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="484" />
         <source>Select an elevation source: a DEM or a contour line layer.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione una fuente de elevación: un DEM o una capa de curvas de nivel.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="498" />
         <source>The selected DEM layer is not a raster layer.</source>
-        <translation type="unfinished" />
+        <translation>La capa DEM seleccionada no es una capa raster.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="507" />
         <source>The DEM CRS is not valid.</source>
-        <translation type="unfinished" />
+        <translation>El SRC del DEM no es válido.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="511" />
         <source>The DEM coordinate reference system is not valid.</source>
-        <translation type="unfinished" />
+        <translation>El sistema de referencia de coordenadas del DEM no es válido.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="519" />
         <source>The DEM must use metric units.</source>
-        <translation type="unfinished" />
+        <translation>El DEM debe utilizar unidades métricas.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="523" />
         <source>The digital elevation model must use a projected coordinate reference system with units in meters.</source>
-        <translation type="unfinished" />
+        <translation>El modelo digital de elevación debe utilizar un sistema de referencia de coordenadas proyectado con unidades en metros.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="534" />
         <source>The DEM must contain a single band.</source>
-        <translation type="unfinished" />
+        <translation>El DEM debe contener una sola banda.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="538" />
         <source>The selected raster does not appear to be a digital elevation model. The layer may be an image and may not contain terrain elevation data.</source>
-        <translation type="unfinished" />
+        <translation>El raster seleccionado no parece ser un modelo digital de elevación. La capa puede ser una imagen y no contener datos de elevación del terreno.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="573" />
         <source>The DEM raster type is not valid.</source>
-        <translation type="unfinished" />
+        <translation>El tipo de raster del DEM no es válido.</translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="577" />
         <source>The selected raster does not appear to be a digital elevation model. Detected data type: </source>
-        <translation type="unfinished" />
+        <translation>El raster seleccionado no parece ser un modelo digital de elevación. Tipo de dato detectado: </translation>
     </message>
     <message>
         <location filename="..\secgeol.py" line="715" />
         <source>Profile created successfully.</source>
-        <translation type="unfinished" />
+        <translation>Perfil creado correctamente.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="130" />
         <source>Error finishing drawing: </source>
-        <translation type="unfinished" />
+        <translation>Error al finalizar el dibujo: </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1903" />
         <source>Error generating polygons/axes: </source>
-        <translation type="unfinished" />
+        <translation>Error al generar polígonos/ejes: </translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="54" />
         <source>The DEM has invalid dimensions.</source>
-        <translation type="unfinished" />
+        <translation>El DEM tiene dimensiones no válidas.</translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="79" />
         <source>The densification distance must be greater than zero.</source>
-        <translation type="unfinished" />
+        <translation>La distancia de densificación debe ser mayor que cero.</translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="107" />
         <source>The densified line does not have enough vertices.</source>
-        <translation type="unfinished" />
+        <translation>La línea densificada no tiene suficientes vértices.</translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="136" />
         <source>Could not obtain a valid elevation for the first profile point: </source>
-        <translation type="unfinished" />
+        <translation>No fue posible obtener una elevación válida para el primer punto del perfil: </translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="147" />
         <source>Elevation is not available. The previous value was used at point </source>
-        <translation type="unfinished" />
+        <translation>La elevación no está disponible. Se utilizó el valor anterior en el punto </translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="201" />
         <source>The contour line layer is not valid.</source>
-        <translation type="unfinished" />
+        <translation>La capa de curvas de nivel no es válida.</translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="209" />
         <source>No elevation field has been selected.</source>
-        <translation type="unfinished" />
+        <translation>No se ha seleccionado un campo de elevación.</translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="257" />
         <source>At least two intersections between the section and the contour lines are required.</source>
-        <translation type="unfinished" />
+        <translation>Se requieren al menos dos intersecciones entre la sección y las curvas de nivel.</translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="356" />
         <source>There are no profile points available to construct the profile box.</source>
-        <translation type="unfinished" />
+        <translation>No hay puntos de perfil disponibles para construir la caja del perfil.</translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="373" />
         <source>At least two valid points are required to construct the profile box.</source>
-        <translation type="unfinished" />
+        <translation>Se requieren al menos dos puntos válidos para construir la caja del perfil.</translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="529" />
         <source>The section layer is not valid.</source>
-        <translation type="unfinished" />
+        <translation>La capa de sección no es válida.</translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="539" />
         <source>The DEM layer is not valid.</source>
-        <translation type="unfinished" />
+        <translation>La capa DEM no es válida.</translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="570" />
         <source>No valid geometry was found in the section layer.</source>
-        <translation type="unfinished" />
+        <translation>No se encontró una geometría válida en la capa de sección.</translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="581" />
         <source>Could not generate profile points.</source>
-        <translation type="unfinished" />
+        <translation>No fue posible generar los puntos del perfil.</translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="788" />
         <source>The profile line layer is not valid.</source>
-        <translation type="unfinished" />
+        <translation>La capa de líneas del perfil no es válida.</translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="846" />
         <source>Polygonize did not generate any polygons.</source>
-        <translation type="unfinished" />
+        <translation>La poligonización no generó ningún polígono.</translation>
     </message>
     <message>
         <location filename="..\core\profile.py" line="909" />
         <source>The line layer is not valid.</source>
-        <translation type="unfinished" />
+        <translation>La capa de líneas no es válida.</translation>
     </message>
     <message>
         <location filename="..\core\section.py" line="83" />
         <source>The clipping distances are outside the section length.</source>
-        <translation type="unfinished" />
+        <translation>Las distancias de recorte están fuera de la longitud de la sección.</translation>
     </message>
     <message>
         <location filename="..\core\section.py" line="93" />
         <source>The section must contain at least two vertices.</source>
-        <translation type="unfinished" />
+        <translation>La sección debe contener al menos dos vértices.</translation>
     </message>
     <message>
         <location filename="..\core\section.py" line="164" />
         <source>Could not clip the section between the specified distances.</source>
-        <translation type="unfinished" />
+        <translation>No fue posible recortar la sección entre las distancias especificadas.</translation>
     </message>
     <message>
         <location filename="..\core\section.py" line="210" />
         <source>The source CRS is not valid.</source>
-        <translation type="unfinished" />
+        <translation>El SRC de origen no es válido.</translation>
     </message>
     <message>
         <location filename="..\core\section.py" line="281" />
         <location filename="..\core\section.py" line="218" />
         <source>The destination CRS is not valid.</source>
-        <translation type="unfinished" />
+        <translation>El SRC de destino no es válido.</translation>
     </message>
     <message>
         <location filename="..\core\section.py" line="273" />
         <source>No valid section was provided.</source>
-        <translation type="unfinished" />
+        <translation>No se proporcionó una sección válida.</translation>
     </message>
     <message>
         <location filename="..\core\workspace.py" line="55" />
         <source>Error creating layer: </source>
-        <translation type="unfinished" />
+        <translation>Error al crear la capa: </translation>
     </message>
 </context><context>
     <name>SecGeolDialog</name>
@@ -486,7 +500,43 @@ azimuth</source>
                 &lt;/p&gt;
             &lt;/div&gt;
             </source>
-        <translation type="unfinished" />
+        <translation>
+            &lt;div style="padding:10px; line-height:1.4;"&gt;
+                &lt;h3&gt;Herramienta de secciones geológicas&lt;/h3&gt;
+
+                &lt;p&gt;
+                    Este módulo genera un perfil topográfico a lo largo de una línea de
+                    sección definida por el usuario utilizando una de dos fuentes de elevación:
+                    un &lt;b&gt;modelo digital de elevación (DEM)&lt;/b&gt; o una
+                    &lt;b&gt;capa de curvas de nivel&lt;/b&gt;.
+                &lt;/p&gt;
+
+                &lt;p&gt;
+                    El perfil resultante puede utilizarse como base para la interpretación
+                    geológica y la construcción de secciones geológicas.
+                &lt;/p&gt;
+
+                &lt;p&gt;
+                    &lt;b&gt;Requisitos:&lt;/b&gt;&lt;br&gt;
+                    - Cargue todas las capas de entrada en el proyecto actual de QGIS.&lt;br&gt;
+                    - Utilice un sistema de referencia de coordenadas proyectado con unidades
+                    métricas (se recomienda UTM).&lt;br&gt;
+                    - Asegúrese de que las capas de entrada utilicen sistemas de referencia
+                    de coordenadas compatibles.
+                &lt;/p&gt;
+
+                &lt;p&gt;
+                    Cuando se utilizan curvas de nivel como fuente de elevación, el perfil
+                    queda limitado al segmento comprendido entre la primera y la última
+                    intersección. A la primera intersección se le asigna &lt;b&gt;X = 0&lt;/b&gt;.
+                &lt;/p&gt;
+
+                &lt;p&gt;
+                    &lt;b&gt;Consejo:&lt;/b&gt; Los campos marcados con un asterisco (*) son obligatorios.&lt;br&gt;
+                    Coloque el cursor sobre cada control para mostrar información adicional.
+                &lt;/p&gt;
+            &lt;/div&gt;
+        </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="287" />
@@ -512,7 +562,29 @@ azimuth</source>
                 &lt;/p&gt;
             &lt;/div&gt;
             </source>
-        <translation type="unfinished" />
+        <translation>
+            &lt;div style="padding:10px; line-height:1.4; font-size:12px;"&gt;
+                &lt;h3&gt;Líneas a polígonos&lt;/h3&gt;
+
+                &lt;p&gt;
+                    Este módulo convierte las líneas interpretadas del perfil,
+                    generadas a partir del perfil topográfico, en geometrías
+                    poligonales cerradas.
+                &lt;/p&gt;
+
+                &lt;p&gt;
+                    Los polígonos resultantes representan la interpretación geológica
+                    de la sección en coordenadas locales del perfil y pueden utilizarse
+                    como entrada para el módulo de reconstrucción 3D.
+                &lt;/p&gt;
+
+                &lt;p&gt;
+                    Antes de ejecutar este paso, ajuste las líneas del perfil de acuerdo
+                    con la interpretación geológica y verifique que las geometrías
+                    necesarias para formar los polígonos estén correctamente conectadas.
+                &lt;/p&gt;
+            &lt;/div&gt;
+            </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="312" />
@@ -538,112 +610,133 @@ azimuth</source>
                 &lt;/p&gt;
             &lt;/div&gt;
             </source>
-        <translation type="unfinished" />
+        <translation>
+            &lt;div style="padding:10px; line-height:1.4; font-size:12px;"&gt;
+                &lt;h3&gt;Reconstrucción geológica 3D&lt;/h3&gt;
+
+                &lt;p&gt;
+                    Seleccione el perfil geológico interpretado generado en
+                    &lt;b&gt;2. Líneas a polígonos&lt;/b&gt; y la &lt;b&gt;sección guía&lt;/b&gt;
+                    generada en &lt;b&gt;1. Sección a perfil&lt;/b&gt;.
+                &lt;/p&gt;
+
+                &lt;p&gt;
+                    La sección guía conserva la referencia espacial utilizada para generar
+                    el perfil topográfico y permite reconstruir la interpretación geológica
+                    2D en coordenadas reales.
+                &lt;/p&gt;
+
+                &lt;p&gt;
+                    La salida resultante es un &lt;b&gt;perfil geológico 3D&lt;/b&gt; que puede
+                    visualizarse y analizarse en entornos tridimensionales.
+                &lt;/p&gt;
+            &lt;/div&gt;
+            </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="425" />
         <source>Select a digital elevation model (DEM).</source>
-        <translation type="unfinished" />
+        <translation>Seleccione un modelo digital de elevación (DEM).</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="429" />
         <source>Select a contour line layer as the elevation source.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione una capa de curvas de nivel como fuente de elevación.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="433" />
         <source>Select the numeric field containing contour elevations.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione el campo numérico que contiene las cotas de las curvas de nivel.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="437" />
         <source>Include geological information in the profile.</source>
-        <translation type="unfinished" />
+        <translation>Incluya información geológica en el perfil.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="441" />
         <source>Include geological structures in the profile.</source>
-        <translation type="unfinished" />
+        <translation>Incluya estructuras geológicas en el perfil.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="445" />
         <source>Select the layer containing the section line.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione la capa que contiene la línea de sección.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="449" />
         <source>Draw a section line directly on the map.</source>
-        <translation type="unfinished" />
+        <translation>Dibuje una línea de sección directamente sobre el mapa.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="453" />
         <source>Reverse the section direction (start ↔ end).</source>
-        <translation type="unfinished" />
+        <translation>Invierta la dirección de la sección (inicio ↔ fin).</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="457" />
         <source>Select an optional geology layer to intersect the section.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione una capa geológica opcional para intersectar la sección.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="461" />
         <source>Select the field used to classify geological profile segments.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione el campo utilizado para clasificar los segmentos del perfil geológico.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="465" />
         <source>Select an optional structural layer to intersect the section.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione una capa estructural opcional para intersectar la sección.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="469" />
         <source>Set the profile box depth in meters. The default value is 100 m.</source>
-        <translation type="unfinished" />
+        <translation>Defina la profundidad de la caja del perfil en metros. El valor predeterminado es 100 m.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="476" />
         <source>Create X and Y axes for the generated profile.</source>
-        <translation type="unfinished" />
+        <translation>Cree los ejes X y Y para el perfil generado.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="480" />
         <source>Select the output file for the topographic profile.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione el archivo de salida para el perfil topográfico.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="484" />
         <source>Select the topographic profile to be converted into polygons.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione el perfil topográfico que se convertirá en polígonos.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="488" />
         <source>Select the output file for the 2D geological profile.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione el archivo de salida para el perfil geológico 2D.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="492" />
         <source>Select the polygonal 2D geological profile to reconstruct in 3D.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione el perfil geológico poligonal 2D que se reconstruirá en 3D.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="496" />
         <source>Select the guide section that provides the profile spatial reference.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione la sección guía que proporciona la referencia espacial del perfil.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="500" />
         <source>Select the output file for the 3D geological profile.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione el archivo de salida para el perfil geológico 3D.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="504" />
         <source>Select the numeric field containing the dip of each structure.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione el campo numérico que contiene el echado de cada estructura.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="508" />
         <source>Select the numeric field containing the dip azimuth of each structure.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione el campo numérico que contiene el azimut de buzamiento de cada estructura.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1201" />
@@ -652,12 +745,12 @@ azimuth</source>
         <location filename="..\secgeol_dialog.py" line="613" />
         <location filename="..\secgeol_dialog.py" line="537" />
         <source>Select an elevation source: a digital elevation model (DEM) or a contour line layer.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione una fuente de elevación: un modelo digital de elevación (DEM) o una capa de curvas de nivel.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="665" />
         <source>Contour lines</source>
-        <translation type="unfinished" />
+        <translation>Curvas de nivel</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="666" />
@@ -678,12 +771,28 @@ azimuth</source>
                             will be set to &lt;b&gt;X = 0&lt;/b&gt;.
                         &lt;/p&gt;
                         </source>
-        <translation type="unfinished" />
+        <translation>
+                        &lt;p&gt;
+                            Seleccione una &lt;b&gt;capa vectorial de líneas&lt;/b&gt; que contenga las curvas
+                            de nivel que se utilizarán como fuente de elevación.
+                        &lt;/p&gt;
+
+                        &lt;p&gt;
+                            SecGeol calculará las intersecciones entre la línea de sección
+                            y las curvas de nivel para construir el perfil topográfico.
+                        &lt;/p&gt;
+
+                        &lt;p&gt;
+                            &lt;b&gt;Importante:&lt;/b&gt; el perfil estará limitado desde la primera
+                            hasta la última curva de nivel intersectada. La primera intersección
+                            se establecerá en &lt;b&gt;X = 0&lt;/b&gt;.
+                        &lt;/p&gt;
+                        </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="690" />
         <source>Elevation field</source>
-        <translation type="unfinished" />
+        <translation>Campo de elevación</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="691" />
@@ -703,12 +812,27 @@ azimuth</source>
                         symbols, or additional text.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Seleccione el campo numérico que contiene la
+                        &lt;b&gt;elevación&lt;/b&gt; de cada curva de nivel.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        SecGeol muestra únicamente los &lt;b&gt;campos numéricos&lt;/b&gt;
+                        disponibles en la capa seleccionada.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Los valores deben almacenarse como números, sin unidades,
+                        símbolos ni texto adicional.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="713" />
         <source>Draw section</source>
-        <translation type="unfinished" />
+        <translation>Dibujar sección</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="714" />
@@ -724,12 +848,23 @@ azimuth</source>
                         and use &lt;b&gt;right-click&lt;/b&gt; to finish drawing.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Dibuje una &lt;b&gt;línea de sección&lt;/b&gt; directamente sobre el mapa
+                        como alternativa a seleccionar una sección desde
+                        una capa vectorial.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Haga clic en el mapa para definir los vértices de la línea
+                        y utilice &lt;b&gt;clic derecho&lt;/b&gt; para finalizar el dibujo.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="732" />
         <source>Reverse section</source>
-        <translation type="unfinished" />
+        <translation>Invertir sección</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="733" />
@@ -744,12 +879,22 @@ azimuth</source>
                         &lt;b&gt;start and end&lt;/b&gt; of the section.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Invierte la dirección de la línea de sección y,
+                        por lo tanto, la orientación del perfil resultante.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Active esta opción cuando necesite intercambiar el
+                        &lt;b&gt;inicio y el final&lt;/b&gt; de la sección.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="750" />
         <source>Include geology</source>
-        <translation type="unfinished" />
+        <translation>Incluir geología</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="751" />
@@ -769,12 +914,27 @@ azimuth</source>
                         This option is &lt;b&gt;optional&lt;/b&gt;.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Active esta opción para incluir una capa geológica
+                        poligonal en el perfil.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        SecGeol intersectará las unidades geológicas con
+                        la línea de sección y las representará sobre el
+                        perfil topográfico.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Esta opción es &lt;b&gt;opcional&lt;/b&gt;.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="773" />
         <source>Include structures</source>
-        <translation type="unfinished" />
+        <translation>Incluir estructuras</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="774" />
@@ -794,14 +954,29 @@ azimuth</source>
                         This option is &lt;b&gt;optional&lt;/b&gt;.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Active esta opción para incluir estructuras geológicas
+                        representadas mediante una capa vectorial de líneas.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        SecGeol utilizará los campos de &lt;b&gt;echado&lt;/b&gt; y
+                        &lt;b&gt;azimut de buzamiento&lt;/b&gt; para representar las estructuras
+                        que intersectan la línea de sección.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Esta opción es &lt;b&gt;opcional&lt;/b&gt;.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1748" />
         <location filename="..\secgeol_dialog.py" line="1685" />
         <location filename="..\secgeol_dialog.py" line="796" />
         <source>Geology layer</source>
-        <translation type="unfinished" />
+        <translation>Capa de geología</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="797" />
@@ -821,12 +996,27 @@ azimuth</source>
                         This input is &lt;b&gt;optional&lt;/b&gt;.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Seleccione una &lt;b&gt;capa vectorial de polígonos&lt;/b&gt; que contenga
+                        las unidades geológicas atravesadas por la línea de sección.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        SecGeol intersectará esta capa con la línea de sección
+                        para representar la distribución de las unidades geológicas
+                        sobre el perfil topográfico.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Esta entrada es &lt;b&gt;opcional&lt;/b&gt;.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="819" />
         <source>Geological classification field</source>
-        <translation type="unfinished" />
+        <translation>Campo de clasificación geológica</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="820" />
@@ -841,14 +1031,24 @@ azimuth</source>
                         profile and stored in the &lt;b&gt;valor_geo&lt;/b&gt; attribute.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Seleccione el campo de atributos que identifica las
+                        &lt;b&gt;unidades geológicas&lt;/b&gt;.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Los valores de este campo se transferirán al
+                        perfil y se almacenarán en el atributo &lt;b&gt;valor_geo&lt;/b&gt;.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1834" />
         <location filename="..\secgeol_dialog.py" line="1801" />
         <location filename="..\secgeol_dialog.py" line="838" />
         <source>Structural layer</source>
-        <translation type="unfinished" />
+        <translation>Capa de estructuras</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="839" />
@@ -862,12 +1062,21 @@ azimuth</source>
                         This input is &lt;b&gt;optional&lt;/b&gt;.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Seleccione una capa vectorial de líneas que contenga las
+                        estructuras geológicas que intersectan la línea de sección.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Esta entrada es &lt;b&gt;opcional&lt;/b&gt;.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="855" />
         <source>Profile box depth</source>
-        <translation type="unfinished" />
+        <translation>Profundidad de la caja del perfil</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="856" />
@@ -887,12 +1096,27 @@ azimuth</source>
                         box &lt;b&gt;500 m&lt;/b&gt; below the minimum profile elevation.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Define, en metros, la profundidad adicional representada
+                        por debajo de la elevación mínima del perfil topográfico.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Los valores permitidos van de &lt;b&gt;1 a 10 000 m&lt;/b&gt;.
+                        El valor predeterminado es &lt;b&gt;100 m&lt;/b&gt;.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Por ejemplo, un valor de &lt;b&gt;500&lt;/b&gt; extiende la caja del perfil
+                        &lt;b&gt;500 m&lt;/b&gt; por debajo de la elevación mínima del perfil.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="878" />
         <source>Create axes</source>
-        <translation type="unfinished" />
+        <translation>Crear ejes</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="879" />
@@ -908,12 +1132,23 @@ azimuth</source>
                         axis represents &lt;b&gt;elevation&lt;/b&gt;.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Active esta opción para generar los ejes horizontal y
+                        vertical asociados con el perfil.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        El eje horizontal representa la
+                        &lt;b&gt;distancia a lo largo de la sección&lt;/b&gt;, y el eje vertical
+                        representa la &lt;b&gt;elevación&lt;/b&gt;.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="898" />
         <source>Output file</source>
-        <translation type="unfinished" />
+        <translation>Archivo de salida</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="899" />
@@ -929,12 +1164,23 @@ azimuth</source>
                         the 3D reconstruction.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Seleccione la ubicación y el nombre del archivo donde se
+                        guardará el perfil topográfico.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        SecGeol también generará la &lt;b&gt;sección guía&lt;/b&gt;,
+                        que conserva la referencia espacial necesaria para
+                        la reconstrucción 3D.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="919" />
         <source>Dip field</source>
-        <translation type="unfinished" />
+        <translation>Campo de echado</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="920" />
@@ -955,12 +1201,28 @@ azimuth</source>
                         represented in the profile.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Seleccione el campo numérico que contiene el
+                        &lt;b&gt;echado&lt;/b&gt; de cada estructura.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Los valores deben almacenarse como &lt;b&gt;valores numéricos&lt;/b&gt;
+                        entre &lt;b&gt;0 y 90&lt;/b&gt; grados, sin incluir
+                        el símbolo de grado (°).
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Los registros con valores fuera de este rango no serán
+                        representados en el perfil.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="943" />
         <source>Dip azimuth field</source>
-        <translation type="unfinished" />
+        <translation>Campo de azimut de buzamiento</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="944" />
@@ -981,12 +1243,28 @@ azimuth</source>
                         range will not be represented in the profile.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Seleccione el campo numérico que contiene el
+                        &lt;b&gt;azimut de buzamiento&lt;/b&gt; de cada estructura.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Los valores deben almacenarse como &lt;b&gt;valores numéricos&lt;/b&gt;
+                        entre &lt;b&gt;0 y 360&lt;/b&gt; grados, sin incluir
+                        el símbolo de grado (°).
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Los registros con un valor de &lt;b&gt;-1&lt;/b&gt; o fuera de este
+                        rango no serán representados en el perfil.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="967" />
         <source>Guide section</source>
-        <translation type="unfinished" />
+        <translation>Sección guía</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="968" />
@@ -1009,12 +1287,29 @@ azimuth</source>
                         between the first and last intersections.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Seleccione la &lt;b&gt;sección guía&lt;/b&gt; generada en
+                        &lt;b&gt;1. Sección a perfil&lt;/b&gt;.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Esta capa conserva la referencia espacial utilizada para
+                        generar el perfil y permite reconstruir la interpretación
+                        geológica en sus coordenadas reales.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Cuando el perfil se genera a partir de curvas de nivel,
+                        la sección guía corresponde únicamente al segmento
+                        comprendido entre la primera y la última intersección.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="993" />
         <source>2D geological profile</source>
-        <translation type="unfinished" />
+        <translation>Perfil geológico 2D</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="994" />
@@ -1036,12 +1331,29 @@ azimuth</source>
                         real-world coordinates.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Seleccione la capa de polígonos generada en
+                        &lt;b&gt;2. Líneas a polígonos&lt;/b&gt;.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Esta capa contiene la interpretación geológica
+                        del perfil en coordenadas locales, donde el
+                        eje X representa la distancia a lo largo de la sección.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        SecGeol utilizará esta geometría junto con la
+                        sección guía para reconstruir el perfil en
+                        coordenadas reales.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1019" />
         <source>Geological profile output</source>
-        <translation type="unfinished" />
+        <translation>Salida del perfil geológico</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1020" />
@@ -1056,12 +1368,22 @@ azimuth</source>
                         &lt;b&gt;3. 2D profile to 3D&lt;/b&gt;.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Seleccione la ubicación y el nombre del archivo donde se
+                        guardará el &lt;b&gt;perfil geológico poligonal 2D&lt;/b&gt;.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Esta capa podrá utilizarse posteriormente en
+                        &lt;b&gt;3. Perfil 2D a 3D&lt;/b&gt;.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1037" />
         <source>3D geological profile output</source>
-        <translation type="unfinished" />
+        <translation>Salida del perfil geológico 3D</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1038" />
@@ -1078,12 +1400,24 @@ azimuth</source>
                         environments.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Seleccione la ubicación y el nombre del archivo donde se
+                        guardará el perfil geológico reconstruido en
+                        &lt;b&gt;coordenadas reales&lt;/b&gt;.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        La salida conserva la geometría tridimensional
+                        necesaria para la visualización y el análisis en
+                        entornos 3D.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1057" />
         <source>Topographic profile</source>
-        <translation type="unfinished" />
+        <translation>Perfil topográfico</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1058" />
@@ -1105,39 +1439,56 @@ azimuth</source>
                         to construct the polygonal geological profile.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Seleccione la capa &lt;b&gt;Perfil_topografico&lt;/b&gt; generada
+                        en &lt;b&gt;1. Sección a perfil&lt;/b&gt;.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Esta capa contiene la línea del terreno y los elementos
+                        asociados con el perfil. Puede editarse durante la
+                        interpretación geológica antes de convertir las líneas
+                        en polígonos.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        &lt;b&gt;2. Líneas a polígonos&lt;/b&gt; utilizará estas geometrías
+                        para construir el perfil geológico poligonal.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1128" />
         <source>The drawn section was not found.</source>
-        <translation type="unfinished" />
+        <translation>No se encontró la sección dibujada.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1144" />
         <source>The section layer was not found.</source>
-        <translation type="unfinished" />
+        <translation>No se encontró la capa de sección.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1156" />
         <source>No valid section was found to prepare.</source>
-        <translation type="unfinished" />
+        <translation>No se encontró una sección válida para preparar.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1217" />
         <location filename="..\secgeol_dialog.py" line="1161" />
         <source>Could not prepare the working section.</source>
-        <translation type="unfinished" />
+        <translation>No fue posible preparar la sección de trabajo.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1224" />
         <source>Could not obtain the effective section geometry.</source>
-        <translation type="unfinished" />
+        <translation>No fue posible obtener la geometría efectiva de la sección.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1403" />
         <location filename="..\secgeol_dialog.py" line="1285" />
         <source>Digital elevation model</source>
-        <translation type="unfinished" />
+        <translation>Modelo digital de elevación</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1286" />
@@ -1150,12 +1501,20 @@ azimuth</source>
                     Select a valid raster layer to continue.
                 &lt;/p&gt;
                 </source>
-        <translation type="unfinished" />
+        <translation>
+                &lt;p&gt;
+                    No se ha seleccionado un &lt;b&gt;modelo digital de elevación (DEM)&lt;/b&gt;.
+                &lt;/p&gt;
+
+                &lt;p&gt;
+                    Seleccione una capa raster válida para continuar.
+                &lt;/p&gt;
+                </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1302" />
         <source>Invalid digital elevation model</source>
-        <translation type="unfinished" />
+        <translation>Modelo digital de elevación no válido</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1303" />
@@ -1168,77 +1527,85 @@ azimuth</source>
                     Select a digital elevation model in raster format.
                 &lt;/p&gt;
                 </source>
-        <translation type="unfinished" />
+        <translation>
+                &lt;p&gt;
+                    La capa seleccionada no es una &lt;b&gt;capa raster&lt;/b&gt;.
+                &lt;/p&gt;
+
+                &lt;p&gt;
+                    Seleccione un modelo digital de elevación en formato raster.
+                &lt;/p&gt;
+                </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1362" />
         <source>&lt;b&gt;Status: Compatible with SecGeol.&lt;/b&gt;</source>
-        <translation type="unfinished" />
+        <translation>&lt;b&gt;Estado: Compatible con SecGeol.&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1371" />
         <source>The CRS is not valid.</source>
-        <translation type="unfinished" />
+        <translation>El SRC no es válido.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1375" />
         <source>The CRS must use meters as its unit.</source>
-        <translation type="unfinished" />
+        <translation>El SRC debe utilizar metros como unidad.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1380" />
         <source>The raster must contain a single band.</source>
-        <translation type="unfinished" />
+        <translation>El raster debe contener una sola banda.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1384" />
         <source>The data type is not suitable</source>
-        <translation type="unfinished" />
+        <translation>El tipo de dato no es adecuado</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1395" />
         <source>&lt;p&gt;&lt;b&gt;Status: Not compatible with SecGeol.&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="unfinished" />
+        <translation>&lt;p&gt;&lt;b&gt;Estado: No compatible con SecGeol.&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1396" />
         <source>&lt;p&gt;Check the following characteristics:&lt;/p&gt;</source>
-        <translation type="unfinished" />
+        <translation>&lt;p&gt;Revise las siguientes características:&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1406" />
         <source>Selected DEM:</source>
-        <translation type="unfinished" />
+        <translation>DEM seleccionado:</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1408" />
         <source>Pixel size:</source>
-        <translation type="unfinished" />
+        <translation>Tamaño de píxel:</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1409" />
         <source>Bands:</source>
-        <translation type="unfinished" />
+        <translation>Bandas:</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1410" />
         <source>Data type:</source>
-        <translation type="unfinished" />
+        <translation>Tipo de dato:</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1419" />
         <source>Error reading DEM</source>
-        <translation type="unfinished" />
+        <translation>Error al leer el DEM</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1422" />
         <source>Could not correctly read the properties of the selected layer.</source>
-        <translation type="unfinished" />
+        <translation>No fue posible leer correctamente las propiedades de la capa seleccionada.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1429" />
         <source>Details:</source>
-        <translation type="unfinished" />
+        <translation>Detalle:</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1616" />
@@ -1248,7 +1615,7 @@ azimuth</source>
         <location filename="..\secgeol_dialog.py" line="1494" />
         <location filename="..\secgeol_dialog.py" line="1446" />
         <source>Invalid section</source>
-        <translation type="unfinished" />
+        <translation>Sección no válida</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1447" />
@@ -1262,52 +1629,61 @@ azimuth</source>
                             Draw the section line again to continue.
                         &lt;/p&gt;
                         </source>
-        <translation type="unfinished" />
+        <translation>
+                        &lt;p&gt;
+                            &lt;span style="color:red; font-size:18px;"&gt;⚠&lt;/span&gt;
+                            &lt;b&gt;La sección dibujada no contiene una geometría válida.&lt;/b&gt;
+                        &lt;/p&gt;
+
+                        &lt;p&gt;
+                            Dibuje nuevamente la línea de sección para continuar.
+                        &lt;/p&gt;
+                        </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1635" />
         <location filename="..\secgeol_dialog.py" line="1464" />
         <source>Yes</source>
-        <translation type="unfinished" />
+        <translation>Sí</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1635" />
         <location filename="..\secgeol_dialog.py" line="1464" />
         <source>No</source>
-        <translation type="unfinished" />
+        <translation>No</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1637" />
         <location filename="..\secgeol_dialog.py" line="1467" />
         <source>Active section</source>
-        <translation type="unfinished" />
+        <translation>Sección activa</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1470" />
         <source>Source:</source>
-        <translation type="unfinished" />
+        <translation>Origen:</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1470" />
         <source>Drawn by the user</source>
-        <translation type="unfinished" />
+        <translation>Dibujada por el usuario</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1641" />
         <location filename="..\secgeol_dialog.py" line="1471" />
         <source>Length:</source>
-        <translation type="unfinished" />
+        <translation>Longitud:</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1642" />
         <location filename="..\secgeol_dialog.py" line="1472" />
         <source>Reversed orientation:</source>
-        <translation type="unfinished" />
+        <translation>Orientación invertida:</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1480" />
         <source>Section</source>
-        <translation type="unfinished" />
+        <translation>Sección</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1481" />
@@ -1317,7 +1693,12 @@ azimuth</source>
                         directly on the map.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        Seleccione una &lt;b&gt;capa de sección&lt;/b&gt; o dibuje una línea
+                        directamente sobre el mapa.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1495" />
@@ -1331,7 +1712,16 @@ azimuth</source>
                         Select a vector line layer to continue.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        &lt;span style="color:red; font-size:18px;"&gt;⚠&lt;/span&gt;
+                        &lt;b&gt;La capa seleccionada no es de tipo línea.&lt;/b&gt;
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Seleccione una capa vectorial lineal para continuar.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1516" />
@@ -1341,13 +1731,18 @@ azimuth</source>
                         &lt;b&gt;The selected layer contains no features.&lt;/b&gt;
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        &lt;span style="color:red; font-size:18px;"&gt;⚠&lt;/span&gt;
+                        &lt;b&gt;La capa seleccionada no contiene registros.&lt;/b&gt;
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1551" />
         <location filename="..\secgeol_dialog.py" line="1529" />
         <source>Section required</source>
-        <translation type="unfinished" />
+        <translation>Sección requerida</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1530" />
@@ -1361,7 +1756,16 @@ azimuth</source>
                         Leave &lt;b&gt;only one line&lt;/b&gt; selected to continue.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        &lt;span style="color:red; font-size:18px;"&gt;⚠&lt;/span&gt;
+                        &lt;b&gt;Hay más de una sección seleccionada.&lt;/b&gt;
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Deje seleccionada &lt;b&gt;una sola línea&lt;/b&gt; para continuar.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1552" />
@@ -1375,7 +1779,16 @@ azimuth</source>
                         Select &lt;b&gt;only one line&lt;/b&gt; to continue.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p style="color:#b00020;"&gt;
+                        &lt;span style="color:red; font-size:18px;"&gt;⚠&lt;/span&gt;
+                        &lt;b&gt;La capa contiene más de una sección.&lt;/b&gt;
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Seleccione &lt;b&gt;una sola línea&lt;/b&gt; para continuar.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1583" />
@@ -1385,7 +1798,12 @@ azimuth</source>
                         &lt;b&gt;The section geometry is empty.&lt;/b&gt;
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        &lt;span style="color:red; font-size:18px;"&gt;⚠&lt;/span&gt;
+                        &lt;b&gt;La geometría de la sección está vacía.&lt;/b&gt;
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1600" />
@@ -1398,7 +1816,15 @@ azimuth</source>
                             Select a &lt;b&gt;valid line geometry&lt;/b&gt; to continue.
                         &lt;/p&gt;
                         </source>
-        <translation type="unfinished" />
+        <translation>
+                        &lt;p&gt;
+                            No fue posible interpretar la geometría de la sección seleccionada.
+                        &lt;/p&gt;
+
+                        &lt;p&gt;
+                            Seleccione una &lt;b&gt;geometría lineal válida&lt;/b&gt; para continuar.
+                        &lt;/p&gt;
+                        </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1617" />
@@ -1412,17 +1838,26 @@ azimuth</source>
                             The line may contain multiple vertices and changes in direction.
                         &lt;/p&gt;
                         </source>
-        <translation type="unfinished" />
+        <translation>
+                        &lt;p&gt;
+                            El registro seleccionado contiene &lt;b&gt;más de una línea independiente&lt;/b&gt;.
+                        &lt;/p&gt;
+
+                        &lt;p&gt;
+                            SecGeol requiere &lt;b&gt;una sola línea por registro&lt;/b&gt;.
+                            La línea puede contener múltiples vértices y cambios de dirección.
+                        &lt;/p&gt;
+                        </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1640" />
         <source>Layer:</source>
-        <translation type="unfinished" />
+        <translation>Capa:</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1659" />
         <source>No geology</source>
-        <translation type="unfinished" />
+        <translation>Sin geología</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1660" />
@@ -1437,7 +1872,17 @@ azimuth</source>
                         the section line.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        La incorporación de información geológica es &lt;b&gt;opcional&lt;/b&gt;.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Active esta opción para seleccionar una capa poligonal
+                        y representar las unidades geológicas que intersectan
+                        la línea de sección.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1686" />
@@ -1457,7 +1902,22 @@ azimuth</source>
                         classification field.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        La opción de geología está &lt;b&gt;activada&lt;/b&gt;.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Seleccione una capa vectorial de &lt;b&gt;polígonos&lt;/b&gt;
+                        que contenga las unidades geológicas.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Después de seleccionar la capa, SecGeol habilitará sus
+                        campos de atributos para que pueda seleccionar el campo
+                        de clasificación geológica.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1723" />
@@ -1468,7 +1928,13 @@ azimuth</source>
                     as the identifier for the geological units.
                 &lt;/p&gt;
                 </source>
-        <translation type="unfinished" />
+        <translation>
+                &lt;p&gt;
+                    La capa geológica no contiene campos de atributos.
+                    SecGeol continuará utilizando únicamente &lt;b&gt;id_lito&lt;/b&gt;
+                    como identificador de las unidades geológicas.
+                &lt;/p&gt;
+                </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1733" />
@@ -1483,23 +1949,33 @@ azimuth</source>
                     field as an internal identifier.
                 &lt;/p&gt;
                 </source>
-        <translation type="unfinished" />
+        <translation>
+                &lt;p&gt;
+                    Seleccione el campo de atributos que identifica las
+                    &lt;b&gt;unidades geológicas&lt;/b&gt;.
+                &lt;/p&gt;
+
+                &lt;p&gt;
+                    SecGeol también generará el campo &lt;b&gt;id_lito&lt;/b&gt;
+                    como identificador interno.
+                &lt;/p&gt;
+                </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1837" />
         <location filename="..\secgeol_dialog.py" line="1751" />
         <source>Selected layer:</source>
-        <translation type="unfinished" />
+        <translation>Capa seleccionada:</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1753" />
         <source>Available fields:</source>
-        <translation type="unfinished" />
+        <translation>Campos disponibles:</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1775" />
         <source>No structures</source>
-        <translation type="unfinished" />
+        <translation>Sin estructuras</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1776" />
@@ -1514,7 +1990,17 @@ azimuth</source>
                         the section line.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+        <translation>
+                    &lt;p&gt;
+                        La incorporación de información estructural es &lt;b&gt;opcional&lt;/b&gt;.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Active esta opción para seleccionar una capa de líneas
+                        y representar las estructuras geológicas que intersectan
+                        la línea de sección.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1802" />
@@ -1534,137 +2020,153 @@ azimuth</source>
                         and &lt;b&gt;dip azimuth&lt;/b&gt;.
                     &lt;/p&gt;
                     </source>
-        <translation type="unfinished" />
+       <translation>
+                    &lt;p&gt;
+                        La opción de estructuras está &lt;b&gt;activada&lt;/b&gt;.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Seleccione una capa vectorial de &lt;b&gt;líneas&lt;/b&gt;
+                        que contenga las estructuras geológicas.
+                    &lt;/p&gt;
+
+                    &lt;p&gt;
+                        Después de seleccionar la capa, SecGeol habilitará los
+                        campos numéricos disponibles para definir el &lt;b&gt;echado&lt;/b&gt;
+                        y el &lt;b&gt;azimut de buzamiento&lt;/b&gt;.
+                    &lt;/p&gt;
+                    </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1842" />
         <source>SecGeol displays only the available &lt;b&gt;numeric fields&lt;/b&gt; for selecting the &lt;b&gt;dip&lt;/b&gt; and &lt;b&gt;dip azimuth&lt;/b&gt;.</source>
-        <translation type="unfinished" />
+        <translation>SecGeol muestra únicamente los &lt;b&gt;campos numéricos&lt;/b&gt; disponibles para seleccionar el &lt;b&gt;echado&lt;/b&gt; y el &lt;b&gt;azimut de buzamiento&lt;/b&gt;.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1849" />
         <source>These values will be used to represent the structures that intersect the section line on the profile.</source>
-        <translation type="unfinished" />
+        <translation>Estos valores se utilizarán para representar las estructuras que intersectan la línea de sección sobre el perfil.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1865" />
         <source>Select a profile line layer.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione una capa de líneas del perfil.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1888" />
         <source>Lines to polygons</source>
-        <translation type="unfinished" />
+        <translation>Líneas a polígonos</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1889" />
         <source>The temporary &lt;b&gt;perfil_geologico&lt;/b&gt; layer was generated.</source>
-        <translation type="unfinished" />
+        <translation>Se generó la capa temporal &lt;b&gt;perfil_geologico&lt;/b&gt;.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1893" />
         <source> The &lt;b&gt;ejes&lt;/b&gt; layer was also generated.</source>
-        <translation type="unfinished" />
+        <translation> También se generó la capa &lt;b&gt;ejes&lt;/b&gt;.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1913" />
         <source>Error</source>
-        <translation type="unfinished" />
+        <translation>Error</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1929" />
         <source>The geological profile layer was not generated.</source>
-        <translation type="unfinished" />
+        <translation>No se generó la capa del perfil geológico.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="1934" />
         <source>Select an output path.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione una ruta de salida.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2000" />
         <source>Could not save the geological profile: </source>
-        <translation type="unfinished" />
+        <translation>No fue posible guardar el perfil geológico: </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2014" />
         <source>The geological profile was saved, but could not be loaded.</source>
-        <translation type="unfinished" />
+        <translation>El perfil geológico se guardó, pero no pudo cargarse.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2033" />
         <source>Could not save the axes layer: </source>
-        <translation type="unfinished" />
+        <translation>No fue posible guardar la capa de ejes: </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2047" />
         <source>The axes layer was saved, but could not be loaded.</source>
-        <translation type="unfinished" />
+        <translation>La capa de ejes se guardó, pero no pudo cargarse.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2078" />
         <source>There is no valid working section available to create the guide section.</source>
-        <translation type="unfinished" />
+        <translation>No hay una sección de trabajo válida para crear la sección guía.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2149" />
         <source>Select a polygon layer for the geological profile.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione una capa poligonal del perfil geológico.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2156" />
         <source>Select the guide section layer.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione la capa de sección guía.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2164" />
         <source>Select an output path for the 3D geological profile.</source>
-        <translation type="unfinished" />
+        <translation>Seleccione una ruta de salida para el perfil geológico 3D.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2265" />
         <source>Could not read the multipolygon geometry.</source>
-        <translation type="unfinished" />
+        <translation>No fue posible leer la geometría multipolígono.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2295" />
         <source>There are not enough vertices to construct a polygon.</source>
-        <translation type="unfinished" />
+        <translation>No hay suficientes vértices para construir un polígono.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2319" />
         <source>The output file must have a .shp or .gpkg extension.</source>
-        <translation type="unfinished" />
+        <translation>El archivo de salida debe tener extensión .shp o .gpkg.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2333" />
         <source>Could not save the 3D geological profile.
 Error: </source>
-        <translation type="unfinished" />
+        <translation>No fue posible guardar el perfil geológico 3D.
+Error: </translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2355" />
         <source>The file was generated, but could not be loaded into QGIS.</source>
-        <translation type="unfinished" />
+        <translation>El archivo fue generado, pero no pudo cargarse en QGIS.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2369" />
         <source>3D geological profile</source>
-        <translation type="unfinished" />
+        <translation>Perfil geológico 3D</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2371" />
         <source>3D geological profile generated successfully.</source>
-        <translation type="unfinished" />
+        <translation>Perfil geológico 3D generado correctamente.</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2372" />
         <source>Polygons created:</source>
-        <translation type="unfinished" />
+        <translation>Polígonos creados:</translation>
     </message>
     <message>
         <location filename="..\secgeol_dialog.py" line="2373" />
         <source>Output:</source>
-        <translation type="unfinished" />
+        <translation>Salida:</translation>
     </message>
 </context></TS>

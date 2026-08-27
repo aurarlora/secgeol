@@ -43,7 +43,7 @@
        <rect>
         <x>10</x>
         <y>340</y>
-        <width>221</width>
+        <width>251</width>
         <height>20</height>
        </rect>
       </property>
@@ -97,7 +97,7 @@
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>61</width>
+         <width>71</width>
          <height>20</height>
         </rect>
        </property>
@@ -108,9 +108,9 @@
       <widget class="QgsMapLayerComboBox" name="MapLayerSec">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>120</x>
          <y>10</y>
-         <width>261</width>
+         <width>251</width>
          <height>21</height>
         </rect>
        </property>
@@ -137,9 +137,9 @@
       <widget class="QLabel" name="label_7">
        <property name="geometry">
         <rect>
-         <x>240</x>
+         <x>210</x>
          <y>40</y>
-         <width>41</width>
+         <width>71</width>
          <height>31</height>
         </rect>
        </property>
@@ -166,7 +166,7 @@
       <widget class="QgsMapLayerComboBox" name="MapLayerGeo">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>120</x>
          <y>10</y>
          <width>141</width>
          <height>21</height>
@@ -176,9 +176,9 @@
       <widget class="QgsMapLayerComboBox" name="MapLayerEst">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>120</x>
          <y>50</y>
-         <width>261</width>
+         <width>251</width>
          <height>21</height>
         </rect>
        </property>
@@ -196,9 +196,9 @@
       <widget class="QgsFieldComboBox" name="FieldAzimuthEst">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>120</x>
          <y>90</y>
-         <width>101</width>
+         <width>91</width>
          <height>21</height>
         </rect>
        </property>
@@ -218,7 +218,7 @@
         <rect>
          <x>30</x>
          <y>80</y>
-         <width>51</width>
+         <width>81</width>
          <height>31</height>
         </rect>
        </property>
@@ -232,7 +232,7 @@ azimuth</string>
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>76</width>
+         <width>101</width>
          <height>20</height>
         </rect>
        </property>
@@ -245,7 +245,7 @@ azimuth</string>
         <rect>
          <x>10</x>
          <y>50</y>
-         <width>76</width>
+         <width>101</width>
          <height>20</height>
         </rect>
        </property>
@@ -256,10 +256,10 @@ azimuth</string>
       <widget class="QLabel" name="label_8">
        <property name="geometry">
         <rect>
-         <x>240</x>
+         <x>230</x>
          <y>90</y>
-         <width>31</width>
-         <height>16</height>
+         <width>41</width>
+         <height>20</height>
         </rect>
        </property>
        <property name="text">
@@ -270,9 +270,9 @@ azimuth</string>
      <widget class="QgsMapLayerComboBox" name="MapLayerDEM">
       <property name="geometry">
        <rect>
-        <x>120</x>
+        <x>140</x>
         <y>20</y>
-        <width>261</width>
+        <width>241</width>
         <height>21</height>
        </rect>
       </property>
@@ -287,7 +287,7 @@ azimuth</string>
        </rect>
       </property>
       <property name="dialogTitle">
-       <string>Guardar perfil topográfico</string>
+       <string>Save topographic profile</string>
       </property>
       <property name="storageMode">
        <enum>QgsFileWidget::StorageMode::SaveFile</enum>
@@ -325,9 +325,9 @@ azimuth</string>
      <widget class="QgsMapLayerComboBox" name="MapLayerCurvas">
       <property name="geometry">
        <rect>
-        <x>120</x>
+        <x>130</x>
         <y>60</y>
-        <width>141</width>
+        <width>131</width>
         <height>21</height>
        </rect>
       </property>
@@ -362,7 +362,7 @@ azimuth</string>
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>101</width>
+         <width>111</width>
          <height>31</height>
         </rect>
        </property>
@@ -391,7 +391,7 @@ azimuth</string>
        <rect>
         <x>10</x>
         <y>100</y>
-        <width>101</width>
+        <width>201</width>
         <height>20</height>
        </rect>
       </property>
@@ -409,7 +409,7 @@ azimuth</string>
        </rect>
       </property>
       <property name="dialogTitle">
-       <string>Guardar perfil geológico de polígonos</string>
+       <string>Save polygonal geological profile</string>
       </property>
       <property name="storageMode">
        <enum>QgsFileWidget::StorageMode::SaveFile</enum>
@@ -443,7 +443,7 @@ azimuth</string>
        <rect>
         <x>10</x>
         <y>20</y>
-        <width>141</width>
+        <width>221</width>
         <height>16</height>
        </rect>
       </property>
@@ -484,7 +484,7 @@ azimuth</string>
        <rect>
         <x>20</x>
         <y>10</y>
-        <width>221</width>
+        <width>281</width>
         <height>16</height>
        </rect>
       </property>
@@ -515,7 +515,7 @@ azimuth</string>
        </rect>
       </property>
       <property name="dialogTitle">
-       <string>Guardar perfil geológico 3D</string>
+       <string>Save 3D geological profile</string>
       </property>
       <property name="storageMode">
        <enum>QgsFileWidget::StorageMode::SaveFile</enum>
