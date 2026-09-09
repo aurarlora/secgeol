@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="../../assets/css/secgeol-manual.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SecGeol — Manual de usuario</title>
+</head>
+
+<body>
+
+
+    <!-- Contenedor general: izquierda + derecha -->
+    <div class="manual-layout">
+
+        <!-- =========================
+             COLUMNA IZQUIERDA
+             ========================= -->
+        <aside class="sidebar">
+
+            <a href="../index.html" class="nav-item">
+                <span class="nav-icon">⌂</span>
+                <span>Inicio</span>
+            </a>
+
+             <a href="procedimiento_01_seccion_vectorial.html"
+               class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>1. Sección a perfil</span>
+            </a>
+
+            <a href="procedimiento_02_lineas_poligonos.html"
+               class="nav-item active">
+                <span class="nav-icon">▤</span>
+                <span>2. Líneas a polígonos</span>
+            </a>
+
+            <a href="procedimiento_03_reconstruccion_3d.html"
+               class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>3. Reconstrucción 3D</span>
+            </a>
+
+        </aside>
+
+
+        <!-- =========================
+             COLUMNA DERECHA
+             ========================= -->
+        <div class="manual-right">
+
+            <!-- Encabezado -->
+            <div class="topbar">
+
+                <div class="manual-title">
+                    SecGeol · Manual de usuario
+                </div>
+
+                <div class="languages">
+                    <a href="../es/index.html"
+                       class="active"
+                       title="Español">🇲🇽</a>
+
+                    <a href="../en/index.html"
+                       title="English">🇬🇧</a>
+                </div>
+
+            </div>
+
+
+
+<!-- Contenido -->
+<main class="manual-container">
+
+    <h1>
+        Fase 2. Vista general de la herramienta
+    </h1>
+
+    <div class="image-placeholder">
+        <img
+            src="../images/tab2_gral.png"
+            class="interface-image"
+            alt="Vista general de la segunda fase de SecGeol"
+        >
+    </div>
+
+
+    <h2>Selección del perfil interpretado</h2>
+
+     <p>
+        En esta fase se utiliza el perfil obtenido durante la
+        <strong>Fase 1</strong>, una vez realizada la interpretación geológica
+        mediante líneas.
+    </p>
+
+
+    <div class="image-placeholder">
+        <img
+            src="../images/tab2_uno.png"
+            class="interface-image"
+            alt="Selección del perfil interpretado mediante líneas"
+        >
+    </div>
+
+   
+
+    <p>
+        SecGeol utiliza estas líneas para delimitar las diferentes unidades
+        interpretadas y generar un nuevo perfil constituido por polígonos.
+    </p>
+
+
+    <h3>Ejes de referencia</h3>
+
+        <div class="image-placeholder">
+        <img
+            src="../images/tab2_dos.png"
+            class="interface-image"
+            alt="Selección del perfil interpretado mediante líneas"
+        >
+    </div>
+
+
+    <p>
+        De manera opcional, puede activarse la generación de una capa adicional
+        de ejes de referencia. Esta salida se identifica mediante el sufijo
+        <strong>_ejes</strong>.
+    </p>
+
+    <p>
+        La capa contiene divisiones expresadas en metros a lo largo de los ejes
+        del perfil y puede utilizarse como referencia para interpretar las
+        distancias y elevaciones representadas en la sección.
+    </p>
+
+
+    <h2>Perfil geológico poligonal de salida </h2>
+
+    <p>
+        Como resultado del proceso, SecGeol genera un perfil geológico compuesto
+        por polígonos que representan las unidades delimitadas durante la
+        interpretación.
+    </p>
+
+    <p>
+        Los polígonos que se encuentran en contacto con el perfil topográfico
+        conservan la información geológica incorporada durante la
+        <strong>Fase 1</strong>, cuando ésta se encuentra disponible.
+    </p>
+
+    <p>
+        Los polígonos interpretados en profundidad que no tienen contacto con
+        el perfil topográfico se generan sin una unidad geológica asignada.
+        Estos valores pueden incorporarse posteriormente mediante la edición
+        de la tabla de atributos de la capa resultante.
+    </p>
+
+
+    <div class="objective">
+        <strong>Importante.</strong>
+        Antes de continuar con la <strong>Fase 3. Reconstrucción 3D</strong>,
+        revise y complete los atributos del perfil geológico poligonal,
+        asignando la información correspondiente a las unidades interpretadas
+        que todavía no cuenten con ella.
+    </div>
+ 
+
+
+    <footer>
+        <span>SecGeol · Manual de usuario</span>
+        <span>2</span>
+    </footer>
+
+    </main>
+
+    </div> <!-- manual-right -->
+
+    </div> <!-- manual-layout -->
+
+<script>
+function toggleMenu() {
+    document.getElementById("manualMenu").classList.toggle("open");
+}
+</script>
+
+</body>
+
+</html>

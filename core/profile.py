@@ -532,7 +532,23 @@ class ProfileManager:
                 )
             )
 
+        # Tomar la primera geometría válida de la sección
+        line_geom = None
+        for feat in section_layer.getFeatures():
+            geom = feat.geometry()
+            if geom is not None and not geom.isEmpty():
+                line_geom = geom
+                break
 
+        if line_geom is None or line_geom.isEmpty():
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "No valid geometry was found in the section layer."
+                )
+            )
+
+        # Solo si NO llegaron puntos desde curvas, usar DEM
         if profile_point_features is None:
             if dem_layer is None or not dem_layer.isValid():
                 raise Exception(
@@ -557,25 +573,6 @@ class ProfileManager:
         if extra_depth <= 0:
             extra_depth = 100.0
 
-        # Tomar la primera geometría válida de la sección
-        line_geom = None
-        for feat in section_layer.getFeatures():
-            geom = feat.geometry()
-            if geom is not None and not geom.isEmpty():
-                line_geom = geom
-                break
-
-        if line_geom is None or line_geom.isEmpty():
-            raise Exception(
-                QCoreApplication.translate(
-                    "SecGeol",
-                    "No valid geometry was found in the section layer."
-                )
-            )
-
-
-        # Solo si NO llegaron puntos desde curvas, usar DEM
-        
         if not profile_point_features:
             raise Exception(
                 QCoreApplication.translate(

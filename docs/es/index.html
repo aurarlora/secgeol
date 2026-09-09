@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SecGeol | Manual de usuario</title>
+
+    <link rel="stylesheet" href="../assets/css/secgeol-manual.css">
+
+</head>
+
+<body>
+
+    <!-- Contenedor general: izquierda + derecha -->
+    <div class="manual-layout">
+
+        <!-- =========================
+             COLUMNA IZQUIERDA
+             ========================= -->
+        <aside class="sidebar">
+
+            <a href="index.html" class="nav-item active">
+                <span class="nav-icon">⌂</span>
+                <span>Inicio</span>
+            </a>
+
+            <a href="procedimientos/procedimiento_01_seccion_vectorial.html"
+               class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>1. Sección a perfil</span>
+            </a>
+
+            <a href="procedimientos/procedimiento_02_lineas_poligonos.html"
+               class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>2. Líneas a polígonos</span>
+            </a>
+
+            <a href="procedimientos/procedimiento_03_reconstruccion_3d.html"
+               class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>3. Reconstrucción 3D</span>
+            </a>
+
+        </aside>
+
+
+        <!-- =========================
+             COLUMNA DERECHA
+             ========================= -->
+        <div class="manual-right">
+
+            <!-- Encabezado -->
+            <div class="topbar">
+
+                <div class="manual-title">
+                    SecGeol · Manual de usuario
+                </div>
+
+                <div class="languages">
+                    <a href="../es/index.html"
+                       class="active"
+                       title="Español">🇲🇽</a>
+
+                    <a href="../en/index.html"
+                       title="English">🇬🇧</a>
+                </div>
+
+            </div>
+
+
+            <!-- Contenido -->
+            <main class="manual-container">
+
+                <!-- =========================================================
+                     ENCABEZADO
+                     ========================================================= -->
+
+                <header class="manual-header">
+
+            <img
+                src="images/secgeol_icon.png"
+                alt="SecGeol"
+            >
+
+            <h1 class="secgeol-highlight">SecGeol</h1>
+
+
+            <p class="manual-subtitle">
+                Herramienta para la construcción e interpretación de secciones geológicas
+            </p>
+
+             <p class="manual-author">
+                Desarrollado por <strong>Aura Ramos Lora</strong>
+            </p>
+
+        </header>
+
+
+
+
+        <!-- =========================================================
+            INTRODUCCIÓN
+            ========================================================= -->
+
+        <section class="intro">
+
+            <h2>Antes de comenzar</h2>
+
+
+            <p>
+                <strong >SecGeol</strong> es una herramienta para QGIS que proporciona
+                un marco de trabajo para construir y modelar una interpretación
+                geológica del subsuelo a partir de una sección.
+            </p>
+
+            <p>
+                Antes de utilizar la herramienta, es recomendable preparar primero
+                un <strong>proyecto de sección geológica</strong>. Esto significa
+                cargar en la vista del mapa los insumos que puedan participar en
+                la construcción del perfil y definir correctamente el sistema de
+                referencia espacial del proyecto.
+            </p>
+
+            <div class="note">
+                <strong class="secgeol-highlight">Sistema de coordenadas.</strong>
+                SecGeol trabaja con coordenadas proyectadas y unidades métricas.
+                Por esta razón, se recomienda utilizar una proyección UTM
+                correspondiente a la zona de estudio. Las coordenadas geográficas
+                expresadas en grados no son adecuadas para trabajar directamente
+                con las distancias que requiere la construcción del perfil.
+            </div>
+
+        </section>
+
+
+        <!-- =========================================================
+            FLUJO GENERAL DE SECGEOl
+            ========================================================= -->
+
+        <section class="workflow">
+
+            <h2>Flujo de trabajo</h2>
+
+            <p>
+                SecGeol está organizado en <strong>tres fases consecutivas</strong>,
+                que permiten pasar desde los datos espaciales originales hasta una
+                representación tridimensional de la interpretación geológica.
+            </p>
+
+
+            <!-- FASE 1 -->
+
+            <article class="workflow-step">
+
+                <h3>
+                    <span class="step-number">1.</span>
+                    De la sección al perfil
+                </h3>
+
+                <img
+                    src="images/sec_tab1.png"
+                    alt="Primera fase de SecGeol: de la sección al perfil"
+                >
+
+                <p>
+                    En la primera fase se proporcionan los insumos necesarios para
+                    generar un <strong>perfil topográfico</strong> a lo largo de una
+                    línea de sección.
+                </p>
+
+                <p>
+                    Este perfil constituye el marco sobre el cual podrás realizar
+                    la interpretación geológica del subsuelo, utilizando la
+                    información disponible y tu conocimiento geológico para
+                    bosquejar contactos, unidades y estructuras.
+                </p>
+
+
+
+
+            </article>
+
+
+            <!-- FASE 2 -->
+
+            <article class="workflow-step">
+
+                <h3>
+                    <span class="step-number">2.</span>
+                    De líneas interpretadas a polígonos
+                </h3>
+
+                <img
+                    src="images/sec_tab2.png"
+                    alt="Segunda fase de SecGeol: conversión de líneas a polígonos"
+                >
+
+                <p>
+                    Una vez realizada la interpretación del subsuelo, el dibujo
+                    continúa siendo esencialmente un conjunto de líneas. En esta
+                    segunda fase, SecGeol permite transformar esas líneas en
+                    <strong>polígonos geológicos cerrados</strong>.
+                </p>
+
+                <p>
+                    Los polígonos pueden identificarse mediante nombres, claves
+                    o atributos correspondientes a las diferentes unidades o
+                    litologías interpretadas.
+                </p>
+
+                <p>
+                    Esta fase produce el <strong>perfil geológico poligonal</strong>,
+                    que puede utilizarse directamente en mapas, figuras y reportes.
+                    La salida conserva además una referencia métrica del perfil,
+                    con las distancias correspondientes a lo largo de su eje
+                    horizontal.
+                </p>
+
+
+
+            </article>
+
+
+            <!-- FASE 3 -->
+
+            <article class="workflow-step">
+
+                <h3>
+                    <span class="step-number">3.</span>
+                    Reconstrucción del perfil en 3D
+                </h3>
+
+                <img
+                    src="images/sec_tab3.png"
+                    alt="Tercera fase de SecGeol: reconstrucción geológica 3D"
+                >
+
+                <p>
+                    En la tercera fase, los polígonos interpretados en el perfil
+                    pueden reconstruirse nuevamente en su
+                    <strong>posición espacial real</strong>, utilizando como
+                    referencia la sección generada durante la primera fase.
+                </p>
+
+                <p>
+                    El resultado es un perfil geológico con geometría
+                    tridimensional, que puede visualizarse y analizarse en
+                    entornos compatibles con información 3D, como la vista 3D
+                    de QGIS, ArcScene o Leapfrog.
+                </p>
+
+
+
+            </article>
+
+        </section>
+
+        <div class="note">
+            <strong>Archivos de salida.</strong>
+            En las tres etapas, SecGeol genera capas vectoriales que pueden guardarse
+            en formato Shapefile (*.shp) o GeoPackage (*.gpkg).
+        </div>
+
+
+        <!-- =========================================================
+            INSUMOS
+            ========================================================= -->
+
+        <section class="requirements">
+
+            <h2>Insumos para preparar el proyecto de sección</h2>
+
+            <p>
+                Antes de comenzar, carga en QGIS los datos que utilizarás para
+                construir la sección. No todos son obligatorios, pero mientras
+                mayor sea la información disponible, mayor será el contexto para
+                realizar la interpretación.
+            </p>
+
+
+            <article class="input-item">
+
+                <h3>1. Modelo Digital de Elevación o curvas de nivel</h3>
+
+                <p>
+                    SecGeol necesita una fuente de elevación para construir el
+                    perfil topográfico. Esta puede ser un
+                    <strong>Modelo Digital de Elevación (MDE)</strong> o una
+                    <strong>capa de curvas de nivel</strong>.
+                </p>
+
+                <p>
+                    La fuente de elevación es uno de los insumos principales del
+                    proyecto y debe encontrarse en un sistema de coordenadas
+                    proyectado con unidades métricas. Es recomendable utilizar su
+                    sistema de referencia como base para mantener la consistencia
+                    espacial entre los datos empleados durante el procedimiento.
+                </p>
+
+            </article>
+
+
+            <article class="input-item">
+
+                <h3>2. Línea de sección</h3>
+
+                <p>
+                    Es la línea que define el recorrido sobre el cual se construirá
+                    el perfil.
+                </p>
+
+                <p>
+                    Puede utilizarse una sección existente perteneciente a una capa
+                    de líneas o dibujarse directamente sobre el área de estudio.
+                    Su trayectoria determina qué información del terreno, la
+                    geología y las estructuras será proyectada sobre el perfil.
+                </p>
+
+            </article>
+
+
+            <article class="input-item">
+
+                <h3>3. Geología</h3>
+
+                <p>
+                    Si dispones de una capa de
+                    <strong>polígonos geológicos</strong>, puedes incorporarla al
+                    proyecto.
+                </p>
+
+                <p>
+                    Cuando la línea de sección atraviesa diferentes unidades
+                    geológicas, sus contactos pueden transferirse al perfil y
+                    servir como referencia para realizar la interpretación del
+                    subsuelo.
+                </p>
+
+            </article>
+
+
+            <article class="input-item">
+
+                <h3>4. Estructuras</h3>
+
+                <p>
+                    También puedes incorporar una capa de
+                    <strong>estructuras geológicas</strong>.
+                </p>
+
+                <p>
+                    Las estructuras que intersectan la línea de sección pueden
+                    proyectarse sobre el perfil resultante y utilizarse como apoyo
+                    durante la interpretación geológica.
+                </p>
+
+            </article>
+
+        </section>
+
+    <footer>
+        <span>SecGeol · Manual de usuario</span>
+        <span>i</span>
+    </footer>
+
+    </main>
+</div>
+ <!-- FIN manual-right -->
+
+</div>
+    <!-- FIN manual-layout -->
+
+<script>
+function toggleMenu() {
+    document.getElementById("manualMenu").classList.toggle("open");
+}
+</script>
+</body>
+</html>

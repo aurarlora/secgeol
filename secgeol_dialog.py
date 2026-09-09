@@ -1,7 +1,7 @@
 import os, re, unicodedata
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import Qt, QVariant, QCoreApplication
+from qgis.PyQt.QtCore import Qt, QVariant, QCoreApplication, QUrl
 from qgis.PyQt.QtWidgets import QDialog, QSplitter
 from qgis.core import (QgsMapLayerProxyModel, QgsProject, Qgis,QgsPoint, QgsPolygon,QgsVectorFileWriter,
                        QgsFeature, QgsGeometry, QgsVectorLayer, QgsField, QgsLineString,
@@ -245,11 +245,34 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             if handle:
                 handle.setEnabled(False)
 
+        # Recursos gráficos de ayuda
+        images_dir = os.path.join(
+            os.path.dirname(__file__),
+            "resources",
+            "images"
+        )
+
+        image_tab1_url = QUrl.fromLocalFile(
+            os.path.join(images_dir, "sectab1.png")
+        ).toString()
+
+        image_tab2_url = QUrl.fromLocalFile(
+            os.path.join(images_dir, "sectab2.png")
+        ).toString()
+
+        image_tab3_url = QUrl.fromLocalFile(
+            os.path.join(images_dir, "sectab3.png")
+        ).toString()
+
         # ESTADO INICIAL DE LA AYUDA
         self.help_tab_uno = self.tr(
             """
             <div style="padding:10px; line-height:1.4;">
                 <h3>Geological Section Tool</h3>
+
+                <div align="center">
+                    <img src="{IMAGE_TAB1}" width="180">
+                </div>
 
                 <p>
                     This module generates a topographic profile along a user-defined
@@ -283,11 +306,16 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 </p>
             </div>
             """
-        )
+        ).replace("{IMAGE_TAB1}", image_tab1_url)
+
+
         self.help_tab_dos = self.tr(
             """
             <div style="padding:10px; line-height:1.4; font-size:12px;">
                 <h3>Lines to Polygons</h3>
+                <div align="center">
+                    <img src="{IMAGE_TAB2}" width="180">
+                </div>
 
                 <p>
                     This module converts the interpreted profile lines generated from
@@ -307,12 +335,15 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 </p>
             </div>
             """
-        )
+        ).replace("{IMAGE_TAB2}", image_tab2_url)
 
         self.help_tab_tres = self.tr(
             """
             <div style="padding:10px; line-height:1.4; font-size:12px;">
                 <h3>3D Geological Reconstruction</h3>
+                <div align="center">
+                    <img src="{IMAGE_TAB3}" width="180">
+                </div>
 
                 <p>
                     Select the interpreted geological profile generated in
@@ -332,7 +363,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 </p>
             </div>
             """
-        )
+        ).replace("{IMAGE_TAB3}", image_tab3_url)
 
         # CONEXIÓN DE TABS
         self.tabWidget.currentChanged.connect(self.actualizar_ayuda_tab)

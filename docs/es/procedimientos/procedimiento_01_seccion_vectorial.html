@@ -10,176 +10,429 @@
 
 <body>
 
-<div class="page">
 
-    <!-- Encabezado -->
-    <div class="topbar">
+    <!-- Contenedor general: izquierda + derecha -->
+    <div class="manual-layout">
 
-        <div class="manual-title">
-            SecGeol · Manual de usuario
-        </div>
+        <!-- =========================
+             COLUMNA IZQUIERDA
+             ========================= -->
+        <aside class="sidebar">
 
-        <div class="languages">
-            <a href="manual_es.html"
-               class="active"
-               title="Español">🇲🇽</a>
+            <a href="../index.html" class="nav-item">
+                <span class="nav-icon">⌂</span>
+                <span>Inicio</span>
+            </a>
 
-            <a href="manual_en.html"
-               title="English">🇬🇧</a>
-        </div>
+            <a href="procedimiento_01_seccion_vectorial.html"
+               class="nav-item active">
+                <span class="nav-icon">▤</span>
+                <span>1. Sección a perfil</span>
+            </a>
 
-    </div>
+            <a href="procedimiento_02_lineas_poligonos.html"
+               class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>2. Líneas a polígonos</span>
+            </a>
+
+            <a href="procedimiento_03_reconstruccion_3d.html"
+               class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>3. Reconstrucción 3D</span>
+            </a>
+
+        </aside>
 
 
-    <div class="case-number">
-        Caso de uso 01
-    </div>
+        <!-- =========================
+             COLUMNA DERECHA
+             ========================= -->
+        <div class="manual-right">
+
+            <!-- Encabezado -->
+            <div class="topbar">
+
+                <div class="manual-title">
+                    SecGeol · Manual de usuario
+                </div>
+
+                <div class="languages">
+                    <a href="../es/index.html"
+                       class="active"
+                       title="Español">🇲🇽</a>
+
+                    <a href="../en/index.html"
+                       title="English">🇬🇧</a>
+                </div>
+
+            </div>
+
+
+
+<!-- Contenido -->
+            <main class="manual-container">
+
 
     <h1>
-        Sección desde una capa vectorial
-    </h1>
+    Fase 1. Vista general de la herramienta
+</h1>
+<div class="image-placeholder"><img
+    src="../images/tab1_gral.png"
+    class="interface-image"
+    alt="Vista general de la primera fase de SecGeol"
+> </div>
+
+
+<h2>Selección de la fuente de elevación</h2>
+
+<div class="image-placeholder"> <img
+    src="../images/tab1_uno.png"
+    class="interface-image"
+    alt="Selección de la fuente de elevación"
+></div>
+
+
+<p>
+    La fuente de elevación es uno de los elementos principales de esta fase,
+    ya que proporciona los valores de elevación (Z) utilizados para construir
+    el perfil topográfico. Asimismo, su sistema de referencia espacial se
+    utiliza como referencia para las salidas generadas por SecGeol.
+</p>
+
+<p>
+    SecGeol admite dos tipos de fuentes de elevación:
+</p>
+
+<div class="step">
+
+    <h3>Modelo Digital de Elevación (MDE)</h3>
 
     <p>
-        <strong>Orientación original · Flujo básico sin información
-        geológica ni estructural</strong>
+        Corresponde a una capa ráster en la que cada píxel contiene un valor
+        de elevación. El MDE debe cubrir el área atravesada por la línea de
+        sección.
     </p>
+
+    <p>
+        El tamaño de píxel determina el espaciamiento utilizado para muestrear
+        el perfil topográfico. Por lo tanto, un MDE con menor tamaño de píxel
+        permite representar con mayor detalle las variaciones del relieve.
+    </p>
+
+    <div class="image-placeholder"> <img
+        src="../images/tab1_uno_a.png"
+        class="interface-image"
+        alt="Selección de un Modelo Digital de Elevación"
+    ></div>
+
+
+    <h3>Curvas de nivel</h3>
+
+    <p>
+        Corresponden a una capa vectorial de líneas, en la que se deberá seleccionar
+        el campo que contiene el valor de elevación.
+        SecGeol obtiene los puntos del perfil a partir de las
+        intersecciones entre la línea de sección y las curvas de nivel.
+    </p>
+
+    <p>
+        En este caso, el perfil se construye entre la primera y la última
+        intersección con las curvas de nivel. Por esta razón, la extensión
+        resultante del perfil puede ser menor que la longitud total de la
+        línea de sección.
+
+    </p>
+
+    <div class="image-placeholder">
+    <img
+        src="../images/tab1_uno_b.png"
+        class="interface-image"
+        alt="Selección de curvas de nivel"
+    >
+    </div>
+
+    <div class="objective">
+        <strong>Nota.</strong>
+    En esta sección solo puede seleccionarse una fuente de elevación:
+    un Modelo Digital de Elevación (MDE) o una capa de curvas de nivel.
+    Ambas opciones son excluyentes.
+    </div>
+
+
+    <h2>Línea de sección</h2>
+
+    <p>
+        La línea de sección define el trazado sobre el cual se construirá el
+        perfil topográfico. SecGeol permite definirla de dos formas: mediante
+        una línea existente en una capa vectorial o dibujándola directamente
+        sobre la vista del mapa.
+    </p>
+
+    <p>
+        Para cada opción deben considerarse las siguientes condiciones.
+    </p>
+
+    <div class="image-placeholder">
+        <img
+            src="../images/tab1_dos.png"
+            class="interface-image"
+            alt="Selección de la línea de sección"
+        >
+    </div>
+
+
+    <h3>Línea proveniente de una capa vectorial</h3>
+
+    <p>
+        Cuando se utiliza una línea existente en una capa vectorial, deben
+        considerarse las siguientes condiciones:
+    </p>
+
+    <ol>
+        <li>
+            La sección debe estar definida por una sola entidad. Si la capa
+            contiene varias líneas, SecGeol permite seleccionar la que se
+            utilizará para generar el perfil.
+        </li>
+
+        <li>
+            Si la línea no tiene definido un sistema de referencia espacial y
+            se encuentra sobre la fuente de elevación, SecGeol le asignará el
+            sistema de referencia espacial de dicha fuente.
+        </li>
+
+        <li>
+            La línea puede contener más de dos vértices y, por lo tanto,
+            presentar cambios de dirección en su trazado.
+        </li>
+
+        <li>
+            La geometría de la línea no puede ser multiparte. Una geometría
+            multiparte contiene dos o más trazados separados que pertenecen
+            a una misma entidad.
+        </li>
+    </ol>
+
+
+    <h3>Línea dibujada por el usuario</h3>
+
+    <p>
+        Cuando la línea de sección se dibuja directamente en SecGeol, deben
+        considerarse las siguientes condiciones:
+    </p>
+
+    <ol>
+        <li>
+            El modo de dibujo se activa mediante el botón
+            <strong>Dibujar</strong>. Con la fuente de elevación previamente
+            cargada, haga clic sobre la vista del mapa para definir los
+            vértices de la sección y finalice el trazado con clic derecho.
+        </li>
+
+        <li>
+            La línea adoptará el sistema de referencia espacial de la fuente
+            de elevación utilizada.
+        </li>
+
+        <li>
+            La línea puede contener más de dos vértices, por lo que puede
+            presentar cambios de dirección en su trazado.
+        </li>
+    </ol>
 
 
     <div class="objective">
-        <strong>Objetivo.</strong>
-        Generar un perfil topográfico a partir de una línea de sección existente, 
-        conservar su orientación original y continuar el flujo de trabajo hasta 
-        obtener el perfil geológico 2D y su reconstrucción espacial en 3D.
+        <strong>Nota.</strong>
+        Solo puede utilizarse una modalidad para definir la línea de sección:
+        seleccionar una línea existente o dibujar una nueva.
+        En ambos casos es posible invertir la dirección de la sección y
+        establecer la profundidad de representación.
     </div>
 
 
-    <h2>Flujo del ejercicio</h2>
+    <h3>Profundidad de la sección</h3>
 
-    <div class="workflow">
-        1. Sección a perfil
-        <span class="arrow">→</span>
-       2. Líneas a polígonos
-        <span class="arrow">→</span>
-        3. Perfil 2D a 3D
+    <p>
+        La profundidad predeterminada es de 100 m y puede modificarse de acuerdo
+        con las necesidades de la sección. El usuario debe introducir únicamente
+        la magnitud de la profundidad, sin signo negativo.
+    </p>
+
+    <p>
+        La profundidad se calcula a partir de la elevación mínima encontrada
+        a lo largo del perfil y se extiende hacia abajo desde ese valor.
+    </p>
+
+
+    <h2>Geología</h2>
+    <p>
+        De manera opcional, puede incorporarse una capa de geología para
+        proporcionar información de referencia durante la interpretación del
+        perfil. Esta información debe corresponder a una capa vectorial de
+        geometría poligonal.
+    </p>
+
+    <div class="image-placeholder">
+        <img
+            src="../images/tab1_tres_a.png"
+            class="interface-image"
+            alt="Selección de la capa geológica"
+        >
+    </div>
+
+    <p>
+        SecGeol identifica los polígonos geológicos que intersectan la línea de
+        sección y traslada esta información al perfil topográfico. Al seleccionar
+        la capa geológica, deberá indicarse el campo de atributos que contiene
+        la información que se desea representar en el perfil, por ejemplo,
+        la unidad litológica.
+    </p>
+
+    <p>
+        De esta manera, la distribución de las unidades geológicas observadas
+        en superficie sirve como referencia para apoyar la interpretación
+        geológica hacia el subsuelo.
+    </p>
+
+
+    <h2>Estructuras</h2>
+    <p>
+        De manera opcional, también puede incorporarse una capa vectorial de
+        líneas que represente estructuras geológicas, como fallas o fracturas.
+        Las estructuras que intersectan la línea de sección pueden proyectarse
+        sobre el perfil para apoyar la interpretación geológica en profundidad.
+    </p>
+
+    <div class="image-placeholder">
+        <img
+            src="../images/tab1_tres_b.png"
+            class="interface-image"
+            alt="Selección de la capa estructural"
+        >
+    </div>
+
+    <p>
+        Para realizar esta proyección, la tabla de atributos de la capa
+        estructural debe contener dos campos con la información de orientación:
+    </p>
+
+    <ul>
+        <li>
+            <strong>Azimut de buzamiento:</strong>
+            indica la dirección hacia la cual buza la estructura y debe
+            encontrarse en el intervalo de 0° a 360°.
+        </li>
+
+        <li>
+            <strong>Echado:</strong>
+            indica el ángulo de inclinación de la estructura y debe
+            encontrarse en el intervalo de 0° a 90°.
+        </li>
+    </ul>
+
+    <div class="objective">
+        <strong>Nota.</strong>
+        Las estructuras cuyos valores de azimut de buzamiento o echado no se
+        encuentren dentro de los intervalos admitidos no serán representadas
+        en el perfil.
     </div>
 
 
-    <h2>Datos necesarios</h2>
+    <h2>Perfil de salida</h2>
 
-    <div class="requirements">
-        <ul>
-            <li>Modelo digital de elevación (DEM).</li>
-            <li>Capa vectorial de líneas que contenga la sección.</li>
-            <li>CRS proyectado adecuado para trabajar en unidades métricas.</li>
-        </ul>
-    </div>
+    <p>
+        SecGeol genera un perfil topográfico que constituye la base para realizar
+        la interpretación geológica. Este perfil representa la elevación sobre
+        el eje Y y la distancia recorrida a lo largo de la línea de sección
+        sobre el eje X.
+    </p>
+
+    <p>
+        Para realizar la interpretación deben considerarse las siguientes
+        recomendaciones:
+    </p>
+
+    <ol>
+        <li>
+            El perfil conserva las elevaciones (Z) de la superficie sobre el
+            eje Y y las distancias reales recorridas a lo largo de la línea
+            de sección sobre el eje X.
+        </li>
+        <li>
+            <strong>No debe modificarse la geometría del perfil topográfico.</strong>
+            Los vértices que representan el relieve no deben moverse, eliminarse
+            ni editarse, ya que constituyen la referencia geométrica de la sección.
+            Esta restricción aplica únicamente al perfil topográfico; las líneas
+            utilizadas para la interpretación geológica y las estructuras proyectadas
+            sí pueden editarse.
+        </li>
+
+        <li>
+            La línea del perfil topográfico conserva como atributo la información
+            geológica obtenida de los polígonos que intersectaron la línea de sección.
+            Se recomienda simbolizar el perfil utilizando este campo, ya que permite
+            visualizar la distribución de las unidades geológicas observadas en
+            superficie y utilizarlas como referencia durante la interpretación.
+        </li>
+
+        <li>
+            El perfil también contiene las estructuras geológicas proyectadas de
+            acuerdo con sus valores de azimut de buzamiento y echado. Estas líneas
+            pueden conservarse en la posición generada por SecGeol o modificarse
+            durante la interpretación, de acuerdo con el criterio del usuario.
+        </li>
+
+        <li>
+            Sobre el perfil pueden agregarse y editarse líneas para realizar
+            la interpretación geológica. El proceso puede entenderse como
+            bosquejar la geometría del subsuelo sobre el perfil utilizando
+            entidades lineales.
+        </li>
+
+        <li>
+            Al construir la interpretación, procure que las líneas se prolonguen
+            ligeramente más allá de sus intersecciones con otras líneas. No es
+            necesario eliminar los pequeños segmentos excedentes, ya que estos
+            serán resueltos durante la generación de los polígonos en la
+            siguiente fase.
+        </li>
+
+        <li>
+            Una vez concluida la interpretación y revisadas las intersecciones
+            entre las líneas, continúe con la
+            <strong>Fase 2. Líneas a polígonos</strong>.
+        </li>
+    </ol>
 
 
     <div class="note">
-        <strong>Para este procedimiento, deje sin seleccionar las capas de geología y estructuras.</strong>
-    </div>
-
-
-    <h2>Módulo 1 · Generación del perfil topográfico</h2>
-
-
-    <div class="step">
-
-        <p>
-            <span class="step-number">Paso 1.</span>
-            Seleccione el modelo digital de elevación en el campo
-            correspondiente.
-        </p>
-
-    </div>
-
-
-    <div class="step">
-
-        <p>
-            <span class="step-number">Paso 2.</span>
-            Seleccione la capa vectorial que contiene la línea de sección.
-        </p>
-
-        <p>
-            Mantenga desactivada la opción
-            <strong>Invertir sección</strong> para conservar el sentido
-            original de la geometría.
-        </p>
-
-    </div>
-
-
-    <div class="step">
-
-        <p>
-            <span class="step-number">Paso 3.</span>
-            No seleccione capas de geología ni estructuras.
-        </p>
-
-    </div>
-
-
-    <div class="step">
-
-        <p>
-            <span class="step-number">Paso 4.</span>
-            Defina la ubicación del archivo de salida y ejecute
-            la herramienta.
-        </p>
-
-    </div>
-
-
-    <div class="image-placeholder">
-        Captura pendiente · Configuración del Módulo 1
-    </div>
-
-
-    <div class="result">
-        <strong>Resultado </strong>
-        SecGeol genera el perfil topográfico y la sección guía, conservando el sentido original de la línea seleccionada.
-    </div>
-
-
-    <h2>Módulo 2 · Construcción del perfil geológico</h2>
-
-    <p>
-        El perfil generado en el módulo anterior constituye la base
-        geométrica para la interpretación y construcción del perfil
-        geológico.
-    </p>
-
-    <div class="image-placeholder">
-        Captura pendiente · Flujo del Módulo 2
-    </div>
-
-
-    <h2>Módulo 3 · Reconstrucción 3D</h2>
-
-    <p>
-        Finalmente, el perfil geológico y la sección guía se utilizan
-        para reconstruir la geometría en sus coordenadas espaciales
-        originales.
-    </p>
-
-    <div class="image-placeholder">
-        Captura pendiente · Resultado tridimensional
-    </div>
-
-
-    <div class="result">
-        <strong>Resultado final.</strong>
-        El perfil geológico 3D se genera en sus coordenadas espaciales, conservando la posición, longitud y orientación de la sección guía.
+        <strong>Importante.</strong>
+        Junto con el perfil, SecGeol genera un archivo adicional cuyo nombre
+        contiene el sufijo <strong>_guia</strong>. Este archivo no debe eliminarse
+        ni modificarse, ya que conserva la referencia espacial necesaria para
+        reconstruir el perfil en coordenadas reales durante la
+        <strong>Fase 3. Reconstrucción 3D</strong>.
     </div>
 
 
     <footer>
         <span>SecGeol · Manual de usuario</span>
-        <span>2</span>
+        <span>1</span>
     </footer>
 
-</div>
+    </main>
+
+    </div> <!-- manual-right -->
+
+    </div> <!-- manual-layout -->
+
+<script>
+function toggleMenu() {
+    document.getElementById("manualMenu").classList.toggle("open");
+}
+</script>
 
 </body>
+
 </html>

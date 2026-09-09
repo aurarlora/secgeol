@@ -1,12 +1,25 @@
 [general]
 name=SecGeol
-description=Herramienta para secciones y perfiles geológicos
-version=0.1
-qgisMinimumVersion=3.0
-qgisMaximumVersion=4.0
+description=QGIS plugin for generating geological cross sections and reconstructing interpreted profiles in 3D.
+about=SecGeol is a QGIS plugin for generating topographic profiles from DEMs or contour lines, integrating geological and structural information, converting interpreted profile lines into polygons, and reconstructing geological profiles in real-world 3D coordinates.
+version=1.0.0
+qgisMinimumVersion=4.0
+qgisMaximumVersion=4.99
+
 author=Aura Ramos Lora
-email=ralaua@correo.com
-requires_qt=5;6
+email=ralaua@gmail.com
+
+homepage=https://github.com/aurarlora/secgeol
+repository=https://github.com/aurarlora/secgeol
+tracker=https://github.com/aurarlora/secgeol/issues
+
+license=GPL-3.0
+
+category=Vector
+icon=icon.png
+
+experimental=False
+deprecated=False
 
 [advanced]
 class_name=SecGeol

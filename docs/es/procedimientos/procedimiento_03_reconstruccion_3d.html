@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="../../assets/css/secgeol-manual.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SecGeol — Manual de usuario</title>
+</head>
+
+<body>
+
+
+    <!-- Contenedor general: izquierda + derecha -->
+    <div class="manual-layout">
+
+        <!-- =========================
+             COLUMNA IZQUIERDA
+             ========================= -->
+        <aside class="sidebar">
+
+            <a href="../index.html" class="nav-item">
+                <span class="nav-icon">⌂</span>
+                <span>Inicio</span>
+            </a>
+
+             <a href="procedimiento_01_seccion_vectorial.html"
+               class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>1. Sección a perfil</span>
+            </a>
+
+            <a href="procedimiento_02_lineas_poligonos.html"
+               class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>2. Líneas a polígonos</span>
+            </a>
+
+            <a href="procedimiento_03_reconstruccion_3d.html"
+               class="nav-item active">
+                <span class="nav-icon">▤</span>
+                <span>3. Reconstrucción 3D</span>
+            </a>
+
+        </aside>
+
+
+        <!-- =========================
+             COLUMNA DERECHA
+             ========================= -->
+        <div class="manual-right">
+
+            <!-- Encabezado -->
+            <div class="topbar">
+
+                <div class="manual-title">
+                    SecGeol · Manual de usuario
+                </div>
+
+                <div class="languages">
+                    <a href="../es/index.html"
+                       class="active"
+                       title="Español">🇲🇽</a>
+
+                    <a href="../en/index.html"
+                       title="English">🇬🇧</a>
+                </div>
+
+            </div>
+
+
+
+<!-- Contenido -->
+<main class="manual-container">
+
+
+    <h1>
+        Fase 3. Vista general de la herramienta
+    </h1>
+
+    <div class="image-placeholder">
+        <img
+            src="../images/tab3_gral.png"
+            class="interface-image"
+            alt="Vista general de la tercera fase de SecGeol"
+        >
+    </div>
+
+
+    <h2>Selección del perfil geológico poligonal</h2>
+
+    <p>
+        En esta fase se utiliza el perfil geológico poligonal obtenido en la
+        <strong>Fase 2</strong>. Antes de continuar, se recomienda verificar que
+        el campo correspondiente a las unidades geológicas se encuentre
+        debidamente completado en la tabla de atributos.
+    </p>
+
+    <div class="image-placeholder">
+        <img
+            src="../images/tab3_uno.png"
+            class="interface-image"
+            alt="Selección del perfil geológico poligonal"
+        >
+    </div>
+
+
+    <h2>Selección de la sección guía</h2>
+
+    <div class="image-placeholder">
+        <img
+            src="../images/tab3_dos.png"
+            class="interface-image"
+            alt="Selección de la sección guía"
+        >
+    </div>
+
+    <p>
+        En este apartado se selecciona la sección guía generada durante la
+        <strong>Fase 1</strong>, identificada mediante el sufijo
+        <strong>_guia</strong>.
+    </p>
+
+    <p>
+        La sección guía conserva la referencia espacial necesaria para
+        reconstruir el perfil geológico, originalmente interpretado en
+        coordenadas locales de distancia y elevación, en su posición
+        correspondiente en el espacio tridimensional.
+    </p>
+
+
+    <div class="objective">
+        <strong>Importante.</strong>
+        Si la sección guía original ya no se encuentra disponible, puede
+        generarse nuevamente a partir de la misma línea de sección y siguiendo
+        las condiciones utilizadas originalmente en la Fase 1.
+        La nueva sección guía puede utilizarse directamente en esta fase;
+        no es necesario repetir la Fase 2.
+    </div>
+
+
+    <h2>Perfil geológico poligonal 3D de salida</h2>
+
+    <p>
+        Como resultado, SecGeol genera una capa vectorial poligonal tridimensional
+        que conserva la interpretación y los atributos del perfil geológico.
+        Sus vértices se reconstruyen en coordenadas reales X, Y y Z a partir
+        de la sección guía.
+    </p>
+
+    <p>
+        La capa resultante puede incorporarse a escenarios tridimensionales
+        para su visualización y análisis en aplicaciones compatibles con
+        geometrías 3D, como QGIS, ArcScene o Leapfrog.
+    </p>
+
+
+    <div class="objective">
+        <strong>Importante.</strong>
+        Los valores Z generados por SecGeol corresponden a elevaciones absolutas.
+        Para visualizar correctamente el perfil en la vista 3D de QGIS,
+        utilice el modo de elevación <strong>Absoluto</strong>, con escala 1
+        y desplazamiento 0.
+    </div>
+
+
+    <footer>
+        <span>SecGeol · Manual de usuario</span>
+        <span>3</span>
+    </footer>
+
+    </main>
+
+    </div> <!-- manual-right -->
+
+    </div> <!-- manual-layout -->
+
+<script>
+function toggleMenu() {
+    document.getElementById("manualMenu").classList.toggle("open");
+}
+</script>
+
+</body>
+
+</html>
