@@ -23,9 +23,26 @@ class WorkspaceManager:
         self.gpkg_path = os.path.join(secgeol_dir, f"secgeol_{timestamp}.gpkg")
         return self.gpkg_path
 
-    def create_layer(self, gpkg_path, layer_name, geometry_type, crs_authid, fields):
-        uri = f"{QgsWkbTypes.displayString(geometry_type)}?crs={crs_authid}"
-        mem_layer = QgsVectorLayer(uri, layer_name, "memory")
+    def create_layer(self, gpkg_path, layer_name, geometry_type, crs, fields):
+
+        uri = QgsWkbTypes.displayString(geometry_type)
+
+        mem_layer = QgsVectorLayer(
+            uri,
+            layer_name,
+            "memory"
+        )
+
+        if not mem_layer.isValid():
+            raise Exception(
+                QCoreApplication.translate(
+                    "SecGeol",
+                    "Error creating temporary layer."
+                )
+            )
+
+        mem_layer.setCrs(crs)
+
         provider = mem_layer.dataProvider()
         provider.addAttributes(fields)
         mem_layer.updateFields()
@@ -35,9 +52,13 @@ class WorkspaceManager:
         options.layerName = layer_name
 
         if os.path.exists(gpkg_path):
-            options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+            options.actionOnExistingFile = (
+                QgsVectorFileWriter.CreateOrOverwriteLayer
+            )
         else:
-            options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteFile
+            options.actionOnExistingFile = (
+                QgsVectorFileWriter.CreateOrOverwriteFile
+            )
 
         writer_result = QgsVectorFileWriter.writeAsVectorFormatV3(
             mem_layer,
@@ -48,7 +69,6 @@ class WorkspaceManager:
 
         result = writer_result[0]
         error_message = writer_result[1] if len(writer_result) > 1 else ""
-        
 
         if result != QgsVectorFileWriter.NoError:
             raise Exception(
@@ -60,11 +80,16 @@ class WorkspaceManager:
             )
 
 
-    def create_base_geopackage(self, crs_authid):
+    def create_base_geopackage(self, crs):
         gpkg_path = self.create_workspace_path()
         self.create_layer(
-            gpkg_path, "sec_draw_lines", QgsWkbTypes.LineString, crs_authid, self._fields_draw_lines()
+            gpkg_path,
+            "sec_draw_lines",
+            QgsWkbTypes.LineString,
+            crs,
+            self._fields_draw_lines()
         )
+
         return gpkg_path
 
 

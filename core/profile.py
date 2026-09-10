@@ -657,12 +657,18 @@ class ProfileManager:
 
         
         # CAPA DE SALIDA
-        
-        crs_authid = section_layer.crs().authid()
-        if not crs_authid:
-            crs_authid = dem_layer.crs().authid()
+        source_crs = section_layer.crs()
 
-        out_layer = QgsVectorLayer(f"LineString?crs={crs_authid}", layer_name, "memory")
+        if not source_crs.isValid():
+            source_crs = dem_layer.crs()
+        
+        out_layer = QgsVectorLayer(
+            "LineString", 
+            layer_name, 
+            "memory")
+
+        out_layer.setCrs(source_crs)
+
         prov = out_layer.dataProvider()
 
         prov.addAttributes([
@@ -673,6 +679,7 @@ class ProfileManager:
             QgsField("y_min", QVariant.Double),
             QgsField("base_y", QVariant.Double)
         ])
+
         out_layer.updateFields()
 
         feature_defs = []
@@ -778,7 +785,11 @@ class ProfileManager:
 
         # Crea una capa temporal de polígonos para el perfil geológico.
         
-    def build_geological_polygon_layer(self, line_layer, layer_name="perfil_geologico"):
+    def build_geological_polygon_layer(
+        self,
+        line_layer,
+        layer_name="perfil_geologico"
+    ):
 
         if line_layer is None or not line_layer.isValid():
             raise Exception(
@@ -788,16 +799,14 @@ class ProfileManager:
                 )
             )
 
-        crs_authid = line_layer.crs().authid()
-        if not crs_authid:
-            crs_authid = "EPSG:4326"
-
+        source_crs = line_layer.crs()
         out_layer = QgsVectorLayer(
-            f"Polygon?crs={crs_authid}",
+            "Polygon",
             layer_name,
             "memory"
         )
 
+        out_layer.setCrs(source_crs)
         prov = out_layer.dataProvider()
 
         prov.addAttributes([
@@ -805,6 +814,7 @@ class ProfileManager:
             QgsField("tipo", QVariant.String),
             QgsField("valor_geo", QVariant.String)
         ])
+
         out_layer.updateFields()
 
         line_geoms = []
@@ -909,15 +919,15 @@ class ProfileManager:
                 )
             )   
 
-        crs_authid = line_layer.crs().authid()
-
+        source_crs = line_layer.crs()
         out_layer = QgsVectorLayer(
-            f"LineString?crs={crs_authid}",
+            "LineString",
             layer_name,
             "memory"
         )
-
+        out_layer.setCrs(source_crs)
         prov = out_layer.dataProvider()
+        
 
         prov.addAttributes([
             QgsField("tipo", QVariant.String),

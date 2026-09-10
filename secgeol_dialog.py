@@ -633,11 +633,16 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         dem_layer = self.MapLayerDEM.currentLayer()
         curvas_layer = self.MapLayerCurvas.currentLayer()
 
+        print("DEM CRS válido:", dem_layer.crs().isValid())
+        print("DEM CRS authid:", dem_layer.crs())
+        print("DEM CRS description:", dem_layer.crs().description())
+        print("DEM CRS WKT:", dem_layer.crs().toWkt())
+
         if dem_layer is not None:
-            crs_authid = dem_layer.crs().authid()
+            crs_authid = dem_layer.crs()
 
         elif curvas_layer is not None:
-            crs_authid = curvas_layer.crs().authid()
+            crs_authid = curvas_layer.crs()
 
         else:
             raise Exception(
@@ -648,7 +653,12 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 )
             )
        
-        layer = QgsVectorLayer(f"LineString?crs={crs_authid}", "seccion_dibujada", "memory")
+        layer = QgsVectorLayer(
+            "LineString",
+            "seccion_dibujada",
+            "memory"
+        )
+
         if not layer.isValid():
             return
 
@@ -1199,10 +1209,10 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         curvas_layer = self.MapLayerCurvas.currentLayer()
 
         if dem_layer is not None:
-            crs_authid = dem_layer.crs().authid()
+            source_crs = dem_layer.crs()
 
         elif curvas_layer is not None:
-            crs_authid = curvas_layer.crs().authid()
+            source_crs = curvas_layer.crs()
 
         else:
             raise Exception(
@@ -1213,7 +1223,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 )
             )
 
-        self.gpkg_path = self.workspace_manager.create_base_geopackage(crs_authid)
+        self.gpkg_path = self.workspace_manager.create_base_geopackage(source_crs)
         self.section_manager.set_gpkg_path(self.gpkg_path)
 
     # Entra a secprofile    
@@ -2111,13 +2121,18 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 )
             )
 
-        crs_authid = section_layer.crs().authid()
+        source_crs = section_layer.crs()
+
+        crs_text = source_crs.authid() or source_crs.description()
 
         guia_layer = QgsVectorLayer(
-            f"LineString?crs={crs_authid}",
+            "LineString",
             layer_name,
             "memory"
         )
+
+        guia_layer.setCrs(source_crs)
+
 
         prov = guia_layer.dataProvider()
 
@@ -2151,7 +2166,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 1,
                 float(geom.length()),
                 1 if invertida else 0,
-                section_layer.crs().authid()
+                crs_text
             ])
 
             out_features.append(feat)
@@ -2199,13 +2214,15 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             sec_geom = sec_feat.geometry()
 
 
-            crs_authid = sec_layer.crs().authid()
+            source_crs = sec_layer.crs()
 
             out_layer = QgsVectorLayer(
-                f"PolygonZ?crs={crs_authid}",
+                "PolygonZ",
                 "perfil_geologico3D",
                 "memory"
             )
+
+            out_layer.setCrs(source_crs)
 
             prov = out_layer.dataProvider()
             prov.addAttributes(poly_layer.fields())

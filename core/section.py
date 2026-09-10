@@ -284,9 +284,16 @@ class SectionManager:
                 )
             )
 
-        crs_authid = target_crs.authid()
+       
 
-        temp_layer = QgsVectorLayer(f"LineString?crs={crs_authid}", "seccion_temp", "memory")
+        temp_layer = QgsVectorLayer(
+            "LineString",
+            "seccion_temp",
+            "memory"
+        )
+
+        temp_layer.setCrs(target_crs)
+
         provider = temp_layer.dataProvider()
 
         new_feat = self._prepare_section_feature(
