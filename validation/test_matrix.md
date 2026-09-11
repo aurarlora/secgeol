@@ -18,6 +18,7 @@ detectadas y verificar las correcciones implementadas antes de su publicación.
 | R3 | ITRF08 / UTM 14N | Sin CRS y no cae → no continúa | EPSG:32614 | EPSG:32614 | ✅ | — | — | Satisfactoria |
 | P4 | Fuente incompatible | Bloqueada | Bloqueada | Bloqueadas | — | — | — | No satisfactoria |
 | R4 | DEM compatible ITRF08 / UTM 14N | Habilitada | Habilitada | Habilitadas | ✅ | — | — | Satisfactoria |
+| P5 | ITRF08 / UTM 14N | CRS asignado incorrectamente; queda fuera del DEM | - | - | ✅ | — | — | Satisfactoria |
 
 
 ---
@@ -205,4 +206,10 @@ Cuando el DEM seleccionado no es compatible con SecGeol, la herramienta deshabil
 
 ** Resultado: ✅ SATISFACTORIA**
 
+
+## Prueba 5 — CRS asignado incorrectamente; queda fuera del DEM 
+
+En este caso, la sección tiene un CRS válido, pero asignado incorrectamente, por lo que no queda contenida dentro del DEM. SecGeol valida la ubicación espacial de la sección y detiene el proceso, indicando que la sección no se encuentra completamente contenida dentro de la fuente de elevación.
+
+** Resultado: ✅ SATISFACTORIA**
 
