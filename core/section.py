@@ -246,8 +246,19 @@ class SectionManager:
         geom = source_feature.geometry()
 
         # Transformar CRS si es necesario
-        if source_crs and target_crs and source_crs != target_crs:
-            geom = self._transform_geometry_to_crs(geom, source_crs, target_crs)
+
+        if (
+            source_crs is not None
+            and target_crs is not None
+            and source_crs.isValid()
+            and target_crs.isValid()
+            and source_crs != target_crs
+        ):
+            geom = self._transform_geometry_to_crs(
+                geom,
+                source_crs,
+                target_crs
+            )
 
         # Invertir si aplica
         if invertida:

@@ -198,13 +198,19 @@
 
     <ol>
         <li>
+        La línea de sección debe estar contenida completamente dentro de la
+        fuente de elevación. De lo contrario, SecGeol no podrá continuar con
+        la construcción del perfil topográfico.
+        </li>
+        
+        <li>
             La sección debe estar definida por una sola entidad. Si la capa
             contiene varias líneas, SecGeol permite seleccionar la que se
             utilizará para generar el perfil.
         </li>
 
         <li>
-            Si la línea no tiene definido un sistema de referencia espacial y
+            Si la línea de sección no tiene definido un sistema de referencia espacial y
             se encuentra sobre la fuente de elevación, SecGeol le asignará el
             sistema de referencia espacial de dicha fuente.
         </li>

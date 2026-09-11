@@ -176,6 +176,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.drawn_section_feature = None
         self.draw_tool = None
         self.section_geom_recortada = None
+        self._section_selection_layer = None
 
 
         # para cambiar entre dem y contour
@@ -540,9 +541,31 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         )
 
     def on_section_layer_changed(self, layer):
+        # Desconectar la capa anterior, si existía
+        if self._section_selection_layer is not None:
+            try:
+                self._section_selection_layer.selectionChanged.disconnect(
+                    self.on_section_selection_changed
+                )
+            except (TypeError, RuntimeError):
+                pass
+
+        self._section_selection_layer = layer
+
         if layer is not None:
+
             self.clear_drawn_section_feature()
             self._remove_layer_by_name("seccion_dibujada")
+
+            # Actualizar información cuando cambie la entidad seleccionada
+            layer.selectionChanged.connect(
+                self.on_section_selection_changed
+            )
+
+        self.actualizar_info_seccion()
+
+    def on_section_selection_changed(self, *args):
+        self.actualizar_info_seccion()
 
 
     def _remove_layer_by_name(self, layer_name):
@@ -1185,12 +1208,54 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                     self.tr("The section layer was not found.")
                 )
             source_crs = source_layer.crs()
+
+             # Registrar si la sección originalmente no tenía CRS.
+            missing_crs = (
+                source_crs is None
+                or not source_crs.isValid()
+            )
+
+
+            # Si la sección no tiene CRS definido, sus coordenadas se interpretan
+            # en el CRS de la fuente de elevación.
+
+            if missing_crs:
+                source_crs = target_crs
+
+
             temp_layer = self.section_manager.prepare_section_layer_from_feature(
                 source_feature=feat_sec,
                 source_crs=source_crs,
                 target_crs=target_crs,
                 invertida=invertida
             )
+
+            # Verificar que la sección quede completamente dentro del DEM.
+
+            if dem_layer is not None:
+                dem_extent = dem_layer.extent()
+                section_extent = temp_layer.extent()
+
+                if not dem_extent.contains(section_extent):
+                    raise Exception(
+                        self.tr(
+                            "The section line must be completely contained "
+                            "within the elevation source."
+                        )
+                    )
+
+            # Si originalmente no tenía CRS y pasó la validación espacial,
+            # informar al usuario que se utilizará el CRS de la fuente de elevación.
+            if missing_crs:
+                self.iface.messageBar().pushInfo(
+                    self.tr("SecGeol"),
+                    self.tr(
+                        "The selected section has no defined CRS. "
+                        "The CRS of the elevation source will be assigned."
+                    )
+                )
+
+            
          
         else:
             raise Exception(
@@ -1322,6 +1387,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         dem_layer = self.MapLayerDEM.currentLayer()
 
         if dem_layer is None:
+            self.frame.setEnabled(False)
+            self.frame_2.setEnabled(False)
+            
             self.mostrar_ayuda(
             self.tr("Digital elevation model"),
             self.tr(
@@ -1398,6 +1466,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             banda_valida = una_banda and (band_type in tipos_validos)
 
             if es_metrico and banda_valida:
+                self.frame.setEnabled(True)
+                self.frame_2.setEnabled(True)
                 estado = (
                     "<p style='color:green;'>"
                     + self.tr("<b>Status: Compatible with SecGeol.</b>")
@@ -1405,6 +1475,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 )
 
             else:
+                self.frame.setEnabled(False)
+                self.frame_2.setEnabled(False)
+
                 detalles = []
 
                 if not dem_crs.isValid():
@@ -1456,6 +1529,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         )
 
         except Exception as e:
+            self.frame.setEnabled(False)
+            self.frame_2.setEnabled(False)
             self.mostrar_ayuda(
                 self.tr("Error reading DEM"),
                 f"""
@@ -1671,9 +1746,86 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 return
 
         
+        dem_layer = self.MapLayerDEM.currentLayer()
+        curvas_layer = self.MapLayerCurvas.currentLayer()
 
+        elevation_layer = dem_layer if dem_layer is not None else curvas_layer
+
+        missing_crs = False
+
+        if elevation_layer is not None:
+
+            target_crs = elevation_layer.crs()
+            source_crs = sec_layer.crs()
+
+            missing_crs = (
+                source_crs is None
+                or not source_crs.isValid()
+            )
+
+            geom_check = QgsGeometry(geom)
+
+            # Si no tiene CRS, NO transformamos.
+            # Sus coordenadas se evalúan directamente contra
+            # la fuente de elevación.
+
+            if not missing_crs and source_crs != target_crs:
+                geom_check = self.section_manager._transform_geometry_to_crs(
+                    geom_check,
+                    source_crs,
+                    target_crs
+                )
+
+            section_extent = geom_check.boundingBox()
+            elevation_extent = elevation_layer.extent()
+
+           
+
+            if not elevation_extent.contains(section_extent):
+                self.mostrar_ayuda(
+                    self.tr("Invalid section"),
+                    self.tr(
+                        """
+                        <p>
+                            <span style="color:red; font-size:18px;">⚠</span>
+                            <b>The selected section is not completely contained
+                            within the elevation source.</b>
+                        </p>
+
+                        <p>
+                            Select a section located completely inside the
+                            elevation source to continue.
+                        </p>
+                        """
+                    )
+                )
+                return
+            
+        #si sí cae y además no tiene CRS
         longitud = geom.length()
         estado_invertida = self.tr("Yes") if invertida else self.tr("No")
+
+        # SEGUNDO: ya sabemos que espacialmente sí es válida.
+        if missing_crs:
+            self.mostrar_ayuda(
+                self.tr("Active section"),
+                f"""
+                <p>
+                    <b>{self.tr("Layer:")}</b> {sec_layer.name()}<br>
+                    <b>{self.tr("Length:")}</b> {longitud:.2f} m<br>
+                    <b>{self.tr("Reversed orientation:")}</b> {estado_invertida}
+                </p>
+
+                <p style="color:#b36b00;">
+                    <span style="font-size:18px;">⚠</span>
+                    <b>{self.tr("The selected section has no defined CRS.")}</b><br>
+                    {self.tr("The CRS of the elevation source will be assigned.")}
+                </p>
+                """
+            )
+            return
+        #sí tiene CRS
+
         self.mostrar_ayuda(
             self.tr("Active section"),
             f"""
