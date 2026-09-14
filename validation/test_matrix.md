@@ -19,6 +19,7 @@ detectadas y verificar las correcciones implementadas antes de su publicación.
 | P4 | Fuente incompatible | Bloqueada | Bloqueada | Bloqueadas | — | — | — | No satisfactoria |
 | R4 | DEM compatible ITRF08 / UTM 14N | Habilitada | Habilitada | Habilitadas | ✅ | — | — | Satisfactoria |
 | P5 | ITRF08 / UTM 14N | CRS asignado incorrectamente; queda fuera del DEM | - | - | ✅ | — | — | Satisfactoria |
+| R6 | EPSG:6369 / UTM 14N | EPSG:6369 / UTM 14N | - | - | ✅ | — | — | Satisfactoria |
 
 
 ---
@@ -213,3 +214,9 @@ En este caso, la sección tiene un CRS válido, pero asignado incorrectamente, p
 
 ** Resultado: ✅ SATISFACTORIA**
 
+## Prueba 6 — Curvas de nivel compatibles como fuente de elevación
+
+Se seleccionó una capa de curvas de nivel con CRS EPSG:6369 - Mexico ITRF2008 / UTM zone 14N y un campo numérico de elevación. SecGeol habilitó correctamente los controles de Sección y Geología/Estructuras y generó el perfil topográfico.
+La línea de sección de trabajo y la capa _guía conservaron el CRS de la fuente de elevación.
+
+** Resultado: ✅ SATISFACTORIA**

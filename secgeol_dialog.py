@@ -5,7 +5,7 @@ from qgis.PyQt.QtCore import Qt, QVariant, QCoreApplication, QUrl
 from qgis.PyQt.QtWidgets import QDialog, QSplitter
 from qgis.core import (QgsMapLayerProxyModel, QgsProject, Qgis,QgsPoint, QgsPolygon,QgsVectorFileWriter,
                        QgsFeature, QgsGeometry, QgsVectorLayer, QgsField, QgsLineString,
-                       QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog,  QgsPointXY,)
+                       QgsWkbTypes, QgsFieldProxyModel, QgsMessageLog,  QgsPointXY,QgsUnitTypes,)
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.utils import iface
 from qgis.PyQt.QtGui import QColor
@@ -181,6 +181,8 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         # para cambiar entre dem y contour
         self.MapLayerCurvas.layerChanged.connect(self.al_cambiar_curvas)
+        self.FieldElevCurvas.fieldChanged.connect(self.actualizar_info_curvas)
+
         self.MapLayerDEM.layerChanged.connect(self.al_cambiar_dem)
         self.btnDrawSec.clicked.connect(self.activar_dibujo_seccion)
         self.MapLayerSec.layerChanged.connect(self.on_section_layer_changed)
@@ -723,30 +725,9 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             elif obj == self.MapLayerSec:
                 self.actualizar_info_seccion()
 
-
             elif obj == self.MapLayerCurvas:
-                self.mostrar_ayuda(
-                    self.tr("Contour lines"),
-                    self.tr(
-                        """
-                        <p>
-                            Select a vector <b>line layer</b> containing the contour
-                            lines to be used as the elevation source.
-                        </p>
-
-                        <p>
-                            SecGeol will calculate the intersections between the section
-                            line and the contour lines to construct the topographic profile.
-                        </p>
-
-                        <p>
-                            <b>Important:</b> the profile will be limited from the first
-                            to the last intersected contour line. The first intersection
-                            will be set to <b>X = 0</b>.
-                        </p>
-                        """
-                    )
-                )  
+                self.actualizar_info_curvas()
+               
                 
 
             elif obj == self.FieldElevCurvas:
@@ -1151,18 +1132,228 @@ class SecGeolDialog(QDialog, FORM_CLASS):
     def al_cambiar_curvas(self, layer):
         if layer is not None:
             self.MapLayerDEM.setLayer(None)
+
             self.FieldElevCurvas.setLayer(layer)
-            self.FieldElevCurvas.setEnabled(True)
+
+            crs = layer.crs()
+
+            capa_valida = (
+                crs.isValid()
+                and crs.mapUnits() == Qgis.DistanceUnit.Meters
+                and layer.geometryType() == Qgis.GeometryType.Line
+            )
+
+            self.FieldElevCurvas.setEnabled(capa_valida)
+
         else:
             self.FieldElevCurvas.setLayer(None)
             self.FieldElevCurvas.setEnabled(False)
 
+        self.actualizar_estado_fuente_elevacion()
+        self.actualizar_info_curvas()
+
+
+    def actualizar_estado_fuente_elevacion(self):
+        compatible = False
+
+        # -------------------------------------------------
+        # 1. Comprobar DEM
+        # -------------------------------------------------
+        dem_layer = self.MapLayerDEM.currentLayer()
+
+        if dem_layer is not None:
+            try:
+                dem_crs = dem_layer.crs()
+
+                es_metrico = (
+                    dem_crs.isValid()
+                    and dem_crs.mapUnits() == Qgis.DistanceUnit.Meters
+                )
+
+                una_banda = dem_layer.bandCount() == 1
+
+                tipos_validos = {
+                    Qgis.DataType.Int16,
+                    Qgis.DataType.UInt16,
+                    Qgis.DataType.Int32,
+                    Qgis.DataType.UInt32,
+                    Qgis.DataType.Float32,
+                    Qgis.DataType.Float64,
+                }
+
+                provider = dem_layer.dataProvider()
+                band_type = provider.dataType(1) if una_banda else None
+                banda_valida = una_banda and band_type in tipos_validos
+
+                compatible = es_metrico and banda_valida
+
+            except Exception:
+                compatible = False
+
+        # -------------------------------------------------
+        # 2. Si no hay DEM compatible, comprobar curvas
+        # -------------------------------------------------
+        if not compatible:
+            curvas_layer = self.MapLayerCurvas.currentLayer()
+
+            if curvas_layer is not None:
+                try:
+                    crs = curvas_layer.crs()
+                    campo_elev = self.FieldElevCurvas.currentField()
+
+                    crs_valido = crs.isValid()
+
+                    es_metrico = (
+                        crs_valido
+                        and crs.mapUnits() == Qgis.DistanceUnit.Meters
+                    )
+
+                    geom_valida = (
+                        curvas_layer.geometryType()
+                        == Qgis.GeometryType.Line
+                    )
+
+                    campo_valido = bool(campo_elev)
+
+                    compatible = (
+                        crs_valido
+                        and es_metrico
+                        and geom_valida
+                        and campo_valido
+                    )
+
+                except Exception:
+                    compatible = False
+
+        # -------------------------------------------------
+        # ÚNICO lugar que controla estos frames
+        # -------------------------------------------------
+        self.frame.setEnabled(compatible)
+        self.frame_2.setEnabled(compatible)
+
+    def actualizar_estado_curvas(self, *args):
+        self.actualizar_estado_fuente_elevacion()
 
     def al_cambiar_dem(self, layer):
         if layer is not None:
+            #self._fuente_elevacion_activa = "dem"
             self.MapLayerCurvas.setLayer(None)
             self.FieldElevCurvas.setLayer(None)
             self.FieldElevCurvas.setEnabled(False)
+
+    def actualizar_info_curvas(self, *args):
+        curvas_layer = self.MapLayerCurvas.currentLayer()
+
+        # Sin capa seleccionada: mostrar ayuda general
+        if curvas_layer is None:
+            self.mostrar_ayuda(
+                self.tr("Contour lines"),
+                self.tr(
+                    """
+                    <p>
+                        Select a vector <b>line layer</b> containing the contour
+                        lines to be used as the elevation source.
+                    </p>
+
+                    <p>
+                        SecGeol will calculate the intersections between the section
+                        line and the contour lines to construct the topographic profile.
+                    </p>
+
+                    <p>
+                        <b>Important:</b> the profile will be limited from the first
+                        to the last intersected contour line. The first intersection
+                        will be set to <b>X = 0</b>.
+                    </p>
+                    """
+                )
+            )
+            return
+        # A partir de aquí:
+        # hay una capa seleccionada y se muestra su estado real
+        crs = curvas_layer.crs()
+        campo_elev = self.FieldElevCurvas.currentField()
+
+        crs_valido = crs.isValid()
+
+        es_metrico = (
+            crs_valido
+            and crs.mapUnits() == Qgis.DistanceUnit.Meters
+        )
+
+        geom_valida = (
+            curvas_layer.geometryType() == Qgis.GeometryType.Line
+        )
+
+        campo_valido = bool(campo_elev)
+
+        compatible = (
+            crs_valido
+            and es_metrico
+            and geom_valida
+            and campo_valido
+        )
+
+        if compatible:
+            estado = (
+                "<p style='color:green;'>"
+                + self.tr("<b>Status: Compatible with SecGeol.</b>")
+                + "</p>"
+            )
+
+        else:
+            detalles = []
+
+            if not crs_valido:
+                detalles.append(
+                    self.tr("The CRS is not valid.")
+                )
+            elif not es_metrico:
+                detalles.append(
+                    self.tr("The CRS must use meters as its unit.")
+                )
+
+            if not geom_valida:
+                detalles.append(
+                    self.tr("The selected layer must contain line geometries.")
+                )
+
+            if not campo_valido:
+                detalles.append(
+                    self.tr("Select a numeric elevation field.")
+                )
+
+            lista_detalles = "".join(
+                f"<li>{detalle}</li>"
+                for detalle in detalles
+            )
+
+            estado = (
+                "<div style='color:red;'>"
+                + self.tr("<p><b>Status: Not compatible with SecGeol.</b></p>")
+                + self.tr("<p>Check the following characteristics:</p>")
+                + f"<ul>{lista_detalles}</ul>"
+                + "</div>"
+            )
+
+        crs_info = (
+            f"{crs.authid()} - {crs.description()}"
+            if crs.authid()
+            else crs.description()
+        )
+
+        self.mostrar_ayuda(
+            self.tr("Contour lines"),
+            f"""
+            <p>
+                <b>{self.tr("Selected layer:")}</b> {curvas_layer.name()}<br>
+                <b>CRS:</b> {crs_info}<br>
+                <b>{self.tr("Elevation field:")}</b> {campo_elev or "-"}
+            </p>
+
+            {estado}
+            """
+        )
 
     # Conecta la función de la sección      
     
@@ -1384,12 +1575,19 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
     # Información DEM
     def actualizar_info_dem(self):
+
+        print(
+                "INFO DEM - fuente activa:",
+                getattr(self, "_fuente_elevacion_activa", None)
+            )
+         
+        
+
         dem_layer = self.MapLayerDEM.currentLayer()
 
         if dem_layer is None:
-            self.frame.setEnabled(False)
-            self.frame_2.setEnabled(False)
-            
+            self.actualizar_estado_fuente_elevacion()
+
             self.mostrar_ayuda(
             self.tr("Digital elevation model"),
             self.tr(
@@ -1466,8 +1664,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             banda_valida = una_banda and (band_type in tipos_validos)
 
             if es_metrico and banda_valida:
-                self.frame.setEnabled(True)
-                self.frame_2.setEnabled(True)
+                self.actualizar_estado_fuente_elevacion()
                 estado = (
                     "<p style='color:green;'>"
                     + self.tr("<b>Status: Compatible with SecGeol.</b>")
@@ -1475,8 +1672,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 )
 
             else:
-                self.frame.setEnabled(False)
-                self.frame_2.setEnabled(False)
+                self.actualizar_estado_fuente_elevacion()
 
                 detalles = []
 
@@ -1529,8 +1725,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         )
 
         except Exception as e:
-            self.frame.setEnabled(False)
-            self.frame_2.setEnabled(False)
+            self.actualizar_estado_fuente_elevacion()
             self.mostrar_ayuda(
                 self.tr("Error reading DEM"),
                 f"""
