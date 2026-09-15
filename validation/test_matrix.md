@@ -19,7 +19,15 @@ detectadas y verificar las correcciones implementadas antes de su publicación.
 | P4 | Fuente incompatible | Bloqueada | Bloqueada | Bloqueadas | — | — | — | No satisfactoria |
 | R4 | DEM compatible ITRF08 / UTM 14N | Habilitada | Habilitada | Habilitadas | ✅ | — | — | Satisfactoria |
 | P5 | ITRF08 / UTM 14N | CRS asignado incorrectamente; queda fuera del DEM | - | - | ✅ | — | — | Satisfactoria |
-| R6 | EPSG:6369 / UTM 14N | EPSG:6369 / UTM 14N | - | - | ✅ | — | — | Satisfactoria |
+
+| Caso | Contour | Campo | Sección | Geología | Estructuras | Fase 1 | Fase 2 | Fase 3 | Resultado |
+|---|---|---|---|---|---|---|---|---|---|
+| Pc1 | Sin CRS | Bloqueado | Bloqueada | Bloqueada | Bloqueada | — | — | — | ✅ Satisfactoria |
+| Pc2 | EPSG:6369 | Válido | Sin CRS | EPSG:32614 | EPSG:32614 | ✅ | — | — | ✅ Satisfactoria |
+| Pc3 | Curvas EPSG:6369 | Campo válido | Sin CRS | Sin CRS | EPSG:32614 | ✅ | —| — | ⚠ comportamiento por corregir
+|Pc4|	Curvas EPSG:6369|	Campo válido|	EPSG:32614|	EPSG:32612|	EPSG:32614|	✅|	—	|—|	✅ Satisfactoria
+|Pc5|	Curvas EPSG:6369	|Campo válido|	EPSG:32614|	EPSG:32614	|Sin CRS|	✅|	—	|—|	✅ Satisfactoria
+|Pc6|	Curvas EPSG:6369|	Campo válido|	EPSG:32614	|EPSG:32614|	EPSG:32612|	✅|	—	|—	|✅ Satisfactoria
 
 
 ---

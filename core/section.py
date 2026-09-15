@@ -335,7 +335,13 @@ class SectionManager:
     
     # Intersectar con  geologia
     
-    def intersectar_seccion_con_geologia(self, section_geom, section_crs, geo_layer, campo_geo=None):
+    def intersectar_seccion_con_geologia(
+        self,
+        section_geom,
+        section_crs,
+        geo_layer,
+        campo_geo=None
+    ):
         segmentos = []
         id_lito = 1
 
@@ -345,13 +351,16 @@ class SectionManager:
         if geo_layer is None:
             return segmentos
 
+        geo_crs = geo_layer.crs()
         transform = None
-        if geo_layer.crs() != section_crs:
+
+        if geo_crs.isValid() and geo_crs != section_crs:
             transform = QgsCoordinateTransform(
-                geo_layer.crs(),
+                geo_crs,
                 section_crs,
                 QgsProject.instance()
             )
+
 
         for feat_geo in geo_layer.getFeatures():
             geom_geo = QgsGeometry(feat_geo.geometry())
@@ -427,10 +436,9 @@ class SectionManager:
         # Reproyección si es necesario
         
         est_crs = est_layer.crs()
-
         transform = None
 
-        if est_crs != section_crs:
+        if est_crs.isValid() and est_crs != section_crs:
             transform = QgsCoordinateTransform(
                 est_crs,
                 section_crs,

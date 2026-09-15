@@ -837,27 +837,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             )
 
             elif obj == self.MapLayerGeo:
-                self.mostrar_ayuda(
-                self.tr("Geology layer"),
-                self.tr(
-                    """
-                    <p>
-                        Select a vector <b>polygon layer</b> containing
-                        the geological units crossed by the section line.
-                    </p>
-
-                    <p>
-                        SecGeol will intersect this layer with the section
-                        to represent the distribution of geological units
-                        on the topographic profile.
-                    </p>
-
-                    <p>
-                        This input is <b>optional</b>.
-                    </p>
-                    """
-                )
-            )
+                self.actualizar_info_geologia()
 
             elif obj == self.FieldClasGeo:
                 self.mostrar_ayuda(
@@ -879,21 +859,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             
 
             elif obj == self.MapLayerEst:
-                self.mostrar_ayuda(
-                self.tr("Structural layer"),
-                self.tr(
-                    """
-                    <p>
-                        Select a vector line layer containing the geological
-                        structures that intersect the section.
-                    </p>
-
-                    <p>
-                        This input is <b>optional</b>.
-                    </p>
-                    """
-                )
-            )
+                self.actualizar_info_estructuras()
 
             elif obj == self.doubleSpinBox:
                 self.mostrar_ayuda(
@@ -2062,9 +2028,24 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         else:
             self.actualizar_info_geologia()
 
+
+    # Función para obtener el CRS de la fuente de elevación
+    def obtener_crs_fuente_elevacion(self):
+        dem_layer = self.MapLayerDEM.currentLayer()
+        curvas_layer = self.MapLayerCurvas.currentLayer()
+
+        if dem_layer is not None and dem_layer.crs().isValid():
+            return dem_layer.crs()
+
+        if curvas_layer is not None and curvas_layer.crs().isValid():
+            return curvas_layer.crs()
+
+        return None
+
+
     # Si existe Geologia
-    
     def actualizar_info_geologia(self):
+        
         geo_layer = self.MapLayerGeo.currentLayer()
 
         if geo_layer is None:
@@ -2107,6 +2088,40 @@ class SecGeolDialog(QDialog, FORM_CLASS):
 
         crs_info = f"{crs_authid} - {crs_name}" if crs_authid else crs_name
 
+        source_crs = self.obtener_crs_fuente_elevacion()
+
+        if not crs.isValid():
+            crs_info = self.tr("Not defined")
+
+            mensaje_crs = self.tr(
+                """
+                <p>
+                    <b>Warning:</b> The geology layer does not have a defined CRS.
+                    SecGeol will assume that its coordinates use the CRS of the
+                    elevation source.
+                </p>
+                """
+            )
+
+        elif (
+            source_crs is not None
+            and source_crs.isValid()
+            and crs != source_crs
+        ):
+            mensaje_crs = self.tr(
+                """
+                <p>
+                    <b>Note:</b> The geology layer uses a different CRS from the
+                    elevation source. SecGeol will reproject it to the elevation
+                    source CRS.
+                </p>
+                """
+            )
+
+        else:
+            mensaje_crs = ""
+
+
         if total_campos == 0:
             mensaje_campo = self.tr(
                 """
@@ -2140,6 +2155,7 @@ class SecGeolDialog(QDialog, FORM_CLASS):
                 <b>CRS:</b> {crs_info}<br>
                 <b>{self.tr("Available fields:")}</b> {total_campos}
             </p>
+            {mensaje_crs}
 
             {mensaje_campo}
             """
@@ -2216,31 +2232,67 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         crs_name = crs.description()
 
         crs_info = f"{crs_authid} - {crs_name}" if crs_authid else crs_name
+
+        source_crs = self.obtener_crs_fuente_elevacion()
+
+        if not crs.isValid():
+            crs_info = self.tr("Not defined")
+
+            mensaje_crs = self.tr(
+                """
+                <p>
+                    <b>Warning:</b> The structural layer does not have a defined CRS.
+                    SecGeol will assume that its coordinates use the CRS of the
+                    elevation source.
+                </p>
+                """
+            )
+
+        elif (
+            source_crs is not None
+            and source_crs.isValid()
+            and crs != source_crs
+        ):
+            mensaje_crs = self.tr(
+                """
+                <p>
+                    <b>Note:</b> The structural layer uses a different CRS from the
+                    elevation source. SecGeol will reproject it to the elevation
+                    source CRS.
+                </p>
+                """
+            )
+
+        else:
+            mensaje_crs = ""
+
         total_campos = len(est_layer.fields())
 
         self.mostrar_ayuda(
-            self.tr("Structural layer"),
-            f"""
-            <p>
-                <b>{self.tr("Selected layer:")}</b> {est_layer.name()}<br>
-                <b>CRS:</b> {crs_info}<br>
-            </p>
+        self.tr("Structural layer"),
+        f"""
+        <p>
+            <b>{self.tr("Selected layer:")}</b> {est_layer.name()}<br>
+            <b>CRS:</b> {crs_info}<br>
+        </p>
 
-            <p>
-                {self.tr(
-                    "SecGeol displays only the available <b>numeric fields</b> "
-                    "for selecting the <b>dip</b> and <b>dip azimuth</b>."
-                )}
-            </p>
+        {mensaje_crs}
 
-            <p>
-                {self.tr(
-                    "These values will be used to represent the structures "
-                    "that intersect the section line on the profile."
-                )}
-            </p>
-            """
-        )
+        <p>
+            {self.tr(
+                "SecGeol displays only the available <b>numeric fields</b> "
+                "for selecting the <b>dip</b> and <b>dip azimuth</b>."
+            )}
+        </p>
+
+        <p>
+            {self.tr(
+                "These values will be used to represent the structures "
+                "that intersect the section line on the profile."
+            )}
+        </p>
+        """
+    )
 
     #---------------------Tab 2---------------------------------------    
     def ejecutar_lineas_a_poligonos(self):

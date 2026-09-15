@@ -638,9 +638,11 @@ class SecGeol:
                     section_geom = QgsGeometry(f.geometry())
                     break
 
+                work_crs = section_work_layer.crs()
+
                 segmentos_geo = self.dlg.section_manager.intersectar_seccion_con_geologia(
                     section_geom=section_geom,
-                    section_crs=section_work_layer.crs(),
+                    section_crs=work_crs,
                     geo_layer=geo_layer,
                     campo_geo=campo_geo
                 )
@@ -671,13 +673,17 @@ class SecGeol:
                     section_geom = QgsGeometry(f.geometry())
                     break
 
+                work_crs = section_work_layer.crs()
+
+               
+
                 estructuras = self.dlg.section_manager.intersectar_seccion_con_estructuras(
                     section_geom=section_geom,
-                    section_crs=section_work_layer.crs(),
+                    section_crs=work_crs,
                     est_layer=est_layer,
                     campo_dip=campo_dip,
                     campo_azimuth=campo_azimuth
-                )   
+                )  
 
         
             
