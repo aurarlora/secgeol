@@ -9,11 +9,12 @@ qgisMaximumVersion=4.99
 author=Aura Ramos Lora
 email=ralaua@gmail.com
 
-homepage=https://github.com/aurarlora/secgeol
+homepage=https://aurarlora.github.io/secgeol/
 repository=https://github.com/aurarlora/secgeol
 tracker=https://github.com/aurarlora/secgeol/issues
 
 license=GPL-3.0
+tags=geology,cross section,geological profile,3D,DEM,structural geology
 
 category=Vector
 icon=icon.png
