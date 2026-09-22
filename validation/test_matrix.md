@@ -28,6 +28,9 @@ detectadas y verificar las correcciones implementadas antes de su publicación.
 |Pc4|	Curvas EPSG:6369|	Campo válido|	EPSG:32614|	EPSG:32612|	EPSG:32614|	✅|	—	|—|	✅ Satisfactoria
 |Pc5|	Curvas EPSG:6369	|Campo válido|	EPSG:32614|	EPSG:32614	|Sin CRS|	✅|	—	|—|	✅ Satisfactoria
 |Pc6|	Curvas EPSG:6369|	Campo válido|	EPSG:32614	|EPSG:32614|	EPSG:32612|	✅|	—	|—	|✅ Satisfactoria
+|Pc7 | Curvas EPSG:6369 | Campo válido | EPSG:32614 | EPSG:32614 | `ECHADO` / `AZIMUTH_P`, incluye valores `-1` | ✅ | — | — | ✅ Satisfactoria |
+| Pc8 | Curvas EPSG:6369 | Campo válido | EPSG:32614 | EPSG:32614 | EPSG:32614 | ✅ | ✅ Editada | ✅ | ✅ Satisfactoria |
+
 
 
 ---
@@ -207,24 +210,97 @@ También debe añadirse este requisito a la ayuda HTML.
 
 La línea de sección no tiene un CRS definido y no se encuentra completamente contenida dentro del DEM. Se corrigió el comportamiento para que SecGeol no continúe con el procesamiento y muestre una advertencia al usuario indicando que la sección debe estar completamente contenida dentro de la fuente de elevación.
 
-** Resultado: ✅ SATISFACTORIA**
+**Resultado: ✅ SATISFACTORIA**
 
 ## Prueba 4 — Fuente de elevación incompatible
 
 Cuando el DEM seleccionado no es compatible con SecGeol, la herramienta deshabilita los controles correspondientes a Sección y Geología/Estructuras, impidiendo continuar con el flujo de trabajo. Al seleccionar un DEM compatible, los controles se habilitan automáticamente.
 
-** Resultado: ✅ SATISFACTORIA**
+**Resultado: ✅ SATISFACTORIA**
 
 
 ## Prueba 5 — CRS asignado incorrectamente; queda fuera del DEM 
 
 En este caso, la sección tiene un CRS válido, pero asignado incorrectamente, por lo que no queda contenida dentro del DEM. SecGeol valida la ubicación espacial de la sección y detiene el proceso, indicando que la sección no se encuentra completamente contenida dentro de la fuente de elevación.
 
-** Resultado: ✅ SATISFACTORIA**
+**Resultado: ✅ SATISFACTORIA**
 
 ## Prueba 6 — Curvas de nivel compatibles como fuente de elevación
 
 Se seleccionó una capa de curvas de nivel con CRS EPSG:6369 - Mexico ITRF2008 / UTM zone 14N y un campo numérico de elevación. SecGeol habilitó correctamente los controles de Sección y Geología/Estructuras y generó el perfil topográfico.
 La línea de sección de trabajo y la capa _guía conservaron el CRS de la fuente de elevación.
 
-** Resultado: ✅ SATISFACTORIA**
+**Resultado: ✅ SATISFACTORIA**
+
+## Prueba 7 — Validación de valores estructurales
+
+**Objetivo:** verificar que SecGeol procese únicamente estructuras con valores
+válidos de echado y azimut de buzamiento, descartando registros con valores
+inválidos sin interrumpir la generación del perfil.
+
+**Configuración de prueba:**
+
+- Fuente de elevación: curvas de nivel.
+- CRS de trabajo: EPSG:6369.
+- Campo de echado: `ECHADO`.
+- Campo de azimut de buzamiento: `AZIMUTH_P`.
+- La capa estructural contiene valores válidos y registros con `-1`,
+  utilizado en los datos de prueba como valor sin información.
+
+**Criterios de validación:**
+
+- Los campos seleccionables para echado y azimut deben ser de tipo numérico.
+- Los valores de echado deben cumplir `0 < echado <= 90`.
+- Los valores de azimut de buzamiento deben cumplir `0 <= azimut <= 360`.
+- Los valores fuera de estos intervalos deben ser ignorados.
+- Los registros con valor `-1` deben ser ignorados.
+- Los registros inválidos no deben interrumpir la ejecución.
+- Las estructuras con valores válidos deben representarse correctamente
+  en el perfil.
+
+**Resultado observado:**
+
+SecGeol restringe la selección de los campos de echado y azimut a campos
+numéricos. Durante el procesamiento, los registros con valores fuera de los
+intervalos admitidos son descartados y no se incorporan al perfil. Los
+registros con valores válidos se procesan normalmente.
+
+La presencia de valores `-1` en los datos de prueba no interrumpió la
+ejecución.
+
+**Resultado general:**
+
+**✅ SATISFACTORIA**
+
+## Prueba 8 — Reconstrucción 3D de polígonos editados
+
+![Reconstrucción 3D de polígonos editados](/validation/img/seccion_mod.png)
+
+**Objetivo:** verificar que SecGeol conserve las modificaciones realizadas
+manualmente sobre los polígonos geológicos generados en la fase 2 al realizar
+su reconstrucción espacial en la fase 3.
+
+**Procedimiento:**
+
+1. Se generó el perfil topográfico mediante la fase 1.
+2. Se generaron los polígonos geológicos mediante la fase 2.
+3. Se modificó manualmente la geometría de la parte inferior de varios
+   polígonos del perfil.
+4. Se guardaron las modificaciones realizadas sobre la capa.
+5. La capa de polígonos editada se utilizó como entrada para la fase 3.
+6. Se verificó visualmente la geometría obtenida en la reconstrucción 3D.
+
+**Resultado observado:**
+
+La fase 3 procesó correctamente la capa modificada y conservó las ediciones
+realizadas sobre los polígonos geológicos. Las modificaciones introducidas
+manualmente en la parte inferior de los polígonos fueron reproducidas en la
+reconstrucción 3D sin errores.
+
+Esto confirma que la reconstrucción 3D utiliza la geometría existente en la
+capa de entrada y permite incorporar modificaciones realizadas por el usuario
+después de la generación automática de los polígonos en la fase 2.
+
+**Resultado general:**
+
+**✅ SATISFACTORIA**

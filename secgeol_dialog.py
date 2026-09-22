@@ -1842,16 +1842,16 @@ class SecGeolDialog(QDialog, FORM_CLASS):
             return
 
         if feat is None:
-           self.mostrar_ayuda(
-                "Sección no válida",
-                """
+            self.mostrar_ayuda(
+                self.tr("Invalid section"),
+                self.tr("""
                 <p>
                     <span style="color:red; font-size:18px;">⚠</span>
-                    <b> No fue posible recuperar la sección seleccionada.</b>
+                    <b>The selected section could not be retrieved.</b>
                 </p>
-                """
-           )
-           return
+                """)
+            )
+            return
 
         geom = feat.geometry()
         if geom is None or geom.isEmpty():
