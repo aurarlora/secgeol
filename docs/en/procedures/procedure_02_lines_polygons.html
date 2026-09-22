@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="../../assets/css/secgeol-manual.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SecGeol — User Manual</title>
+</head>
+
+<body>
+
+
+    <!-- Contenedor general: izquierda + derecha -->
+    <div class="manual-layout">
+
+        <!-- =========================
+             COLUMNA IZQUIERDA
+             ========================= -->
+        <aside class="sidebar">
+
+            <a href="../index.html" class="nav-item">
+                <span class="nav-icon">⌂</span>
+                <span>Inicio</span>
+            </a>
+
+             <a href="procedure_01_vector_section.html"
+               class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>1. Section to profile</span>
+            </a>
+
+            <a href="procedure_02_lines_polygons.html"
+               class="nav-item active">
+                <span class="nav-icon">▤</span>
+                <span>2. Lines to polygons</span>
+            </a>
+
+            <a href="procedure_03_3d_reconstruction.html"
+               class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>3. 3D reconstruction</span>
+            </a>
+
+        </aside>
+
+
+        <!-- =========================
+             COLUMNA DERECHA
+             ========================= -->
+        <div class="manual-right">
+
+            <!-- Encabezado -->
+            <div class="topbar">
+
+                <div class="manual-title">
+                     SecGeol · User Manual
+                </div>
+
+                <div class="languages">
+                    <a href="../../es/procedimientos/procedimiento_02_lineas_poligonos.html"
+                       title="Español">🇲🇽</a>
+
+                    <a href="procedure_02_lines_polygons.html"
+                       class="active"
+                       title="English">🇬🇧</a>
+                </div>
+
+            </div>
+
+
+
+<!-- Contenido -->
+<main class="manual-container">
+
+    <h1>
+        Phase 2. General view of the tool
+    </h1>
+
+    <div class="image-placeholder">
+        <img
+            src="../images/tab2_gral.png"
+            class="interface-image"
+            alt="General view of the second phase of SecGeol"
+        >
+    </div>
+
+
+    <h2>Selection of the interpreted profile</h2>
+
+     <p>
+        In this phase, the profile obtained during the
+        <strong>Phase 1</strong> is used, once the geological interpretation
+        has been completed using lines.
+    </p>
+
+
+    <div class="image-placeholder">
+        <img
+            src="../images/tab2_uno.png"
+            class="interface-image"
+            alt="Selection of the interpreted profile using lines"
+        >
+    </div>
+
+   
+
+    <p>
+        SecGeol utilizes these lines to delimit the different interpreted units
+        and generate a new profile composed of polygons.
+    </p>
+
+
+    <h3>Reference axes</h3>
+
+    <div class="image-placeholder">
+        <img
+            src="../images/tab2_dos.png"
+            class="interface-image"
+            alt="Selection of the interpreted profile using lines"
+        >
+    </div>
+
+
+    <p>
+        Optionally, the generation of an additional reference axes layer
+        can be enabled. This output is identified by the suffix
+        <strong>_ejes</strong>.
+    </p>
+
+    <p>
+        The layer contains divisions expressed in metres along the profile
+        axes and can be used as a reference for interpreting the distances
+        and elevations represented in the section.
+    </p>
+
+
+    <h2>Output geological polygon profile</h2>
+
+    <p>
+        As a result of the process, SecGeol generates a geological profile
+        composed of polygons representing the units defined during the
+        interpretation.
+    </p>
+
+    <p>
+        Polygons that are in contact with the topographic profile retain
+        the geological information incorporated during
+        <strong>Phase 1</strong>, when available.
+    </p>
+
+    <p>
+        Polygons interpreted at depth that are not in contact with the
+        topographic profile are generated without an assigned geological unit.
+        These values can be added later by editing the attribute table of
+        the resulting layer.
+    </p>
+
+
+    <div class="objective">
+        <strong>Important.</strong>
+        Before continuing to <strong>Phase 3. 3D reconstruction</strong>,
+        review the geological polygon profile. You can complete or modify the
+        attributes of the interpreted units and, when necessary, adjust the
+        polygon geometry according to the geological interpretation.
+        SecGeol will use the geometry present in the input layer to perform
+        the 3D reconstruction, so any modifications made will be preserved
+        in the result.
+    </div>
+ 
+
+
+    <footer>
+        <span>SecGeol · User Manual</span>
+        <span>2</span>
+    </footer>
+
+    </main>
+
+    </div> <!-- manual-right -->
+
+    </div> <!-- manual-layout -->
+
+<script>
+function toggleMenu() {
+    document.getElementById("manualMenu").classList.toggle("open");
+}
+</script>
+
+</body>
+
+</html>

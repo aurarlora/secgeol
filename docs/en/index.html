@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SecGeol | User Manual</title>
+
+    <link rel="stylesheet" href="../assets/css/secgeol-manual.css">
+
+</head>
+
+<body>
+
+    <!-- Contenedor general: izquierda + derecha -->
+    <div class="manual-layout">
+
+        <!-- =========================
+             COLUMNA IZQUIERDA
+             ========================= -->
+        <aside class="sidebar">
+
+            <a href="index.html" class="nav-item active">
+                <span class="nav-icon">⌂</span>
+                <span>Home</span>
+            </a>
+
+            <a href="procedures/procedure_01_vector_section.html"
+               class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>1. Section to profile</span>
+            </a>
+
+            <a href="procedures/procedure_02_lines_polygons.html"
+               class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>2. Lines to polygons</span>
+            </a>
+
+            <a href="procedures/procedure_03_3d_reconstruction.html"
+               class="nav-item">
+                <span class="nav-icon">▤</span>
+                <span>3. 3D reconstruction</span>
+            </a>
+
+        </aside>
+
+
+        <!-- =========================
+             COLUMNA DERECHA
+             ========================= -->
+        <div class="manual-right">
+
+            <!-- Encabezado -->
+            <div class="topbar">
+
+                <div class="manual-title">
+                    SecGeol · User Manual
+                </div>
+
+                <div class="languages">
+                    <a href="../es/index.html"
+                       title="Español">🇲🇽</a>
+
+                    <a href="../en/index.html"
+                       class="active"
+                       title="English">🇬🇧</a>
+                </div>
+
+            </div>
+
+
+            <!-- Contenido -->
+            <main class="manual-container">
+
+                <!-- =========================================================
+                     ENCABEZADO
+                     ========================================================= -->
+
+                <header class="manual-header">
+
+            <img
+                src="images/secgeol_icon.png"
+                alt="SecGeol"
+            >
+
+            <h1 class="secgeol-highlight">SecGeol</h1>
+
+
+            <p class="manual-subtitle">
+                A tool for building and interpreting geological sections
+            </p>
+
+             <p class="manual-author">
+                Developed by <strong>Aura Ramos Lora</strong>
+            </p>
+
+        </header>
+
+
+
+
+        <!-- =========================================================
+            INTRODUCCIÓN
+            ========================================================= -->
+
+        <section class="intro">
+
+            <h2>Before you begin</h2>
+
+
+            <p>
+                <strong>SecGeol</strong> is a QGIS tool that provides a workflow
+                for building and modeling a subsurface geological interpretation
+                from a section.
+            </p>
+
+            <p>
+                Before using the tool, it is recommended to first prepare a
+                <strong>geological section project</strong>. This means loading into
+                the map view the input data that may be used to construct the profile
+                and correctly defining the project coordinate reference system.
+            </p>
+
+            <div class="note">
+                <strong class="secgeol-highlight">Coordinate system.</strong>
+                SecGeol works with projected coordinates and metric units.
+                Therefore, using a UTM projection appropriate for the study area is
+                recommended. Geographic coordinates expressed in degrees are not
+                suitable for directly working with the distances required to construct
+                the profile.
+            </div>
+
+        </section>
+
+
+        <!-- =========================================================
+            FLUJO GENERAL DE SECGEOl
+            ========================================================= -->
+
+        <section class="workflow">
+
+            <h2>Workflow</h2>
+
+            <p>
+                SecGeol is organized into <strong>three consecutive phases</strong>,
+                which take the workflow from the original spatial data to a
+                three-dimensional representation of the geological interpretation.
+            </p>
+
+
+            <!-- FASE 1 -->
+
+            <article class="workflow-step">
+
+                <h3>
+                    <span class="step-number">1.</span>
+                    From section to profile
+                </h3>
+
+                <img
+                    src="images/sec_tab1.png"
+                    alt="First phase of SecGeol: from section to profile"
+                >
+
+                <p>
+                    In the first phase, the required input data are provided to generate
+                    a <strong>topographic profile</strong> along a section line.
+                </p>
+
+                <p>
+                    This profile provides the framework for interpreting the subsurface geology,
+                    using the available information and your geological knowledge to
+                    sketch contacts, units, and structures.
+                </p>
+
+
+
+
+            </article>
+
+
+            <!-- FASE 2 -->
+
+            <article class="workflow-step">
+
+                <h3>
+                    <span class="step-number">2.</span>
+                    From interpreted lines to polygons
+                </h3>
+
+                <img
+                    src="images/sec_tab2.png"
+                    alt="Second phase of SecGeol: converting lines to polygons"
+                >
+
+                <p>
+                    Once the subsurface interpretation has been completed, the drawing
+                    is still essentially a set of lines. In this second phase,
+                    SecGeol transforms those lines into
+                    <strong>closed geological polygons</strong>.
+                </p>
+
+                <p>
+                    The polygons can be identified using names, codes, or attributes
+                    corresponding to the different interpreted units or lithologies.
+                </p>
+
+                <p>
+                    This phase produces the <strong>geological polygon profile</strong>,
+                    which can be used directly in maps, figures, and reports.
+                    The output also preserves a metric reference for the profile,
+                    with the corresponding distances along its horizontal axis.
+                </p>
+
+
+
+            </article>
+
+
+            <!-- FASE 3 -->
+
+            <article class="workflow-step">
+
+                <h3>
+                    <span class="step-number">3.</span>
+                    3D profile reconstruction
+                </h3>
+
+                <img
+                    src="images/sec_tab3.png"
+                    alt="Third phase of SecGeol: 3D geological reconstruction"
+                >
+
+                <p>
+                    In the third phase, the polygons interpreted in the profile can be
+                    reconstructed in their <strong>real-world spatial position</strong>,
+                    using the section generated during the first phase as a reference.
+                </p>
+
+                <p>
+                    The result is a geological profile with three-dimensional geometry,
+                    which can be visualized and analyzed in environments compatible
+                    with 3D data, such as the QGIS 3D view, ArcScene, or Leapfrog.
+                </p>
+
+
+
+            </article>
+
+        </section>
+
+        <div class="note">
+            <strong>Output files.</strong>
+            In all three phases, SecGeol generates vector layers that can be saved
+            in Shapefile (*.shp) or GeoPackage (*.gpkg) format.
+        </div>
+
+
+        <!-- =========================================================
+            INSUMOS
+            ========================================================= -->
+
+        <section class="requirements">
+
+            <h2>Input data for preparing the section project</h2>
+
+            <p>
+                Before you begin, load into QGIS the data you will use to construct
+                the section. Not all inputs are required, but having more information
+                available provides greater context for the interpretation.
+            </p>
+
+
+            <article class="input-item">
+
+                <h3>1. Digital Elevation Model or contour lines</h3>
+
+                <p>
+                    SecGeol requires an elevation source to construct the topographic
+                    profile. This can be a <strong>Digital Elevation Model (DEM)</strong>
+                    or a <strong>contour line layer</strong>.
+                </p>
+
+                <p>
+                    The elevation source is one of the main inputs of the project and
+                    must use a projected coordinate system with metric units. It is
+                    recommended to use its coordinate reference system as the basis
+                    for maintaining spatial consistency among the data used throughout
+                    the procedure.
+                </p>
+
+            </article>
+
+
+            <article class="input-item">
+
+                <h3>2. Section line</h3>
+
+                <p>
+                    This is the line that defines the path along which the profile will
+                    be constructed.
+                </p>
+
+                <p>
+                    An existing section from a line layer can be used, or the section
+                    can be drawn directly over the study area. Its path determines
+                    which terrain, geology, and structural information will be
+                    projected onto the profile.
+                </p>
+
+            </article>
+
+
+            <article class="input-item">
+
+                <h3>3. Geology</h3>
+
+                <p>
+                    If a <strong>geological polygon layer</strong> is available, it can
+                    be incorporated into the project.
+                </p>
+
+                <p>
+                    When the section line crosses different geological units, their
+                    contacts can be transferred to the profile and used as a
+                    reference for the subsurface interpretation.
+                </p>
+
+            </article>
+
+
+            <article class="input-item">
+
+                <h3>4. Structures</h3>
+
+                <p>
+                    A <strong>geological structures layer</strong> can also be incorporated.
+                </p>
+
+                <p>
+                    Structures that intersect the section line can be projected onto
+                    the resulting profile and used to support the geological
+                    interpretation.
+                </p>
+
+            </article>
+
+        </section>
+
+    <footer>
+        <span>SecGeol · User Manual</span>
+        <span>i</span>
+    </footer>
+
+    </main>
+</div>
+ <!-- FIN manual-right -->
+
+</div>
+    <!-- FIN manual-layout -->
+
+<script>
+function toggleMenu() {
+    document.getElementById("manualMenu").classList.toggle("open");
+}
+</script>
+</body>
+</html>
