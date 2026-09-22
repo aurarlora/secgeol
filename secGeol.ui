@@ -566,7 +566,7 @@ azimuth</string>
      <x>445</x>
      <y>9</y>
      <width>241</width>
-     <height>481</height>
+     <height>451</height>
     </rect>
    </property>
    <widget class="QTextBrowser" name="textBrowserHelp">
@@ -575,10 +575,39 @@ azimuth</string>
       <x>10</x>
       <y>10</y>
       <width>221</width>
-      <height>461</height>
+      <height>441</height>
      </rect>
     </property>
    </widget>
+   <widget class="QWidget" name="widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>451</y>
+      <width>201</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="labelManual">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>470</y>
+     <width>211</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LayoutDirection::LeftToRight</enum>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
   </widget>
  </widget>
  <customwidgets>

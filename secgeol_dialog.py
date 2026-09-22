@@ -156,6 +156,13 @@ class SecGeolDialog(QDialog, FORM_CLASS):
         self.iface = iface
         self.setupUi(self)
 
+        manual_text = self.tr("User manual")
+
+        self.labelManual.setText(
+            f'<a href="https://aurarlora.github.io/secgeol/">{manual_text}</a>'
+        )
+        self.labelManual.setOpenExternalLinks(True)
+
         # Estado inicial de controles opcionales
         self.FieldElevCurvas.setEnabled(False)   
         self.MapLayerGeo.setEnabled(False)
