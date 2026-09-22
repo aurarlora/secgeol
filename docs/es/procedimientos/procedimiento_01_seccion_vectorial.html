@@ -105,6 +105,9 @@
     La fuente de elevación define el sistema de referencia espacial de trabajo.
     Si las capas vectoriales utilizadas en esta fase tienen un CRS diferente,
     SecGeol las reproyectará al CRS de la fuente de elevación.
+    Si una capa de geología o estructuras no tiene un CRS definido,
+    SecGeol asumirá que sus coordenadas corresponden al CRS de la fuente
+    de elevación.
 </div>
 
 <p>
@@ -339,16 +342,17 @@
 
         <li>
             <strong>Echado:</strong>
-            indica el ángulo de inclinación de la estructura y debe
-            encontrarse en el intervalo de 0° a 90°.
+            indica el ángulo de inclinación de la estructura y debe ser
+            mayor que 0° y menor o igual que 90°.
         </li>
     </ul>
 
     <div class="objective">
         <strong>Nota.</strong>
-        Las estructuras cuyos valores de azimut de buzamiento o echado no se
-        encuentren dentro de los intervalos admitidos no serán representadas
-        en el perfil.
+        Los campos de azimut de buzamiento y echado deben ser numéricos.
+        Las estructuras cuyos valores no se encuentren dentro de los intervalos
+        admitidos no serán representadas en el perfil. Estos registros serán
+        ignorados sin interrumpir la generación del perfil.
     </div>
 
 
@@ -358,7 +362,9 @@
         SecGeol genera un perfil topográfico que constituye la base para realizar
         la interpretación geológica. Este perfil representa la elevación sobre
         el eje Y y la distancia recorrida a lo largo de la línea de sección
-        sobre el eje X.
+        sobre el eje X. Por lo tanto, sus coordenadas X/Y corresponden al sistema
+        local del perfil y no representan la ubicación geográfica de la sección
+        en planta.
     </p>
 
     <p>
