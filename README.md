@@ -26,7 +26,7 @@ SecGeol provides three complementary workflows:
 - Provides optional profile axes and configurable profile dimensions.
 
 <p align="center">
-  <img src="docs/en/images/sec_tab1.png" alt="SecGeol - Section to profile" width="750">
+  <img src="docs/en/images/sec_tab1.png" alt="SecGeol - Section to profile" width="500">
 </p>
 
 ### 2. Lines to polygons
@@ -36,7 +36,7 @@ SecGeol provides three complementary workflows:
 - Supports optional reference axes for profile interpretation.
 
 <p align="center">
-  <img src="docs/en/images/sec_tab2.png" alt="SecGeol - Lines to polygons" width="750">
+  <img src="docs/en/images/sec_tab2.png" alt="SecGeol - Lines to polygons" width="500">
 </p>
 
 ### 3. 2D profile to 3D
@@ -45,7 +45,7 @@ SecGeol provides three complementary workflows:
 - Uses the guide section generated during the first workflow to preserve the spatial reference of the original section.
 
 <p align="center">
-  <img src="docs/en/images/sec_tab3.png" alt="SecGeol - 2D profile to 3D" width="750">
+  <img src="docs/en/images/sec_tab3.png" alt="SecGeol - 2D profile to 3D" width="500">
 </p>
 
 

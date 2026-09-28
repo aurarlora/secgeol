@@ -27,7 +27,7 @@ SecGeol proporciona tres flujos de trabajo complementarios:
 - Permite crear ejes opcionales y configurar las dimensiones del perfil.
 
 <p align="center">
-  <img src="docs/es/images/sec_tab1.png" alt="SecGeol - Sección a perfil" width="750">
+  <img src="docs/es/images/sec_tab1.png" alt="SecGeol - Sección a perfil" width="500">
 </p>
 
 ### 2. Líneas a polígonos
@@ -37,7 +37,7 @@ SecGeol proporciona tres flujos de trabajo complementarios:
 - Permite utilizar ejes de referencia opcionales para la interpretación del perfil.
 
 <p align="center">
-  <img src="docs/es/images/sec_tab2.png" alt="SecGeol - Líneas a polígonos" width="750">
+  <img src="docs/es/images/sec_tab2.png" alt="SecGeol - Líneas a polígonos" width="500">
 </p>
 
 ### 3. Perfil 2D a 3D
@@ -46,7 +46,7 @@ SecGeol proporciona tres flujos de trabajo complementarios:
 - Utiliza la sección guía generada durante el primer flujo de trabajo para conservar la referencia espacial de la sección original.
 
 <p align="center">
-  <img src="docs/es/images/sec_tab3.png" alt="SecGeol - Perfil 2D a 3D" width="750">
+  <img src="docs/es/images/sec_tab3.png" alt="SecGeol - Perfil 2D a 3D" width="500">
 </p>
 
 
