@@ -1,3 +1,7 @@
+<p align="right">
+  <strong>English</strong> | <a href="README_ES.md">Español</a>
+</p>
+
 # SecGeol
 
 **SecGeol** is a QGIS plugin for generating geological cross sections and reconstructing interpreted profiles in 3D.
@@ -32,7 +36,7 @@ SecGeol provides three complementary workflows:
 
 A complete bilingual user manual (English and Spanish) is available at:
 
-https://aurarlora.github.io/secgeol/
+https://aurarlora.github.io/secgeol/en/
 
 The manual includes workflow descriptions, input requirements, step-by-step procedures, and guidance for the three main SecGeol tools.
 
