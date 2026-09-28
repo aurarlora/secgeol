@@ -379,38 +379,51 @@ class SectionManager:
             if inter is None or inter.isEmpty():
                 continue
 
-            # Calcular distancia inicial y final sobre la sección
-            vertices = list(inter.vertices())
 
-            if len(vertices) < 2:
-                continue
+            # Obtener cada tramo continuo de la intersección por separado
+            if inter.isMultipart():
+                partes = [
+                    QgsGeometry.fromPolylineXY(parte)
+                    for parte in inter.asMultiPolyline()
+                    if len(parte) >= 2
+                ]
+            else:
+                partes = [inter]
 
-            p_ini = vertices[0]
-            p_fin = vertices[-1]
-
-            dist_ini = section_geom.lineLocatePoint(QgsGeometry.fromPointXY(QgsPointXY(p_ini)))
-            dist_fin = section_geom.lineLocatePoint(QgsGeometry.fromPointXY(QgsPointXY(p_fin)))
-
-            if dist_ini > dist_fin:
-                dist_ini, dist_fin = dist_fin, dist_ini
-
-                        
             valor_campo = None
 
             if campo_geo and campo_geo in feat_geo.fields().names():
                 valor_campo = feat_geo[campo_geo]
-            else:
-                valor_campo = None
 
-            segmentos.append({
-                "id_lito": id_lito,
-                "campo_geo": campo_geo,
-                "valor_geo": valor_campo,
-                "dist_ini": dist_ini,
-                "dist_fin": dist_fin,
-                "geometry": inter
-            })
-            id_lito += 1
+            for parte in partes:
+                vertices = list(parte.vertices())
+
+                if len(vertices) < 2:
+                    continue
+
+                p_ini = vertices[0]
+                p_fin = vertices[-1]
+
+                dist_ini = section_geom.lineLocatePoint(
+                    QgsGeometry.fromPointXY(QgsPointXY(p_ini))
+                )
+                dist_fin = section_geom.lineLocatePoint(
+                    QgsGeometry.fromPointXY(QgsPointXY(p_fin))
+                )
+
+                if dist_ini > dist_fin:
+                    dist_ini, dist_fin = dist_fin, dist_ini
+
+                segmentos.append({
+                    "id_lito": id_lito,
+                    "campo_geo": campo_geo,
+                    "valor_geo": valor_campo,
+                    "dist_ini": dist_ini,
+                    "dist_fin": dist_fin,
+                    "geometry": parte
+                })
+
+                id_lito += 1
 
         return segmentos
     
