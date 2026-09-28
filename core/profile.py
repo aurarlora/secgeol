@@ -877,15 +877,26 @@ class ProfileManager:
             id_lito_poly = 0
             valor_geo_poly = None
 
+            mejor_geo = None
+            mayor_longitud = 0.0
+
             for geo in geologia_lineas:
                 geom_geo = geo["geometry"]
 
-                if poly_geom.buffer(0.01, 1).intersects(geom_geo):
+                contacto = poly_geom.intersection(geom_geo)
 
-                    id_lito_poly = geo["id_lito"]
-                    valor_geo_poly = geo["valor_geo"]
+                if contacto is None or contacto.isEmpty():
+                    continue
 
-                    break
+                longitud = contacto.length()
+
+                if longitud > mayor_longitud:
+                    mayor_longitud = longitud
+                    mejor_geo = geo
+
+            if mejor_geo is not None:
+                id_lito_poly = mejor_geo["id_lito"]
+                valor_geo_poly = mejor_geo["valor_geo"]
 
 
             feat.setAttributes([
