@@ -2,7 +2,12 @@
   <a href="README.md">English</a> | <strong>Español</strong>
 </p>
 
-# SecGeol
+
+<p align="center">
+  <img src="icon.png" alt="SecGeol" width="140">
+</p>
+
+<h1 align="center">SecGeol</h1>
 
 **SecGeol** es un complemento de QGIS para generar secciones geológicas y reconstruir perfiles interpretados en 3D.
 
@@ -21,16 +26,29 @@ SecGeol proporciona tres flujos de trabajo complementarios:
 - Genera una sección guía espacial para la posterior reconstrucción 3D.
 - Permite crear ejes opcionales y configurar las dimensiones del perfil.
 
+<p align="center">
+  <img src="docs/es/images/sec_tab1.png" alt="SecGeol - Sección a perfil" width="750">
+</p>
+
 ### 2. Líneas a polígonos
 
 - Convierte las líneas interpretadas del perfil geológico en polígonos cerrados.
 - Asigna información geológica a los polígonos generados.
 - Permite utilizar ejes de referencia opcionales para la interpretación del perfil.
 
+<p align="center">
+  <img src="docs/es/images/sec_tab2.png" alt="SecGeol - Líneas a polígonos" width="750">
+</p>
+
 ### 3. Perfil 2D a 3D
 
 - Reconstruye los polígonos geológicos interpretados desde las coordenadas locales del perfil hacia coordenadas 3D del mundo real.
 - Utiliza la sección guía generada durante el primer flujo de trabajo para conservar la referencia espacial de la sección original.
+
+<p align="center">
+  <img src="docs/es/images/sec_tab3.png" alt="SecGeol - Perfil 2D a 3D" width="750">
+</p>
+
 
 ## Documentación
 
